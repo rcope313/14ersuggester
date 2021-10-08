@@ -1,0 +1,6 @@
+micronaut:
+  application:
+    name: hikesuggester
+
+14ers.com:
+  url: https://www.14ers.com/php14ers/14ers.php
