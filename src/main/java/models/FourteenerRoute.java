@@ -6,16 +6,19 @@ public class FourteenerRoute {
     private String mountainName;
     private String routeName;
     private boolean snowRouteOnly;
+    private boolean standardRoute;
     private Map<Integer, String> grade;
+    private String trailhead;
+    private int startElevation;
+    private int summitElevation;
+    private int totalGain;
+    private double routeLength;
     private String exposure;
     private String rockfallPotential;
     private String routeFinding;
     private String commitment;
-    private String trailhead;
-    private int startElevation;
-    private int summitElevation;
-    private Map<Integer, String> totalGain;
-    private Map<Double, String> routeLength;
+    private boolean multipleRoutes = false;
+
 
     public FourteenerRoute() {}
 
@@ -45,6 +48,18 @@ public class FourteenerRoute {
 
     public void setSnowRouteOnly(boolean snowRouteOnly) {
         this.snowRouteOnly = snowRouteOnly;
+    }
+
+    public boolean isStandardRoute() { return standardRoute; }
+
+    public void setStandardRoute(boolean standardRoute) { this.standardRoute = standardRoute; }
+
+    public boolean isMultipleRoutes() {
+        return multipleRoutes;
+    }
+
+    public void setMultipleRoutes(boolean multipleRoutes) {
+        this.multipleRoutes = multipleRoutes;
     }
 
     public void setGrade(Map<Integer, String> grade) {
@@ -107,19 +122,19 @@ public class FourteenerRoute {
         this.summitElevation = summitElevation;
     }
 
-    public Map<Integer, String> getTotalGain() {
+    public int getTotalGain() {
         return totalGain;
     }
 
-    public void setTotalGain(Map<Integer, String> totalGain) {
+    public void setTotalGain(int totalGain) {
         this.totalGain = totalGain;
     }
 
-    public Map<Double, String> getRouteLength() {
+    public double getRouteLength() {
         return routeLength;
     }
 
-    public void setRouteLength(Map<Double, String> routeLength) {
+    public void setRouteLength(double routeLength) {
         this.routeLength = routeLength;
     }
 }

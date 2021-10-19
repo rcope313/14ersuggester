@@ -6,11 +6,10 @@ import java.util.Map;
 public class Utils {
 
     public static void main (String[] args) {
-        System.out.print(convertRouteLengthIntoMap("Navajo Lake: 9.5 miles RT"));
-        System.out.print(convertRouteLengthIntoMap("9.5 miles starting at Paris Mill"));
+        System.out.print(convertRouteLengthIntoInteger("Navajo Lake: 9.5 miles RT"));
+        System.out.print(convertRouteLengthIntoInteger("9.5 miles starting at Paris Mill"));
 
     }
-
 
     public static Map<Integer,String> convertGradeIntoMap(String gradeString) {
         Map<Integer,String> gradeMap = new HashMap<>();
@@ -81,56 +80,33 @@ public class Utils {
 
     }
 
-    public static Map<Integer,String> convertTotalGainIntoMap (String str) {
+    public static int convertTotalGainIntoInteger(String str) {
 
-        Map<Integer,String> totalGainMap = new HashMap<>();
-
-        for (String s : str.split("\n")) {
-            String[] stringArray = s.split(" feet");
-
-            if (stringArray.length == 1) {
-                totalGainMap.put(convertElevationIntoInteger(stringArray[0]), "");
-            } else {
-                totalGainMap.put(convertElevationIntoInteger(stringArray[0]), stringArray[1].substring(1));
-            }
-
+        if (str.split("\n").length > 1) {
+            return 0;
         }
 
-        return totalGainMap;
-
+        String[] stringArray = str.split(" feet");
+        return convertElevationIntoInteger(stringArray[0]);
 
     }
 
-    public static Map<Double,String> convertRouteLengthIntoMap (String str) {
+    public static double convertRouteLengthIntoInteger(String str) {
 
-        Map<Double, String> totalRouteLengthMap = new HashMap<>();
+        if (str.split("\n").length > 1) {
+            return 0;
+        }
+        String[] stringArrayMiles = str.split(" miles");
+        String[] stringArrayMi = str.split(" mi");
 
-        for (String s : str.split("\n")) {
-            String[] stringArrayMiles = s.split(" miles");
-            String[] stringArrayMi = s.split(" mi");
-
-            if (stringArrayMiles.length == 1) {
-                if (stringArrayMi[1].length() == 3) {
-                    totalRouteLengthMap.put(Double.valueOf(stringArrayMiles[0]), "");
-                } else {
-                    totalRouteLengthMap.put(Double.valueOf(stringArrayMi[0]), stringArrayMi[1].substring(1));
-                }
-            } else {
-                totalRouteLengthMap.put(Double.valueOf(stringArrayMiles[0]), stringArrayMiles[1].substring(1));
-            }
-
+        if (stringArrayMiles.length == 1) {
+            return Double.valueOf(stringArrayMi[0]);
+        } else {
+            return Double.valueOf(stringArrayMiles[0]);
         }
 
-        return totalRouteLengthMap;
-
     }
 
-    public static double convertMileageStringToInteger(String mileage) {
-        String excludeMiles = mileage.substring(0, mileage.length() - 6);
-        return Double.valueOf(excludeMiles);
-
-
-    }
 
 
 

@@ -59,31 +59,65 @@ public class WebScraper {
         final HtmlDivision div = (HtmlDivision) page.getByXPath("//div[@class='BldHdr2 bold1']").get(0);
         final HtmlTable table = (HtmlTable) page.getByXPath("//table[@class='routestatsbox']").get(0);
 
+        scrapeTotalGain(url, table, resultFourteenerRoute);
+        scrapeRouteLength(url, table, resultFourteenerRoute);
         scrapeMountainAndRouteName(div, resultFourteenerRoute);
-        try {
-            scrapeTotalGain(table, resultFourteenerRoute);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            LOG.warn("Unable to scrape {}", url);
-            return null;
-        }
-        try {
-            scrapeRouteLength(table, resultFourteenerRoute);
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            LOG.warn("Unable to scrape {}", url);
-            return null;
-        }
         scrapeSnowRouteOnly(div, resultFourteenerRoute);
+        scrapeStandardRoute(div, resultFourteenerRoute);
+        scrapeGrade(table, resultFourteenerRoute);
         scrapeTrailhead(table, resultFourteenerRoute);
         scrapeStartElevation(table, resultFourteenerRoute);
         scrapeSummitElevation(table, resultFourteenerRoute);
-        scrapeGrade(table, resultFourteenerRoute);
         scrapeExposure(table, resultFourteenerRoute);
         scrapeRockfallPotential(table, resultFourteenerRoute);
         scrapeRouteFinding(table, resultFourteenerRoute);
         scrapeCommitment(table, resultFourteenerRoute);
+        scrapeFourWheelDriveAccessible(div, resultFourteenerRoute);
+
 
         return resultFourteenerRoute;
 
+
+    }
+
+    private static FourteenerRoute scrapeTotalGain(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
+
+        try {
+            final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(5);
+            int totalGain = Utils.convertTotalGainIntoInteger(cell.asNormalizedText());
+            if (totalGain == 0) {
+                resultFourteenerRoute.setMultipleRoutes(true);
+            } else {
+                resultFourteenerRoute.setTotalGain(totalGain);
+            }
+
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            LOG.warn("Unable to scrape {}", url);
+            return null;
+        }
+
+        return resultFourteenerRoute;
+
+
+    }
+
+    private static FourteenerRoute scrapeRouteLength (String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
+        try {
+            final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(6);
+            double routeLength = Utils.convertRouteLengthIntoInteger(cell.asNormalizedText());
+            if (routeLength == 0) {
+                resultFourteenerRoute.setMultipleRoutes(true);
+            } else {
+                resultFourteenerRoute.setRouteLength(routeLength);
+            }
+
+            resultFourteenerRoute.setRouteLength(Utils.convertRouteLengthIntoInteger(cell.asNormalizedText()));
+        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
+            LOG.warn("Unable to scrape {}", url);
+            return null;
+        }
+
+        return resultFourteenerRoute;
     }
 
     private static void scrapeMountainAndRouteName (HtmlDivision div, FourteenerRoute currentFourteenerRoute) {
@@ -114,10 +148,19 @@ public class WebScraper {
         currentFourteenerRoute.setSnowRouteOnly((boolean) div.getByXPath("//@src='/images/icon_snowcover_large.png'").get(0));
     }
 
-    private static void scrapeTotalGain(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(5);
-        currentFourteenerRoute.setTotalGain(Utils.convertTotalGainIntoMap(cell.asNormalizedText()));
+    private static void scrapeStandardRoute(HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
+    }
 
+    private static void scrapeGrade (HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(0);
+        String gradeString = cell.asNormalizedText().split("\n")[0];
+        currentFourteenerRoute.setGrade(Utils.convertGradeIntoMap(gradeString));
+
+    }
+
+    private static void scrapeTrailhead(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(2);
+        currentFourteenerRoute.setTrailhead(cell.asNormalizedText());
     }
 
     private static void scrapeSummitElevation(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
@@ -128,25 +171,6 @@ public class WebScraper {
     private static void scrapeStartElevation(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(3);
         currentFourteenerRoute.setStartElevation(Utils.convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
-
-    }
-
-    private static void scrapeTrailhead(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(2);
-        currentFourteenerRoute.setTrailhead(cell.asNormalizedText());
-    }
-
-    private static void scrapeRouteLength(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(6);
-        currentFourteenerRoute.setRouteLength(Utils.convertRouteLengthIntoMap(cell.asNormalizedText()));
-
-
-    }
-
-    private static void scrapeGrade (HtmlTable table, FourteenerRoute currentFourteenerRoute) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(0);
-        String gradeString = cell.asNormalizedText().split("\n")[0];
-        currentFourteenerRoute.setGrade(Utils.convertGradeIntoMap(gradeString));
 
     }
 
@@ -171,6 +195,9 @@ public class WebScraper {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(1);
         String commitment = cell.asNormalizedText().split(": ")[4].split("\n")[0];
         currentFourteenerRoute.setCommitment(commitment.substring(0, commitment.length() - 2));
+    }
+
+    private static void scrapeFourWheelDriveAccessible(HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
     }
 
 
