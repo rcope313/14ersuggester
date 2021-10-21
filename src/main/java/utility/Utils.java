@@ -1,5 +1,7 @@
 package utility;
 
+import models.GradeQuality;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,22 +13,25 @@ public class Utils {
 
     }
 
-    public static Map<Integer,String> convertGradeIntoMap(String gradeString) {
-        Map<Integer,String> gradeMap = new HashMap<>();
+    public static GradeQuality convertStringIntoGradeQuality(String gradeString) {
+        GradeQuality resultGradeQuality = new GradeQuality();
 
         if (gradeString.split(" ")[1].equals("Difficult")) {
-            gradeMap.put(Integer.valueOf(gradeString.split(" ")[3]), "Difficult");
+            resultGradeQuality.setGrade(Integer.valueOf(gradeString.split(" ")[3]));
+            resultGradeQuality.setQuality("Difficult");
 
         }
 
         else if (gradeString.split(" ")[1].equals("Easy")) {
-            gradeMap.put(Integer.valueOf(gradeString.split(" ")[3]), "Easy");
+            resultGradeQuality.setGrade(Integer.valueOf(gradeString.split(" ")[3]));
+            resultGradeQuality.setQuality("Easy");
 
         } else {
-            gradeMap.put(Integer.valueOf(gradeString.split(" ")[2]), "");
+            resultGradeQuality.setGrade(Integer.valueOf(gradeString.split(" ")[2]));
+            resultGradeQuality.setQuality("");
         }
 
-        return gradeMap;
+        return resultGradeQuality;
     }
 
     public static int convertStartAndSummitElevationStringToInteger(String elevation) {

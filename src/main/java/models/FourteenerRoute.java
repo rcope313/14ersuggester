@@ -7,7 +7,7 @@ public class FourteenerRoute {
     private String routeName;
     private boolean snowRouteOnly;
     private boolean standardRoute;
-    private Map<Integer, String> grade;
+    private GradeQuality gradeQuality;
     private String trailhead;
     private int startElevation;
     private int summitElevation;
@@ -18,6 +18,7 @@ public class FourteenerRoute {
     private String routeFinding;
     private String commitment;
     private boolean multipleRoutes = false;
+    private String url;
 
 
     public FourteenerRoute() {}
@@ -38,10 +39,6 @@ public class FourteenerRoute {
         this.routeName = routeName;
     }
 
-    public Map<Integer, String> getGrade() {
-        return grade;
-    }
-
     public boolean isSnowRouteOnly() {
         return snowRouteOnly;
     }
@@ -50,52 +47,20 @@ public class FourteenerRoute {
         this.snowRouteOnly = snowRouteOnly;
     }
 
-    public boolean isStandardRoute() { return standardRoute; }
-
-    public void setStandardRoute(boolean standardRoute) { this.standardRoute = standardRoute; }
-
-    public boolean isMultipleRoutes() {
-        return multipleRoutes;
+    public boolean isStandardRoute() {
+        return standardRoute;
     }
 
-    public void setMultipleRoutes(boolean multipleRoutes) {
-        this.multipleRoutes = multipleRoutes;
+    public void setStandardRoute(boolean standardRoute) {
+        this.standardRoute = standardRoute;
     }
 
-    public void setGrade(Map<Integer, String> grade) {
-        this.grade = grade;
+    public GradeQuality getGradeQuality() {
+        return gradeQuality;
     }
 
-    public String getExposure() {
-        return exposure;
-    }
-
-    public void setExposure(String exposure) {
-        this.exposure = exposure;
-    }
-
-    public String getRockfallPotential() {
-        return rockfallPotential;
-    }
-
-    public void setRockfallPotential(String rockfallPotential) {
-        this.rockfallPotential = rockfallPotential;
-    }
-
-    public String getRouteFinding() {
-        return routeFinding;
-    }
-
-    public void setRouteFinding(String routeFinding) {
-        this.routeFinding = routeFinding;
-    }
-
-    public String getCommitment() {
-        return commitment;
-    }
-
-    public void setCommitment(String commitment) {
-        this.commitment = commitment;
+    public void setGradeQuality(GradeQuality gradeQuality) {
+        this.gradeQuality = gradeQuality;
     }
 
     public String getTrailhead() {
@@ -136,5 +101,53 @@ public class FourteenerRoute {
 
     public void setRouteLength(double routeLength) {
         this.routeLength = routeLength;
+    }
+
+    public String getExposure() {
+        return exposure;
+    }
+
+    public void setExposure(String exposure) {
+        this.exposure = exposure;
+    }
+
+    public String getRockfallPotential() {
+        return rockfallPotential;
+    }
+
+    public void setRockfallPotential(String rockfallPotential) {
+        this.rockfallPotential = rockfallPotential;
+    }
+
+    public String getRouteFinding() {
+        return routeFinding;
+    }
+
+    public void setRouteFinding(String routeFinding) {
+        this.routeFinding = routeFinding;
+    }
+
+    public String getCommitment() {
+        return commitment;
+    }
+
+    public void setCommitment(String commitment) {
+        this.commitment = commitment;
+    }
+
+    public boolean isMultipleRoutes() {
+        return multipleRoutes;
+    }
+
+    public void setMultipleRoutes(boolean multipleRoutes) {
+        this.multipleRoutes = multipleRoutes;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 }

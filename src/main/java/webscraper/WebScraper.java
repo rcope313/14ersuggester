@@ -19,7 +19,6 @@ public class WebScraper {
 
     public static void main (String[] args) throws Exception {
 
-
         ArrayList<FourteenerRoute> fourteenerRoutes = new WebScraper().createListOfFourteeners();
         System.out.print(fourteenerRoutes);
 
@@ -46,7 +45,7 @@ public class WebScraper {
 
     }
 
-    private FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen) throws IOException {
+    public FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen) throws IOException {
 
         if (routesSeen.contains(url)) {
             LOG.info("Found duplicate entry of {}; did not log duplicate", url);
@@ -64,7 +63,7 @@ public class WebScraper {
         scrapeMountainAndRouteName(div, resultFourteenerRoute);
         scrapeSnowRouteOnly(div, resultFourteenerRoute);
         scrapeStandardRoute(div, resultFourteenerRoute);
-        scrapeGrade(table, resultFourteenerRoute);
+        scrapeGradeQuality(table, resultFourteenerRoute);
         scrapeTrailhead(table, resultFourteenerRoute);
         scrapeStartElevation(table, resultFourteenerRoute);
         scrapeSummitElevation(table, resultFourteenerRoute);
@@ -72,7 +71,7 @@ public class WebScraper {
         scrapeRockfallPotential(table, resultFourteenerRoute);
         scrapeRouteFinding(table, resultFourteenerRoute);
         scrapeCommitment(table, resultFourteenerRoute);
-        scrapeFourWheelDriveAccessible(div, resultFourteenerRoute);
+        resultFourteenerRoute.setUrl("https://www.14ers.com" + url);
 
 
         return resultFourteenerRoute;
@@ -120,23 +119,23 @@ public class WebScraper {
         return resultFourteenerRoute;
     }
 
-    private static void scrapeMountainAndRouteName (HtmlDivision div, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeMountainAndRouteName (HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
 
         String[] divArray0 = div.asNormalizedText().split("\n ");
         String[] divArray1 = div.asNormalizedText().split("\n");
 
         if (divArray1.length == 1 && divArray0.length == 1) {
-            currentFourteenerRoute.setMountainName("Approach Route");
-            currentFourteenerRoute.setRouteName(divArray1[0]);
+            resultFourteenerRoute.setMountainName("Approach Route");
+            resultFourteenerRoute.setRouteName(divArray1[0]);
         }
 
         else if (divArray0.length == 1 && divArray1.length == 2) {
-            currentFourteenerRoute.setMountainName(divArray1[0]);
-            currentFourteenerRoute.setRouteName(divArray1[1]);
+            resultFourteenerRoute.setMountainName(divArray1[0]);
+            resultFourteenerRoute.setRouteName(divArray1[1]);
 
         } else {
-            currentFourteenerRoute.setMountainName(divArray0[0]);
-            currentFourteenerRoute.setRouteName(divArray0[1]);
+            resultFourteenerRoute.setMountainName(divArray0[0]);
+            resultFourteenerRoute.setRouteName(divArray0[1]);
 
         }
 
@@ -144,61 +143,62 @@ public class WebScraper {
 
     }
 
-    private static void scrapeSnowRouteOnly (HtmlDivision div, FourteenerRoute currentFourteenerRoute) {
-        currentFourteenerRoute.setSnowRouteOnly((boolean) div.getByXPath("//@src='/images/icon_snowcover_large.png'").get(0));
+    private static void scrapeSnowRouteOnly (HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
+        resultFourteenerRoute.setSnowRouteOnly((boolean) div.getByXPath("//@src='/images/icon_snowcover_large.png'").get(0));
+        
     }
 
     private static void scrapeStandardRoute(HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
+        resultFourteenerRoute.setStandardRoute((boolean) div.getByXPath("//@alt='standard'").get(0));
+
     }
 
-    private static void scrapeGrade (HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeGradeQuality(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(0);
         String gradeString = cell.asNormalizedText().split("\n")[0];
-        currentFourteenerRoute.setGrade(Utils.convertGradeIntoMap(gradeString));
+        resultFourteenerRoute.setGradeQuality(Utils.convertStringIntoGradeQuality(gradeString));
 
     }
 
-    private static void scrapeTrailhead(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeTrailhead(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(2);
-        currentFourteenerRoute.setTrailhead(cell.asNormalizedText());
+        resultFourteenerRoute.setTrailhead(cell.asNormalizedText());
     }
 
-    private static void scrapeSummitElevation(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeSummitElevation(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(4);
-        currentFourteenerRoute.setSummitElevation(Utils.convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
+        resultFourteenerRoute.setSummitElevation(Utils.convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
     }
 
-    private static void scrapeStartElevation(HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeStartElevation(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(3);
-        currentFourteenerRoute.setStartElevation(Utils.convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
+        resultFourteenerRoute.setStartElevation(Utils.convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
 
     }
 
-    private static void scrapeExposure (HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeExposure (HtmlTable table, FourteenerRoute resultFourteenerRoute) {
          final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(1);
-        currentFourteenerRoute.setExposure(cell.asNormalizedText().split(": ")[1].split("\n")[0]);
+        resultFourteenerRoute.setExposure(cell.asNormalizedText().split(": ")[1].split("\n")[0]);
     }
 
-    private static void scrapeRockfallPotential (HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeRockfallPotential (HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(1);
         String rockfallPotential = cell.asNormalizedText().split(": ")[2].split("\n")[0];
-        currentFourteenerRoute.setRockfallPotential(rockfallPotential.substring(0, rockfallPotential.length() - 2));
+        resultFourteenerRoute.setRockfallPotential(rockfallPotential.substring(0, rockfallPotential.length() - 2));
     }
 
-    private static void scrapeRouteFinding (HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeRouteFinding (HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(1);
         String routeFinding = cell.asNormalizedText().split(": ")[3].split("\n")[0];
-        currentFourteenerRoute.setRouteFinding(routeFinding.substring(0, routeFinding.length() - 2));
+        resultFourteenerRoute.setRouteFinding(routeFinding.substring(0, routeFinding.length() - 2));
     }
 
-    private static void scrapeCommitment (HtmlTable table, FourteenerRoute currentFourteenerRoute) {
+    private static void scrapeCommitment (HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(1);
         String commitment = cell.asNormalizedText().split(": ")[4].split("\n")[0];
-        currentFourteenerRoute.setCommitment(commitment.substring(0, commitment.length() - 2));
+        resultFourteenerRoute.setCommitment(commitment.substring(0, commitment.length() - 2));
     }
 
-    private static void scrapeFourWheelDriveAccessible(HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
-    }
 
 
 
