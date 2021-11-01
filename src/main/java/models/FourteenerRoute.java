@@ -1,6 +1,5 @@
 package models;
 
-import java.util.Map;
 
 public class FourteenerRoute {
     private String mountainName;

@@ -2,32 +2,23 @@ package utility;
 
 import models.GradeQuality;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class Utils {
-
-    public static void main (String[] args) {
-        System.out.print(convertRouteLengthIntoInteger("Navajo Lake: 9.5 miles RT"));
-        System.out.print(convertRouteLengthIntoInteger("9.5 miles starting at Paris Mill"));
-
-    }
 
     public static GradeQuality convertStringIntoGradeQuality(String gradeString) {
         GradeQuality resultGradeQuality = new GradeQuality();
 
         if (gradeString.split(" ")[1].equals("Difficult")) {
-            resultGradeQuality.setGrade(Integer.valueOf(gradeString.split(" ")[3]));
+            resultGradeQuality.setGrade(Integer.parseInt(gradeString.split(" ")[3]));
             resultGradeQuality.setQuality("Difficult");
 
         }
 
         else if (gradeString.split(" ")[1].equals("Easy")) {
-            resultGradeQuality.setGrade(Integer.valueOf(gradeString.split(" ")[3]));
+            resultGradeQuality.setGrade(Integer.parseInt(gradeString.split(" ")[3]));
             resultGradeQuality.setQuality("Easy");
 
         } else {
-            resultGradeQuality.setGrade(Integer.valueOf(gradeString.split(" ")[2]));
+            resultGradeQuality.setGrade(Integer.parseInt(gradeString.split(" ")[2]));
             resultGradeQuality.setQuality("");
         }
 
@@ -105,16 +96,20 @@ public class Utils {
         String[] stringArrayMi = str.split(" mi");
 
         if (stringArrayMiles.length == 1) {
-            return Double.valueOf(stringArrayMi[0]);
+            return Double.parseDouble(stringArrayMi[0]);
         } else {
-            return Double.valueOf(stringArrayMiles[0]);
+            return Double.parseDouble(stringArrayMiles[0]);
         }
 
     }
 
+    public static String convertCoordinatesPhraseToCoordinates (String coordinatesPhrase) {
+        return coordinatesPhrase.split(": ")[1];
+    }
 
-
-
+    public static int convertRoadDifficultyPhraseToInt(String roadDifficultyPhrase) {
+        return Integer.parseInt(roadDifficultyPhrase.split(" ")[1]);
+    }
 
 }
 

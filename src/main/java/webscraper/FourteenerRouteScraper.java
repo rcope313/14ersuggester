@@ -11,20 +11,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class WebScraper {
+public class FourteenerRouteScraper {
 
     final private static WebClient webClient = new WebClient();
-    final private static Logger LOG = LoggerFactory.getLogger(WebScraper.class);
+    final private static Logger LOG = LoggerFactory.getLogger(FourteenerRouteScraper.class);
 
 
     public static void main (String[] args) throws Exception {
 
-        ArrayList<FourteenerRoute> fourteenerRoutes = new WebScraper().createListOfFourteeners();
+        ArrayList<FourteenerRoute> fourteenerRoutes = new FourteenerRouteScraper().createListOfFourteenerRoutes();
         System.out.print(fourteenerRoutes);
 
     }
 
-    public ArrayList<FourteenerRoute> createListOfFourteeners () throws Exception {
+    public ArrayList<FourteenerRoute> createListOfFourteenerRoutes() throws Exception {
 
         HashSet<String> urlsSeen = new HashSet<>();
 
@@ -45,7 +45,7 @@ public class WebScraper {
 
     }
 
-    public FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen) throws IOException {
+    private FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen) throws IOException {
 
         if (routesSeen.contains(url)) {
             LOG.info("Found duplicate entry of {}; did not log duplicate", url);

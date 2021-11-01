@@ -1,7 +1,7 @@
 package mysql;
 
 import models.FourteenerRoute;
-import webscraper.WebScraper;
+import webscraper.FourteenerRouteScraper;
 
 import java.io.IOException;
 import java.sql.*;
@@ -14,32 +14,42 @@ public class GetConnection {
     static final String TABLE_NAME = "fourteener_route";
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException, IOException {
+
+    }
+
+    public void addFourteenerToDatabase (FourteenerRoute route) {
         try(Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
             Statement stmt = conn.createStatement())  {
 
-            FourteenerRoute elb1 = new WebScraper().scrapeFourteener("/route.php?route=elbe1", new HashSet<>());
-
-
-
-            // Execute a query
             System.out.println("Inserting records into the table" + TABLE_NAME +  "...");
-            String sql = "INSERT INTO " + TABLE_NAME + "VALUES (" +
-                    elb1.getRouteName() + ", " +
-                    elb1.getMountainName() + ", " +
-                    elb1.isSnowRouteOnly() + ", " +
-                    elb1.isSnowRouteOnly() + ", " +
+            String sql = "INSERT INTO " + TABLE_NAME + " VALUES (" +
+                    "'" + route.getRouteName() + "', " +
+                    "'" + route.getMountainName() + "', " +
+                    route.isSnowRouteOnly() + ", " +
+                    route.isStandardRoute() + ", " +
+                    route.getGradeQuality().getGrade() + ", " +
+                    "'" + route.getGradeQuality().getQuality() + "', " +
+                    "'" + route.getTrailhead() + "', " +
+                    route.getStartElevation() + ", " +
+                    route.getSummitElevation() + ", " +
+                    route.getTotalGain() + ", " +
+                    "'" + route.getRouteLength() + "', " +
+                    "'" + route.getExposure() + "', " +
+                    "'" + route.getRockfallPotential() + "', " +
+                    "'" + route.getRouteFinding() + "', " +
+                    "'" + route.getCommitment() + "', " +
+                    route.isMultipleRoutes() + ", " +
+                    "'" + route.getUrl() + "'" +
+                    ")";
 
-
-            ")";
             stmt.executeUpdate(sql);
+            System.out.println("Created record in given database...");
 
-
-            stmt.executeUpdate(sql);
-            System.out.println("Created table in given database...");
-        } catch (SQLException | IOException e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
     }
 }
 
