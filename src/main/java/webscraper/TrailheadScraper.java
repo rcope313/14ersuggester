@@ -2,6 +2,7 @@ package webscraper;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
+
 import models.Trailhead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,23 +28,31 @@ public class TrailheadScraper {
 
         ArrayList<String> trailHeadUrls = getTrailHeadUrlList();
         ArrayList<Trailhead> trailHeads = new ArrayList<>();
+        int idx = 0;
 
-        trailHeadUrls.forEach((url) -> {
+
+        for (String url : trailHeadUrls) {
+
             try {
-                trailHeads.add(new TrailheadScraper().scrapeTrailhead(url));
+                trailHeads.add(new TrailheadScraper().scrapeTrailhead(url, idx));
+                idx ++;
             } catch (Exception e) {
                 LOG.warn("Unable to scrape " + url);
             }
-        });
+
+        }
+
 
         return trailHeads;
 
     }
 
-    private Trailhead scrapeTrailhead (String url) throws Exception {
+    private Trailhead scrapeTrailhead (String url, int idx) throws Exception {
 
         Trailhead resultTrailhead = new Trailhead();
+        resultTrailhead.setPrimaryKey(idx);
         resultTrailhead.setUrl(url);
+
 
         final HtmlPage page = webClient.getPage("https://www.14ers.com/php14ers" + url);
         final HtmlDivision pageTitle = (HtmlDivision) page.getByXPath("//div[@class='pagetitle']").get(0);

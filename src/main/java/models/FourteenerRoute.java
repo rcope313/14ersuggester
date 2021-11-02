@@ -2,6 +2,7 @@ package models;
 
 
 public class FourteenerRoute {
+    private int primaryKey;
     private String mountainName;
     private String routeName;
     private boolean snowRouteOnly;
@@ -21,6 +22,14 @@ public class FourteenerRoute {
 
 
     public FourteenerRoute() {}
+
+    public int getPrimaryKey() {
+        return primaryKey;
+    }
+
+    public void setPrimaryKey(int primaryKey) {
+        this.primaryKey = primaryKey;
+    }
 
     public String getMountainName() {
         return mountainName;
