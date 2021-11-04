@@ -18,17 +18,17 @@ public class TrailheadScraper {
 
     public static void main (String[] args) throws Exception {
 
-        var trailheads = new TrailheadScraper().createListOfTrailheads();
+        var trailheads = createListOfTrailheads();
         System.out.print(trailheads);
 
 
     }
 
-    public ArrayList<Trailhead> createListOfTrailheads() throws Exception {
+    public static ArrayList<Trailhead> createListOfTrailheads() throws Exception {
 
         ArrayList<String> trailHeadUrls = getTrailHeadUrlList();
         ArrayList<Trailhead> trailHeads = new ArrayList<>();
-        int idx = 0;
+        int idx = 1;
 
 
         for (String url : trailHeadUrls) {
@@ -47,10 +47,10 @@ public class TrailheadScraper {
 
     }
 
-    private Trailhead scrapeTrailhead (String url, int idx) throws Exception {
+    private static Trailhead scrapeTrailhead (String url, int idx) throws Exception {
 
         Trailhead resultTrailhead = new Trailhead();
-        resultTrailhead.setPrimaryKey(idx);
+        resultTrailhead.setTrailheadId(idx);
         resultTrailhead.setUrl(url);
 
 
@@ -62,7 +62,7 @@ public class TrailheadScraper {
         return scrapeTrailhead(statsBoxAsNormalizedText, pageTitle, resultTrailhead);
     }
 
-    private Trailhead scrapeTrailhead(String[] statsBoxAsNormalizedText, HtmlDivision pageTitle, Trailhead resultTrailhead) {
+    private static Trailhead scrapeTrailhead(String[] statsBoxAsNormalizedText, HtmlDivision pageTitle, Trailhead resultTrailhead) {
 
         scrapeName(pageTitle.asNormalizedText(), resultTrailhead);
 
@@ -85,27 +85,27 @@ public class TrailheadScraper {
 
     }
 
-    private void scrapeName(String str, Trailhead resultTrailhead) {
+    private static void scrapeName(String str, Trailhead resultTrailhead) {
         resultTrailhead.setName(str);
     }
 
-    private void scrapeCoordinates(String str, Trailhead resultTrailhead) {
+    private static void scrapeCoordinates(String str, Trailhead resultTrailhead) {
         resultTrailhead.setCoordinates(Utils.convertCoordinatesPhraseToCoordinates(str));
     }
 
-    private void scrapeRoadDifficulty(String str, Trailhead resultTrailhead) {
+    private static void scrapeRoadDifficulty(String str, Trailhead resultTrailhead) {
         resultTrailhead.setRoadDifficulty(Utils.convertRoadDifficultyPhraseToInt(str));
     }
 
-    private void scrapeRoadDescription(String str, Trailhead resultTrailhead) {
+    private static void scrapeRoadDescription(String str, Trailhead resultTrailhead) {
         resultTrailhead.setRoadDescription(str);
     }
 
-    private void scrapeWinterAccess(String str, Trailhead resultTrailhead) {
+    private static void scrapeWinterAccess(String str, Trailhead resultTrailhead) {
         resultTrailhead.setWinterAccess(str);
     }
 
-    private ArrayList<String> getTrailHeadUrlList() throws Exception {
+    private static ArrayList<String> getTrailHeadUrlList() throws Exception {
 
         ArrayList<String> trailHeadUrls = new ArrayList<>();
 

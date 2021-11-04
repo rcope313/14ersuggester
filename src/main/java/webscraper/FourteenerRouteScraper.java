@@ -24,36 +24,44 @@ public class FourteenerRouteScraper {
 
     }
 
-    public ArrayList<FourteenerRoute> createListOfFourteenerRoutes() throws Exception {
+    public static ArrayList<FourteenerRoute> createListOfFourteenerRoutes() throws Exception {
 
         HashSet<String> urlsSeen = new HashSet<>();
 
         ArrayList<FourteenerRoute> fourteenerRouteArrayList = new ArrayList<>();
         List<List<String>> allRouteIds = getAllRouteIdLists();
+        int idx = 0;
 
         for (List<String> routeIdsByMountain : allRouteIds) {
-            routeIdsByMountain.forEach((routeId) -> {
+
+            for (String routeId : routeIdsByMountain) {
                 try {
-                    fourteenerRouteArrayList.add(scrapeFourteener(routeId.substring(1), urlsSeen));
-                } catch (IOException e) {
+                    fourteenerRouteArrayList.add(scrapeFourteener(routeId.substring(1), urlsSeen, idx));
+                    idx++;
+                } catch (Exception e) {
                     e.printStackTrace();
+                    LOG.warn("Unable to scrape {}", routeId);
+                    System.out.print("unable to scrape" + routeId);
+
                 }
-            });
+            }
         }
 
         return fourteenerRouteArrayList;
 
     }
 
-    private FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen) throws IOException {
+    public static FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen, int idx) throws IOException {
 
         if (routesSeen.contains(url)) {
-            LOG.info("Found duplicate entry of {}; did not log duplicate", url);
             return null;
         }
 
         routesSeen.add(url);
         FourteenerRoute resultFourteenerRoute = new FourteenerRoute();
+        resultFourteenerRoute.setUrl("https://www.14ers.com" + url);
+        resultFourteenerRoute.setFourteenerRouteId(idx);
+
         final HtmlPage page = webClient.getPage("https://www.14ers.com" + url);
         final HtmlDivision div = (HtmlDivision) page.getByXPath("//div[@class='BldHdr2 bold1']").get(0);
         final HtmlTable table = (HtmlTable) page.getByXPath("//table[@class='routestatsbox']").get(0);
@@ -71,52 +79,41 @@ public class FourteenerRouteScraper {
         scrapeRockfallPotential(table, resultFourteenerRoute);
         scrapeRouteFinding(table, resultFourteenerRoute);
         scrapeCommitment(table, resultFourteenerRoute);
-        resultFourteenerRoute.setUrl("https://www.14ers.com" + url);
 
 
-        return resultFourteenerRoute;
-
-
-    }
-
-    private static FourteenerRoute scrapeTotalGain(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
-
-        try {
-            final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(5);
-            int totalGain = Utils.convertTotalGainIntoInteger(cell.asNormalizedText());
-            if (totalGain == 0) {
-                resultFourteenerRoute.setMultipleRoutes(true);
-            } else {
-                resultFourteenerRoute.setTotalGain(totalGain);
-            }
-
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            LOG.warn("Unable to scrape {}", url);
-            return null;
-        }
 
         return resultFourteenerRoute;
 
 
     }
 
-    private static FourteenerRoute scrapeRouteLength (String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
-        try {
-            final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(6);
-            double routeLength = Utils.convertRouteLengthIntoInteger(cell.asNormalizedText());
-            if (routeLength == 0) {
-                resultFourteenerRoute.setMultipleRoutes(true);
-            } else {
-                resultFourteenerRoute.setRouteLength(routeLength);
-            }
+    private static void  scrapeTotalGain(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
+        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(5);
+        int totalGain = Utils.convertTotalGainIntoInteger(cell.asNormalizedText());
 
-            resultFourteenerRoute.setRouteLength(Utils.convertRouteLengthIntoInteger(cell.asNormalizedText()));
-        } catch (NumberFormatException | ArrayIndexOutOfBoundsException e) {
-            LOG.warn("Unable to scrape {}", url);
-            return null;
+        if (totalGain == 0) {
+            resultFourteenerRoute.setMultipleRoutes(true);
+        } else {
+            resultFourteenerRoute.setTotalGain(totalGain);
         }
 
-        return resultFourteenerRoute;
+
+    }
+
+    private static void scrapeRouteLength (String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
+        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(6);
+        double routeLength = Utils.convertRouteLengthIntoInteger(cell.asNormalizedText());
+
+        if (routeLength == 0) {
+            resultFourteenerRoute.setMultipleRoutes(true);
+        } else {
+            resultFourteenerRoute.setRouteLength(routeLength);
+        }
+
+        resultFourteenerRoute.setRouteLength(Utils.convertRouteLengthIntoInteger(cell.asNormalizedText()));
+
+
+
     }
 
     private static void scrapeMountainAndRouteName (HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
@@ -202,7 +199,7 @@ public class FourteenerRouteScraper {
 
 
 
-    public List<List<String>> getAllRouteIdLists () throws Exception {
+    public static List<List<String>> getAllRouteIdLists () throws Exception {
 
         List<List<String>> listOfListOfRouteIds = new ArrayList<>();
 
@@ -221,7 +218,7 @@ public class FourteenerRouteScraper {
 
     }
 
-    public List<String> getARouteIdList(String peakId) throws IOException {
+    public static List<String> getARouteIdList(String peakId) throws IOException {
 
         List<String> listOfRouteIds = new ArrayList<>();
         HashSet<String> routesSeen = new HashSet<>();
@@ -239,7 +236,7 @@ public class FourteenerRouteScraper {
 
     }
 
-    private void getARouteIdList(HtmlTableCell cell, List<String> listOfRouteIds, HashSet<String> routesSeen) {
+    private static void getARouteIdList(HtmlTableCell cell, List<String> listOfRouteIds, HashSet<String> routesSeen) {
 
         HtmlElement element = cell.querySelector("[href]");
         if (element != null) {
@@ -256,7 +253,7 @@ public class FourteenerRouteScraper {
 
     }
 
-    public List<String> getPeakIdList() throws Exception {
+    public static List<String> getPeakIdList() throws Exception {
 
         List<String> listOfPeakIds = new ArrayList<>();
 

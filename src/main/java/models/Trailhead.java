@@ -1,7 +1,7 @@
 package models;
 
 public class Trailhead {
-    private int primaryKey;
+    private int trailheadId;
     private String name;
     private String coordinates;
     private int roadDifficulty;
@@ -9,12 +9,12 @@ public class Trailhead {
     private String winterAccess;
     private String url;
 
-    public int getPrimaryKey() {
-        return primaryKey;
+    public int getTrailheadId() {
+        return trailheadId;
     }
 
-    public void setPrimaryKey(int primaryKey) {
-        this.primaryKey = primaryKey;
+    public void setTrailheadId(int trailheadId) {
+        this.trailheadId = trailheadId;
     }
 
     public String getName() {
