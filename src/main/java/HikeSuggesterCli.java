@@ -1,19 +1,20 @@
 
 import picocli.CommandLine;
-import subcommands.Compare;
-import subcommands.Group;
-import subcommands.Query;
-import subcommands.Search;
+import subcommands.CompareCommand;
+import subcommands.QueryCommand;
+import subcommands.SearchCommand;
+import tester.SyntaxCommand;
+import tester.TestCommand;
 
 import java.util.concurrent.Callable;
 
 @CommandLine.Command(
-        subcommands = {Compare.class, Group.class, Query.class, Search.class},
+        subcommands =
+                {CompareCommand.class, QueryCommand.class, SearchCommand.class, TestCommand.class, SyntaxCommand.class},
         name = "Hike Suggester",
         mixinStandardHelpOptions = true,
         version = "1.0")
-
-class HikeSuggesterCli implements Callable<Integer> {
+public class HikeSuggesterCli implements Callable<Integer> {
 
     @Override
     public Integer call() { // business logic
@@ -21,6 +22,8 @@ class HikeSuggesterCli implements Callable<Integer> {
     }
 
     public static void main(String... args) { // bootstrap the application
-        System.exit(new CommandLine(new HikeSuggesterCli()).execute(args));
+        CommandLine cmd = new CommandLine(new HikeSuggesterCli());
+        int exitCode = cmd.execute(args);
+        var result = cmd.getExecutionResult();
     }
 }

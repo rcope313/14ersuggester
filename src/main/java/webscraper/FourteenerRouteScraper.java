@@ -92,7 +92,7 @@ public class FourteenerRouteScraper {
         int totalGain = Utils.convertTotalGainIntoInteger(cell.asNormalizedText());
 
         if (totalGain == 0) {
-            resultFourteenerRoute.setMultipleRoutes(true);
+            resultFourteenerRoute.setHasMultipleRoutes(true);
         } else {
             resultFourteenerRoute.setTotalGain(totalGain);
         }
@@ -105,7 +105,7 @@ public class FourteenerRouteScraper {
         double routeLength = Utils.convertRouteLengthIntoInteger(cell.asNormalizedText());
 
         if (routeLength == 0) {
-            resultFourteenerRoute.setMultipleRoutes(true);
+            resultFourteenerRoute.setHasMultipleRoutes(true);
         } else {
             resultFourteenerRoute.setRouteLength(routeLength);
         }
@@ -141,7 +141,7 @@ public class FourteenerRouteScraper {
     }
 
     private static void scrapeSnowRouteOnly (HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
-        resultFourteenerRoute.setSnowRouteOnly((boolean) div.getByXPath("//@src='/images/icon_snowcover_large.png'").get(0));
+        resultFourteenerRoute.setSnowRoute((boolean) div.getByXPath("//@src='/images/icon_snowcover_large.png'").get(0));
         
     }
 
@@ -159,7 +159,7 @@ public class FourteenerRouteScraper {
 
     private static void scrapeTrailhead(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(2);
-        resultFourteenerRoute.setTrailhead(cell.asNormalizedText());
+        resultFourteenerRoute.setTrailhead(cell.asNormalizedText() + " Trailhead");
     }
 
     private static void scrapeSummitElevation(HtmlTable table, FourteenerRoute resultFourteenerRoute) {

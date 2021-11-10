@@ -3,7 +3,7 @@ package subcommands;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "compare", mixinStandardHelpOptions = true)
-public class Compare implements Runnable {
+public class CompareCommand implements Runnable {
 
     @CommandLine.Parameters(index = "0", description = "First argument, mountain name")
     String mountainNameA;

@@ -1,7 +1,6 @@
 package mysql;
 
 import models.FourteenerRoute;
-import models.MySqlStatement;
 import utility.Utils;
 import webscraper.FourteenerRouteScraper;
 import java.sql.*;
@@ -47,7 +46,7 @@ public class InitFourteenerRotueDataLoad {
                         route.getFourteenerRouteId() + ", " +
                         "'" + route.getRouteName() + "', " +
                         "'" + route.getMountainName() + "', " +
-                        route.isSnowRouteOnly() + ", " +
+                        route.isSnowRoute() + ", " +
                         route.isStandardRoute() + ", " +
                         route.getGradeQuality().getGrade() + ", " +
                         "'" + route.getGradeQuality().getQuality() + "', " +
@@ -59,12 +58,12 @@ public class InitFourteenerRotueDataLoad {
                         "'" + route.getRockfallPotential() + "', " +
                         "'" + route.getRouteFinding() + "', " +
                         "'" + route.getCommitment() + "', " +
-                        route.isMultipleRoutes() + ", " +
+                        route.hasMultipleRoutes() + ", " +
                         "'" + route.getUrl() + "', " +
                         "'" + route.getTrailhead() + "'" +
                         ")";
 
-                MySqlStatement.createStatement().execute(sql);
+                MySqlConnection.createStatement().execute(sql);
                 System.out.println("ENTRY CREATED \n");
                 System.out.print("Route Name: " + route.getRouteName() + "\n");
                 System.out.print("Fourteener Route Id: " + route.getFourteenerRouteId() + "\n");

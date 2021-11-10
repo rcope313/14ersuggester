@@ -1,5 +1,5 @@
-2021-11-04 15:58:41 WARN  CSS error: 'https://www.14ers.com/scripts/fotorama/fotorama.css' [4:3113] Error in declaration. '*' is not allowed as first char of a property.
-2021-11-04 15:58:41 WARN  CSS error: 'https://www.14ers.com/scripts/fotorama/fotorama.css' [4:3129] Error in declaration. '*' is not allowed as first char of a property.
-2021-11-04 15:58:41 WARN  CSS error: 'https://www.14ers.com/scripts/fotorama/fotorama.css' [4:9773] Error in declaration. '*' is not allowed as first char of a property.
-2021-11-04 15:58:41 WARN  CSS error: 'https://www.14ers.com/scripts/lightbox2/dist/css/lightbox.css' [48:3] Error in declaration. '*' is not allowed as first char of a property.
-2021-11-04 15:58:41 WARN  CSS error: 'https://www.14ers.com/scripts/lightbox2/dist/css/lightbox.css' [146:3] Error in declaration. '*' is not allowed as first char of a property.
+2021-11-10 13:25:12 WARN  CSS error: 'https://www.14ers.com/scripts/fotorama/fotorama.css' [4:3113] Error in declaration. '*' is not allowed as first char of a property.
+2021-11-10 13:25:12 WARN  CSS error: 'https://www.14ers.com/scripts/fotorama/fotorama.css' [4:3129] Error in declaration. '*' is not allowed as first char of a property.
+2021-11-10 13:25:12 WARN  CSS error: 'https://www.14ers.com/scripts/fotorama/fotorama.css' [4:9773] Error in declaration. '*' is not allowed as first char of a property.
+2021-11-10 13:25:12 WARN  CSS error: 'https://www.14ers.com/scripts/lightbox2/dist/css/lightbox.css' [48:3] Error in declaration. '*' is not allowed as first char of a property.
+2021-11-10 13:25:12 WARN  CSS error: 'https://www.14ers.com/scripts/lightbox2/dist/css/lightbox.css' [146:3] Error in declaration. '*' is not allowed as first char of a property.

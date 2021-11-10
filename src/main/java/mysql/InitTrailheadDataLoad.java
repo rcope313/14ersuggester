@@ -1,6 +1,5 @@
 package mysql;
 
-import models.MySqlStatement;
 import models.Trailhead;
 import utility.Utils;
 import webscraper.TrailheadScraper;
@@ -50,7 +49,7 @@ public class InitTrailheadDataLoad {
                     "'" + trailhead.getUrl() + "'" +
                     ")";
 
-            MySqlStatement.createStatement().execute(sql);
+            MySqlConnection.createStatement().execute(sql);
             System.out.println("ENTRY CREATED \n");
             System.out.print("Trailhead Name: " + trailhead.getName() + "\n");
             System.out.print("Trailhead Id: " + trailhead.getTrailheadId() + "\n");

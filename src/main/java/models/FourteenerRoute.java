@@ -5,8 +5,8 @@ public class FourteenerRoute {
     private int fourteenerRouteId;
     private String mountainName;
     private String routeName;
-    private boolean snowRouteOnly;
-    private boolean standardRoute;
+    private boolean isSnowRoute;
+    private boolean isStandardRoute;
     private GradeQuality gradeQuality;
     private String trailhead;
     private int startElevation;
@@ -17,7 +17,7 @@ public class FourteenerRoute {
     private String rockfallPotential;
     private String routeFinding;
     private String commitment;
-    private boolean multipleRoutes = false;
+    private boolean hasMultipleRoutes = false;
     private String url;
 
 
@@ -47,20 +47,20 @@ public class FourteenerRoute {
         this.routeName = routeName;
     }
 
-    public boolean isSnowRouteOnly() {
-        return snowRouteOnly;
+    public boolean isSnowRoute() {
+        return isSnowRoute;
     }
 
-    public void setSnowRouteOnly(boolean snowRouteOnly) {
-        this.snowRouteOnly = snowRouteOnly;
+    public void setSnowRoute(boolean snowRoute) {
+        this.isSnowRoute = snowRoute;
     }
 
     public boolean isStandardRoute() {
-        return standardRoute;
+        return isStandardRoute;
     }
 
     public void setStandardRoute(boolean standardRoute) {
-        this.standardRoute = standardRoute;
+        this.isStandardRoute = standardRoute;
     }
 
     public GradeQuality getGradeQuality() {
@@ -143,12 +143,12 @@ public class FourteenerRoute {
         this.commitment = commitment;
     }
 
-    public boolean isMultipleRoutes() {
-        return multipleRoutes;
+    public boolean hasMultipleRoutes() {
+        return hasMultipleRoutes;
     }
 
-    public void setMultipleRoutes(boolean multipleRoutes) {
-        this.multipleRoutes = multipleRoutes;
+    public void setHasMultipleRoutes(boolean hasMultipleRoutes) {
+        this.hasMultipleRoutes = hasMultipleRoutes;
     }
 
     public String getUrl() {
