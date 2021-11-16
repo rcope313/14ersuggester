@@ -1,8 +1,65 @@
 package utility;
 
+import models.FourteenerRoute;
 import models.GradeQuality;
+import mysql.MySqlConnection;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Utils {
+
+    public static ArrayList<Integer> convertArrayToArrayList (Integer[] array) {
+        if (array == null) {
+            return null;
+        } else {
+            return new ArrayList<>(Arrays.asList(array));
+        }
+    }
+
+    public static ArrayList<String> convertArrayToArrayList (String[] array) {
+        if (array == null) {
+            return null;
+        } else {
+            return new ArrayList<>(Arrays.asList(array));
+        }
+
+    }
+
+    public static boolean checkRowDateForUpdate (String routeUrl) {
+
+        String query =
+                "SELECT updateDate " +
+                "FROM fourteener_routes " +
+                "WHERE fourteener_routes.url = '" + routeUrl + "';";
+
+        try (Statement stmt = MySqlConnection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(query);
+
+            while (rs.next()) {
+                return checkDateWeekly(rs.getString("fourteener_routes.updateDate"));
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+
+
+    }
+
+    private static boolean checkDateWeekly (String calendarDate) {
+        if (calendarDate.equals("businesslogic")) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     public static GradeQuality convertStringIntoGradeQuality(String gradeString) {
         GradeQuality resultGradeQuality = new GradeQuality();

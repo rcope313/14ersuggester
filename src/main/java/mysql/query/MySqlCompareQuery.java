@@ -1,4 +1,4 @@
-package mysql;
+package mysql.query;
 
 
 // create an index

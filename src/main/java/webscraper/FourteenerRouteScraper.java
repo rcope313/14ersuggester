@@ -51,7 +51,39 @@ public class FourteenerRouteScraper {
 
     }
 
-    public static FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen, int idx) throws IOException {
+    public static FourteenerRoute scrapeFourteener(String url) throws IOException {
+
+        FourteenerRoute resultFourteenerRoute = new FourteenerRoute();
+        resultFourteenerRoute.setUrl("https://www.14ers.com" + url);
+        resultFourteenerRoute.setFourteenerRouteId(0);
+
+        final HtmlPage page = webClient.getPage("https://www.14ers.com" + url);
+        final HtmlDivision div = (HtmlDivision) page.getByXPath("//div[@class='BldHdr2 bold1']").get(0);
+        final HtmlTable table = (HtmlTable) page.getByXPath("//table[@class='routestatsbox']").get(0);
+
+        scrapeTotalGain(url, table, resultFourteenerRoute);
+        scrapeRouteLength(url, table, resultFourteenerRoute);
+        scrapeMountainAndRouteName(div, resultFourteenerRoute);
+        scrapeSnowRouteOnly(div, resultFourteenerRoute);
+        scrapeStandardRoute(div, resultFourteenerRoute);
+        scrapeGradeQuality(table, resultFourteenerRoute);
+        scrapeTrailhead(table, resultFourteenerRoute);
+        scrapeStartElevation(table, resultFourteenerRoute);
+        scrapeSummitElevation(table, resultFourteenerRoute);
+        scrapeExposure(table, resultFourteenerRoute);
+        scrapeRockfallPotential(table, resultFourteenerRoute);
+        scrapeRouteFinding(table, resultFourteenerRoute);
+        scrapeCommitment(table, resultFourteenerRoute);
+
+
+
+        return resultFourteenerRoute;
+
+
+    }
+
+
+    private static FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen, int idx) throws IOException {
 
         if (routesSeen.contains(url)) {
             return null;

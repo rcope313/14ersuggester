@@ -1,6 +1,7 @@
-package mysql;
+package mysql.load;
 
 import models.FourteenerRoute;
+import mysql.MySqlConnection;
 import utility.Utils;
 import webscraper.FourteenerRouteScraper;
 import java.sql.*;

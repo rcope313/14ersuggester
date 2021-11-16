@@ -1,6 +1,7 @@
-package mysql;
+package mysql.load;
 
 import models.Trailhead;
+import mysql.MySqlConnection;
 import utility.Utils;
 import webscraper.TrailheadScraper;
 

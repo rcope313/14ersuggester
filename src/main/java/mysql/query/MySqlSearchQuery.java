@@ -1,21 +1,25 @@
-package mysql;
+package mysql.query;
 
-import picocli.CommandLine;
+import mysql.MySqlConnection;
+import utility.Utils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.StringJoiner;
 
 public class MySqlSearchQuery {
 
-    //need to deal with grades
     private boolean isVerbose = false;
+    private String query = null;
     private ArrayList<String> mountainNames;
     private ArrayList<String> routeNames;
     private boolean isStandardRoute = false;
     private boolean isSnowRoute = false;
+    private ArrayList<Integer> grades;
+    private ArrayList<String> gradeQualities;
     private ArrayList<String> trailheads;
     private int startElevation;
     private int summitElevation;
@@ -27,27 +31,37 @@ public class MySqlSearchQuery {
     private String commitment;
     private boolean hasMultipleRoutes = false;
     private ArrayList<String> routeUrls;
-    private ArrayList<String> trailheadUrls;
     private ArrayList<String>trailheadCoordinates;
     private ArrayList<Integer> roadDifficulties;
+    private ArrayList<String> trailheadUrls;
+
 
 
     public static void main (String[] args) throws SQLException {
         MySqlSearchQuery query = new MySqlSearchQuery();
-        query.setStandardRoute(true);
-        query.setTotalGain(4000);
-        query.setVerbose(true);
+        query.setMountainNames(new ArrayList<>(Arrays.asList("Culebra Peak", "Blanca Peak")));
+        query.setRouteFinding("Moderate");
 
-        query.viewMySqlTableVerbose();
+        query.viewMySqlTable();
+
+
     }
 
     public void viewMySqlTable() throws SQLException {
+        if (isVerbose()) {
+            viewMySqlTableVerbose();
+        } else {
+            viewMySqlTableNonVerbose();
+        }
+
+    }
+
+    private void viewMySqlTableNonVerbose() throws SQLException {
 
         System.out.format("%-35s%-25s%-15s%-15s%-40s\n", "Route Name", "Mountain Name", "Total Gain", "Route Length", "URL");
         String query = createSearchQuery();
 
-
-        try (Statement stmt = MySqlConnection.createStatement();) {
+        try (Statement stmt = MySqlConnection.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
 
             while (rs.next()) {
@@ -57,6 +71,7 @@ public class MySqlSearchQuery {
                 double routeLength = rs.getDouble("fourteener_routes.routeLength");
                 String url = rs.getString("fourteener_routes.url");
 
+                Utils.checkRowDateForUpdate(url);
                 System.out.format("%-35s%-25s%-15d%-15f%-40s\n", routeName, mountainName, totalGain, routeLength, url);
             }
 
@@ -65,7 +80,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    public void viewMySqlTableVerbose() throws SQLException {
+    private void viewMySqlTableVerbose() throws SQLException {
 
         System.out.format
                 ("%-10s%-35s%-25s%-15s" +
@@ -99,7 +114,7 @@ public class MySqlSearchQuery {
         String query = createSearchQuery();
 
 
-        try (Statement stmt = MySqlConnection.createStatement();) {
+        try (Statement stmt = MySqlConnection.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
 
             while (rs.next()) {
@@ -144,28 +159,42 @@ public class MySqlSearchQuery {
         }
     }
 
+
+
     public String createSearchQuery() {
-        return createSelectStatement() + createWhereStatements();
+        if (getQuery() == null) {
+            return createSelectStatement() + createWhereStatements();
+        } else {
+            return createSearchQueryByInputOnly();
+        }
     }
 
+    private String createSearchQueryByInputOnly() {
+        return createSelectStatement() + getQuery();
 
+    }
 
     private String createSelectStatement() {
         if (isVerbose()) {
-            return "SELECT * FROM hike_suggester.fourteener_routes ";
+            return
+                    "SELECT * " +
+                    "FROM fourteener_routes " +
+                    "LEFT OUTER JOIN trailheads ON fourteener_routes.trailhead = trailheads.name ";
         } else {
-            return "SELECT " +
+            return
+                    "SELECT " +
                     "fourteener_routes.routeName, " +
                     "fourteener_routes.mountainName, " +
                     "fourteener_routes.totalGain, " +
                     "fourteener_routes.routeLength, " +
                     "fourteener_routes.url " +
-                    "FROM hike_suggester.fourteener_routes ";
+                    "FROM fourteener_routes " +
+                    "LEFT OUTER JOIN trailheads ON fourteener_routes.trailhead = trailheads.name ";
         }
     }
 
     private String createWhereStatements() {
-        return "WHERE fourteenerRouteId > 1 " + createSearchQueryString();
+        return "WHERE fourteenerRouteId >= 0 " + createSearchQueryString();
 
     }
 
@@ -175,6 +204,8 @@ public class MySqlSearchQuery {
         stringJoiner.add(createRouteNamesSyntax());
         stringJoiner.add(createIsSnowRouteSyntax());
         stringJoiner.add(createIsStandardRouteSyntax());
+        stringJoiner.add(createGradeSyntax());
+        stringJoiner.add(createGradeQualitySyntax());
         stringJoiner.add(createTrailheadsSyntax());
         stringJoiner.add(createStartElevationSyntax());
         stringJoiner.add(createSummitElevationSyntax());
@@ -186,9 +217,9 @@ public class MySqlSearchQuery {
         stringJoiner.add(createCommitmentSyntax());
         stringJoiner.add(createHasMultipleRoutesSyntax());
         stringJoiner.add(createRouteUrlsSyntax());
-        stringJoiner.add(createTrailheadUrlsSyntax());
         stringJoiner.add(createTrailheadCoordinatesSyntax());
         stringJoiner.add(createRoadDifficultiesSyntax());
+        stringJoiner.add(createTrailheadUrlsSyntax());
 
         return stringJoiner.toString() + ";";
     }
@@ -196,29 +227,29 @@ public class MySqlSearchQuery {
 
 
     private CharSequence createMountainNamesSyntax() {
-
-        StringJoiner stringJoiner = new StringJoiner(" ");
+        String syntax = "AND fourteener_routes.mountainName IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
         if (getMountainNames() != null) {
-            getMountainNames().forEach((mountainName) -> stringJoiner
-                    .add("AND fourteener_routes.mountainName = '"
-                            + mountainName + "'"));
+            getMountainNames().forEach((mountainName) -> stringJoiner.add("'" + mountainName + "'"));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
         }
-
-        return stringJoiner.toString();
     }
 
     private CharSequence createRouteNamesSyntax() {
-        StringJoiner stringJoiner = new StringJoiner(" ");
+        String syntax = "AND fourteener_routes.routeName IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
         if (getRouteNames() != null) {
-            getRouteNames().forEach((routeName) -> stringJoiner
-                            .add("AND fourteener_routes.routeName = '"
-                                    + routeName + "' "));
+            getRouteNames().forEach((routeName) -> stringJoiner.add("'" + routeName + "'"));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
         }
-        return stringJoiner.toString();
     }
 
     private CharSequence createIsSnowRouteSyntax() {
-        if (isSnowRoute() == true) {
+        if (isSnowRoute()) {
             return "AND fourteener_routes.isSnowRoute = true";
         } else {
             return "";
@@ -226,29 +257,50 @@ public class MySqlSearchQuery {
     }
 
     private CharSequence createIsStandardRouteSyntax() {
-        if (isStandardRoute() == true) {
+        if (isStandardRoute()) {
             return "AND fourteener_routes.isStandardRoute = true";
         } else {
             return "";
         }
     }
 
-    // this won't work without a join
-    private CharSequence createTrailheadsSyntax() {
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        if (trailheads != null) {
-            getTrailheads().forEach((trailhead) -> stringJoiner
-                            .add("AND trailheads.name = '"
-                                    + trailhead + "' "));
+    private CharSequence createGradeSyntax() {
+        String syntax = "AND fourteener_routes.grade IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
+        if (getGrades() != null) {
+            getGrades().forEach((grade) -> stringJoiner.add(String.valueOf(grade)));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
         }
+    }
 
-        return stringJoiner.toString();
+    private CharSequence createGradeQualitySyntax() {
+        String syntax = "AND fourteener_routes.gradeQuality IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
+        if (getGradeQualities() != null) {
+            getGradeQualities().forEach((gradeQuality) -> stringJoiner.add("'" + gradeQuality + "'"));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
+        }
+    }
+
+    private CharSequence createTrailheadsSyntax() {
+        String syntax = "AND trailheads.name IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
+        if (getTrailheads() != null) {
+            getTrailheads().forEach((trailhead) -> stringJoiner.add("'" + trailhead + "'"));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
+        }
     }
 
     private CharSequence createStartElevationSyntax() {
         if (getStartElevation() != 0) {
             String startElevationString = String.valueOf(getStartElevation() );
-            return "AND fourteener_routes.startElevation = " + startElevationString;
+            return "AND fourteener_routes.startElevation >= " + startElevationString;
         } else {
             return "";
         }
@@ -257,7 +309,7 @@ public class MySqlSearchQuery {
     private CharSequence createSummitElevationSyntax() {
         if (getSummitElevation() != 0) {
             String summitElevationString = String.valueOf(getSummitElevation());
-            return "AND fourteener_routes.summitElevation = " + summitElevationString;
+            return "AND fourteener_routes.summitElevation >= " + summitElevationString;
         } else {
             return "";
         }
@@ -266,7 +318,7 @@ public class MySqlSearchQuery {
     private CharSequence createTotalGainSyntax() {
         if (getTotalGain() != 0) {
             String totalGainString = String.valueOf(getTotalGain());
-            return "AND fourteener_routes.totalGain > " + totalGainString;
+            return "AND fourteener_routes.totalGain >= " + totalGainString;
         } else {
             return "";
         }
@@ -275,7 +327,7 @@ public class MySqlSearchQuery {
     private CharSequence createRouteLengthSyntax() {
         if (getRouteLength() != 0) {
             String routeLengthString = String.valueOf(getRouteLength());
-            return "AND fourteener_routes.routeLength > " + routeLengthString;
+            return "AND fourteener_routes.routeLength >= " + routeLengthString;
         } else {
             return "";
         }
@@ -307,14 +359,14 @@ public class MySqlSearchQuery {
 
     private CharSequence createCommitmentSyntax() {
         if (getCommitment() != null) {
-            return "AND fourteener_routes.commitment = '" + commitment + "'";
+            return "AND fourteener_routes.commitment = '" + getCommitment() + "'";
         } else {
             return "";
         }
     }
 
     private CharSequence createHasMultipleRoutesSyntax() {
-        if (isHasMultipleRoutes() == true) {
+        if (isHasMultipleRoutes()) {
             return "AND fourteener_routes.hasMultipleRoutes = true";
         } else {
             return "";
@@ -322,48 +374,47 @@ public class MySqlSearchQuery {
     }
 
     private CharSequence createRouteUrlsSyntax() {
-        StringJoiner stringJoiner = new StringJoiner(" ");
+        String syntax = "AND fourteener_routes.url IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
         if (getRouteUrls() != null) {
-
-            getRouteUrls().forEach((routeUrl) -> stringJoiner
-                    .add("AND fourteener_routes.url = '"
-                            + routeUrl + "' "));
+            getRouteUrls().forEach((url) -> stringJoiner.add("'" + url + "'"));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
         }
-        return stringJoiner.toString();
-    }
-
-    private CharSequence createTrailheadUrlsSyntax() {
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        if (getTrailheadUrls() != null) {
-
-            getTrailheadUrls().forEach((trailheadUrl) -> stringJoiner
-                    .add("AND trailheads.url = '"
-                            + trailheadUrl + "' "));
-        }
-        return stringJoiner.toString();
     }
 
     private CharSequence createTrailheadCoordinatesSyntax() {
-        StringJoiner stringJoiner = new StringJoiner(" ");
+        String syntax = "AND trailheads.coordinates IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
         if (getTrailheadCoordinates() != null) {
-
-          getTrailheadCoordinates().forEach((trailheadCoordinate) -> stringJoiner
-                  .add("AND trailheads.coordinates = '"
-                          + trailheadCoordinate + "' "));
+            getTrailheadCoordinates().forEach((coordinate) -> stringJoiner.add("'" + coordinate + "'"));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
         }
-
-        return stringJoiner.toString();
     }
 
     private CharSequence createRoadDifficultiesSyntax() {
-        StringJoiner stringJoiner = new StringJoiner(" ");
+        String syntax = "AND trailheads.roadDifficulty IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
         if (getRoadDifficulties() != null) {
-
-            getRoadDifficulties().forEach((roadDifficulty) -> stringJoiner
-                            .add("AND trailheads.coordinates = '"
-                                    + String.valueOf(roadDifficulty) + "' "));
+            getRoadDifficulties().forEach((roadDifficulty) -> stringJoiner.add(String.valueOf(roadDifficulty)));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
         }
-        return stringJoiner.toString();
+    }
+
+    private CharSequence createTrailheadUrlsSyntax() {
+        String syntax = "AND trailheads.url IN (";
+        StringJoiner stringJoiner = new StringJoiner(", ");
+        if (getTrailheadUrls() != null) {
+            getTrailheadUrls().forEach((url) -> stringJoiner.add("'" + url + "'"));
+            return syntax + stringJoiner.toString() + ") ";
+        } else {
+            return "";
+        }
     }
 
 
@@ -383,6 +434,14 @@ public class MySqlSearchQuery {
 
     public void setVerbose(boolean verbose) {
         isVerbose = verbose;
+    }
+
+    public String getQuery() {
+        return query;
+    }
+
+    public void setQuery(String query) {
+        this.query = query;
     }
 
     public ArrayList<String> getMountainNames() {
@@ -415,6 +474,22 @@ public class MySqlSearchQuery {
 
     public void setSnowRoute(boolean snowRoute) {
         isSnowRoute = snowRoute;
+    }
+
+    public ArrayList<Integer> getGrades() {
+        return grades;
+    }
+
+    public void setGrades(ArrayList<Integer> grades) {
+        this.grades = grades;
+    }
+
+    public ArrayList<String> getGradeQualities() {
+        return gradeQualities;
+    }
+
+    public void setGradeQualities(ArrayList<String> gradeQualities) {
+        this.gradeQualities = gradeQualities;
     }
 
     public ArrayList<String> getTrailheads() {
@@ -505,14 +580,6 @@ public class MySqlSearchQuery {
         this.routeUrls = routeUrls;
     }
 
-    public ArrayList<String> getTrailheadUrls() {
-        return trailheadUrls;
-    }
-
-    public void setTrailheadUrls(ArrayList<String> trailheadUrls) {
-        this.trailheadUrls = trailheadUrls;
-    }
-
     public ArrayList<String> getTrailheadCoordinates() {
         return trailheadCoordinates;
     }
@@ -528,4 +595,15 @@ public class MySqlSearchQuery {
     public void setRoadDifficulties(ArrayList<Integer> roadDifficulties) {
         this.roadDifficulties = roadDifficulties;
     }
+
+
+    public ArrayList<String> getTrailheadUrls() {
+        return trailheadUrls;
+    }
+
+    public void setTrailheadUrls(ArrayList<String> trailheadUrls) {
+        this.trailheadUrls = trailheadUrls;
+    }
+
+
 }

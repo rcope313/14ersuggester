@@ -1,8 +1,7 @@
-
 import picocli.CommandLine;
-import subcommands.CompareCommand;
-import subcommands.QueryCommand;
-import subcommands.SearchCommand;
+import subcommands.CompareSubCommand;
+import subcommands.QuerySubCommand;
+import subcommands.SearchSubCommand;
 import tester.SyntaxCommand;
 import tester.TestCommand;
 
@@ -10,7 +9,7 @@ import java.util.concurrent.Callable;
 
 @CommandLine.Command(
         subcommands =
-                {CompareCommand.class, QueryCommand.class, SearchCommand.class, TestCommand.class, SyntaxCommand.class},
+                {CompareSubCommand.class, QuerySubCommand.class, SearchSubCommand.class, TestCommand.class, SyntaxCommand.class},
         name = "Hike Suggester",
         mixinStandardHelpOptions = true,
         version = "1.0")
