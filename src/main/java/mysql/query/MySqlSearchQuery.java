@@ -1,7 +1,8 @@
 package mysql.query;
 
 import mysql.MySqlConnection;
-import utility.Utils;
+import mysql.update.UpdateFourteenerRoutes;
+import mysql.update.UpdateTrailheads;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -42,21 +43,21 @@ public class MySqlSearchQuery {
         query.setMountainNames(new ArrayList<>(Arrays.asList("Culebra Peak", "Blanca Peak")));
         query.setRouteFinding("Moderate");
 
-        query.viewMySqlTable();
+        query.viewMySqlTableWithWeeklyUpdate();
 
 
     }
 
-    public void viewMySqlTable() throws SQLException {
+    public void viewMySqlTableWithWeeklyUpdate()  {
         if (isVerbose()) {
-            viewMySqlTableVerbose();
+            viewMySqlTableVerboseWithWeeklyUpdate();
         } else {
-            viewMySqlTableNonVerbose();
+            viewMySqlTableNonVerboseWithWeeklyUpdate();
         }
 
     }
 
-    private void viewMySqlTableNonVerbose() throws SQLException {
+    private void viewMySqlTableNonVerboseWithWeeklyUpdate() {
 
         System.out.format("%-35s%-25s%-15s%-15s%-40s\n", "Route Name", "Mountain Name", "Total Gain", "Route Length", "URL");
         String query = createSearchQuery();
@@ -69,18 +70,23 @@ public class MySqlSearchQuery {
                 String mountainName = rs.getString("fourteener_routes.mountainName");
                 int totalGain = rs.getInt("fourteener_routes.totalGain");
                 double routeLength = rs.getDouble("fourteener_routes.routeLength");
-                String url = rs.getString("fourteener_routes.url");
+                String routeUrl = rs.getString("fourteener_routes.url");
+                String routeUpdateDate = rs.getString ("fourteener_routes.updateDate");
+                String trailheadUrl = rs.getString("trailheads.url");
+                String trailheadUpdateDate = rs.getString ("trailheads.updateDate");
 
-                Utils.checkRowDateForUpdate(url);
-                System.out.format("%-35s%-25s%-15d%-15f%-40s\n", routeName, mountainName, totalGain, routeLength, url);
+                System.out.format("%-35s%-25s%-15d%-15f%-40s\n", routeName, mountainName, totalGain, routeLength, routeUrl);
+                UpdateFourteenerRoutes.weeklyUpdate(routeUpdateDate, routeUrl);
+                UpdateTrailheads.weeklyUpdate(trailheadUpdateDate, trailheadUrl);
+
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void viewMySqlTableVerbose() throws SQLException {
+    private void viewMySqlTableVerboseWithWeeklyUpdate()  {
 
         System.out.format
                 ("%-10s%-35s%-25s%-15s" +
@@ -138,8 +144,13 @@ public class MySqlSearchQuery {
                 String commitment = rs.getString("fourteener_routes.commitment");
                 int hasMultipleRoutes = rs.getInt("fourteener_routes.hasMultipleRoutes");
 
-                String url = rs.getString("fourteener_routes.url");
+                String routeUrl = rs.getString("fourteener_routes.url");
                 String trailhead = rs.getString("fourteener_routes.trailhead");
+
+                String routeUpdateDate = rs.getString("fourteener.routes.updateDate");
+                String trailheadUrl = rs.getString("trailheads.url");
+                String trailheadUpdateDate = rs.getString("trailheads.updateDate");
+
 
                 System.out.format(
                         "%-10d%-35s%-25s%-15d" +
@@ -151,14 +162,17 @@ public class MySqlSearchQuery {
                         isStandardRoute, grade, gradeQuality, startElevation,
                         summitElevation, totalGain, routeLength, exposure,
                         rockfallPotential, routeFinding, commitment, hasMultipleRoutes,
-                        url, trailhead);
+                        routeUrl, trailhead);
+
+                UpdateFourteenerRoutes.weeklyUpdate(routeUpdateDate, routeUrl);
+                UpdateTrailheads.weeklyUpdate(trailheadUpdateDate, trailheadUrl);
+
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
 
     public String createSearchQuery() {
@@ -175,22 +189,11 @@ public class MySqlSearchQuery {
     }
 
     private String createSelectStatement() {
-        if (isVerbose()) {
-            return
-                    "SELECT * " +
-                    "FROM fourteener_routes " +
-                    "LEFT OUTER JOIN trailheads ON fourteener_routes.trailhead = trailheads.name ";
-        } else {
-            return
-                    "SELECT " +
-                    "fourteener_routes.routeName, " +
-                    "fourteener_routes.mountainName, " +
-                    "fourteener_routes.totalGain, " +
-                    "fourteener_routes.routeLength, " +
-                    "fourteener_routes.url " +
-                    "FROM fourteener_routes " +
-                    "LEFT OUTER JOIN trailheads ON fourteener_routes.trailhead = trailheads.name ";
-        }
+        return
+                "SELECT * " +
+                        "FROM fourteener_routes " +
+                        "LEFT OUTER JOIN trailheads ON fourteener_routes.trailhead = trailheads.name ";
+
     }
 
     private String createWhereStatements() {

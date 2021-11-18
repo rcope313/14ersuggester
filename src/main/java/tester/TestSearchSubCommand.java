@@ -32,7 +32,7 @@
 //        exitCode1 = cmd1.execute("--m", "Mt. Elbert", "--m", "Longs Peak", "--m", "Mt. Antero");
 //        q1 = new MySqlSearchQuery();
 //            q1.setMountainNames(new ArrayList<>(Arrays.asList("Mt. Elbert", "Longs Peak", "Mt. Antero")));
-//
+
 //        cmd2 = new CommandLine(app);
 //        sw2 = new StringWriter();
 //        cmd2.setOut(new PrintWriter(sw2));
@@ -102,21 +102,21 @@
 //        q9 = new MySqlSearchQuery();
 //            q9.setTrailheadUrls(new ArrayList<>(Arrays.asList("/trailheadsview.php?thparm=sw01", "/trailheadsview.php?thparm=sw03")));
 //            q9.setRouteUrls(new ArrayList<>(Arrays.asList("https://www.14ers.com/route.php?route=elbe1", "https://www.14ers.com/route.php?route=elbe2")));
-//
+
 //    }
 //
 //    void testSearchSubcommand (Tester t) {
 //        initData();
-//        t.checkExpect(sw0.toString(), q0.createSearchQuery()); this works
-//        t.checkExpect(sw1.toString(), q1.createSearchQuery()); this works
-//        t.checkExpect(sw2.toString(), q2.createSearchQuery()); this works
-//        t.checkExpect(sw3.toString(), q3.createSearchQuery()); this works
-//        t.checkExpect(sw4.toString(), q4.createSearchQuery()); this works
-//        t.checkExpect(sw5.toString(), q5.createSearchQuery()); this works
-//        t.checkExpect(sw6.toString(), q6.createSearchQuery()); this works
-//        t.checkExpect(sw7.toString(), q7.createSearchQuery()); this works
-//        t.checkExpect(sw8.toString(), q8.createSearchQuery()); this works
-//        t.checkExpect(sw9.toString(), q9.createSearchQuery()); this works
+////        t.checkExpect(sw0.toString(), q0.createSearchQuery()); this works
+//        t.checkExpect(sw1.toString(), q1.createSearchQuery());
+////        t.checkExpect(sw2.toString(), q2.createSearchQuery()); this works
+////        t.checkExpect(sw3.toString(), q3.createSearchQuery()); this works
+////        t.checkExpect(sw4.toString(), q4.createSearchQuery()); this works
+////        t.checkExpect(sw5.toString(), q5.createSearchQuery()); this works
+////        t.checkExpect(sw6.toString(), q6.createSearchQuery()); this works
+////        t.checkExpect(sw7.toString(), q7.createSearchQuery()); this works
+////        t.checkExpect(sw8.toString(), q8.createSearchQuery()); this works
+////        t.checkExpect(sw9.toString(), q9.createSearchQuery()); this works
 //
 //
 //

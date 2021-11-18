@@ -2,8 +2,12 @@ package mysql.update;
 
 import models.FourteenerRoute;
 import mysql.MySqlConnection;
+import utility.Utils;
 import webscraper.FourteenerRouteScraper;
+import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 
@@ -18,16 +22,20 @@ public class UpdateFourteenerRoutes {
 
     }
 
+    public static void weeklyUpdate (String strDate, String routeUrl) throws ParseException, SQLException, IOException {
 
-    static void updateARowByAllColumns (FourteenerRoute route) throws ParseException, SQLException {
+        if (Utils.checkDateWeekly(strDate)) {
 
-        String sql = mySqlSyntaxUpdateAllColumns(route);
-        MySqlConnection.createStatement().execute(sql);
+            FourteenerRoute updatedRoute = FourteenerRouteScraper.scrapeFourteener(routeUrl);
+            String sql = mySqlSyntaxWeeklyUpdate(updatedRoute);
+            MySqlConnection.createStatement().execute(sql);
+
+        }
 
 
     }
 
-    static String mySqlSyntaxUpdateAllColumns (FourteenerRoute route) throws ParseException {
+    static String mySqlSyntaxWeeklyUpdate(FourteenerRoute route) throws ParseException {
 
         if (route == null) {
             return "SELECT * FROM fourteener_routes";
@@ -48,13 +56,12 @@ public class UpdateFourteenerRoutes {
                             "routeFinding = '" + route.getRouteFinding() + "', \n" +
                             "commitment = '" + route.getCommitment() + "', \n" +
                             "hasMultipleRoutes = " + route.hasMultipleRoutes() + ", \n" +
-                            "trailhead = '" + route.getTrailhead() + "', \n" +
-                            "updateDate = '" + java.time.LocalDate.now() + "' \n" +
+                            "fourteener_routes.trailhead = '" + route.getTrailhead() + "', \n" +
+                            "fourteener_routes.updateDate = '" + java.time.LocalDate.now() + "' \n" +
                             "WHERE fourteener_routes.url = '" + route.getUrl() + "';";
 
         }
     }
-
 
 
     static void updateAllRowsByTrailheadUpdateDateRouteLength () throws Exception {

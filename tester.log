@@ -1,2 +1,7 @@
-2021-11-15 12:01:07 WARN  CSS error: 'https://www.14ers.com/scripts/lightbox2/dist/css/lightbox.css' [48:3] Error in declaration. '*' is not allowed as first char of a property.
-2021-11-15 12:01:07 WARN  CSS error: 'https://www.14ers.com/scripts/lightbox2/dist/css/lightbox.css' [146:3] Error in declaration. '*' is not allowed as first char of a property.
+2021-11-17 10:13:03 WARN  CSS error: 'https://www.14ers.com/scripts/lightbox2/dist/css/lightbox.css' [48:3] Error in declaration. '*' is not allowed as first char of a property.
+2021-11-17 10:13:03 WARN  CSS error: 'https://www.14ers.com/scripts/lightbox2/dist/css/lightbox.css' [146:3] Error in declaration. '*' is not allowed as first char of a property.
+2021-11-17 10:13:10 WARN  Unable to scrape /trailheadsview.php?thparm=fr11
+2021-11-17 10:13:16 WARN  Unable to scrape /trailheadsview.php?thparm=fr14
+2021-11-17 10:13:21 WARN  Unable to scrape /trailheadsview.php?thparm=tm06
+2021-11-17 10:13:25 WARN  Unable to scrape /trailheadsview.php?thparm=sw16
+2021-11-17 10:13:56 WARN  Unable to scrape /trailheadsview.php?thparm=gr01

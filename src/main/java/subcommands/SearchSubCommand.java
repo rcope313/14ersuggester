@@ -4,9 +4,6 @@ import mysql.query.MySqlSearchQuery;
 import picocli.CommandLine;
 import utility.Utils;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 @CommandLine.Command(name = "search", mixinStandardHelpOptions = true)
 public class SearchSubCommand implements Runnable {
@@ -113,17 +110,19 @@ public class SearchSubCommand implements Runnable {
 
     @Override
     public void run() {
-
 //        spec.commandLine().getOut().println(setSearchQuery().createSearchQuery());
+        MySqlSearchQuery searchQuery = setSearchQuery();
 
         try {
-            setSearchQuery().viewMySqlTable();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+            searchQuery.viewMySqlTableWithWeeklyUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }
-    
+
+
 
     private MySqlSearchQuery setSearchQuery() {
 

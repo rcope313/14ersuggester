@@ -51,13 +51,13 @@ public class FourteenerRouteScraper {
 
     }
 
-    public static FourteenerRoute scrapeFourteener(String url) throws IOException {
+    public static FourteenerRoute scrapeFourteener (String url) throws IOException {
 
         FourteenerRoute resultFourteenerRoute = new FourteenerRoute();
-        resultFourteenerRoute.setUrl("https://www.14ers.com" + url);
+        resultFourteenerRoute.setUrl(url);
         resultFourteenerRoute.setFourteenerRouteId(0);
 
-        final HtmlPage page = webClient.getPage("https://www.14ers.com" + url);
+        final HtmlPage page = webClient.getPage(url);
         final HtmlDivision div = (HtmlDivision) page.getByXPath("//div[@class='BldHdr2 bold1']").get(0);
         final HtmlTable table = (HtmlTable) page.getByXPath("//table[@class='routestatsbox']").get(0);
 
@@ -75,13 +75,9 @@ public class FourteenerRouteScraper {
         scrapeRouteFinding(table, resultFourteenerRoute);
         scrapeCommitment(table, resultFourteenerRoute);
 
-
-
         return resultFourteenerRoute;
 
-
     }
-
 
     private static FourteenerRoute scrapeFourteener (String url, HashSet<String> routesSeen, int idx) throws IOException {
 
@@ -119,7 +115,7 @@ public class FourteenerRouteScraper {
 
     }
 
-    private static void  scrapeTotalGain(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
+    private static void scrapeTotalGain(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(5);
         int totalGain = Utils.convertTotalGainIntoInteger(cell.asNormalizedText());
 

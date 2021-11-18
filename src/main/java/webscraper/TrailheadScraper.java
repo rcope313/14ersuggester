@@ -2,12 +2,10 @@ package webscraper;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-
 import models.Trailhead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utility.Utils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +16,12 @@ public class TrailheadScraper {
 
     public static void main (String[] args) throws Exception {
 
-        var trailheads = createListOfTrailheads();
-        System.out.print(trailheads);
+        var trailhead = scrapeTrailhead("https://www.14ers.com/php14ers/trailheadsview.php?thparm=fr07");
+        System.out.print(trailhead);
 
 
     }
+
 
     public static ArrayList<Trailhead> createListOfTrailheads() throws Exception {
 
@@ -34,7 +33,7 @@ public class TrailheadScraper {
         for (String url : trailHeadUrls) {
 
             try {
-                trailHeads.add(new TrailheadScraper().scrapeTrailhead(url, idx));
+                trailHeads.add(scrapeTrailhead("https://www.14ers.com/php14ers" + url, idx));
                 idx ++;
             } catch (Exception e) {
                 LOG.warn("Unable to scrape " + url);
@@ -47,6 +46,19 @@ public class TrailheadScraper {
 
     }
 
+    public static Trailhead scrapeTrailhead (String url) throws Exception {
+
+        Trailhead resultTrailhead = new Trailhead();
+        resultTrailhead.setUrl(url);
+
+        final HtmlPage page = webClient.getPage(url);
+        final HtmlDivision pageTitle = (HtmlDivision) page.getByXPath("//div[@class='pagetitle']").get(0);
+        final HtmlDivision statsBox = (HtmlDivision) page.getByXPath("//div[@class='statsbox']").get(0);
+        final String[] statsBoxAsNormalizedText = statsBox.asNormalizedText().split("\n");
+
+        return scrapeTrailhead(statsBoxAsNormalizedText, pageTitle, resultTrailhead);
+    }
+
     private static Trailhead scrapeTrailhead (String url, int idx) throws Exception {
 
         Trailhead resultTrailhead = new Trailhead();
@@ -54,7 +66,7 @@ public class TrailheadScraper {
         resultTrailhead.setUrl(url);
 
 
-        final HtmlPage page = webClient.getPage("https://www.14ers.com/php14ers" + url);
+        final HtmlPage page = webClient.getPage(url);
         final HtmlDivision pageTitle = (HtmlDivision) page.getByXPath("//div[@class='pagetitle']").get(0);
         final HtmlDivision statsBox = (HtmlDivision) page.getByXPath("//div[@class='statsbox']").get(0);
         final String[] statsBoxAsNormalizedText = statsBox.asNormalizedText().split("\n");
@@ -84,6 +96,7 @@ public class TrailheadScraper {
         return resultTrailhead;
 
     }
+
 
     private static void scrapeName(String str, Trailhead resultTrailhead) {
         resultTrailhead.setName(str);
@@ -117,6 +130,7 @@ public class TrailheadScraper {
         return trailHeadUrls;
 
     }
+
 
     private static void filterDomAttrValue (DomAttr domAttr, ArrayList<String> trailheadUrls) {
         if (domAttr.getValue().length() < 35) {

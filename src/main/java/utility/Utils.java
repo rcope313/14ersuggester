@@ -1,16 +1,13 @@
 package utility;
 
-import models.FourteenerRoute;
 import models.GradeQuality;
-import mysql.MySqlConnection;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
 public class Utils {
+
 
     public static ArrayList<Integer> convertArrayToArrayList (Integer[] array) {
         if (array == null) {
@@ -29,36 +26,34 @@ public class Utils {
 
     }
 
-    public static boolean checkRowDateForUpdate (String routeUrl) {
+    public static boolean checkDateWeekly (String strDate) {
 
-        String query =
-                "SELECT updateDate " +
-                "FROM fourteener_routes " +
-                "WHERE fourteener_routes.url = '" + routeUrl + "';";
-
-        try (Statement stmt = MySqlConnection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
-
-            while (rs.next()) {
-                return checkDateWeekly(rs.getString("fourteener_routes.updateDate"));
-
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
+        if (strDate == null) {
+            return false;
         }
 
-        return false;
+        LocalDate currentDate = java.time.LocalDate.now();
+        LocalDate updateDate = convertStringToDate(strDate);
+        LocalDate updateDatePlusOneWeek = updateDate.plusWeeks(1);
 
-
-    }
-
-    private static boolean checkDateWeekly (String calendarDate) {
-        if (calendarDate.equals("businesslogic")) {
+        if (currentDate.isAfter(updateDatePlusOneWeek) || currentDate.equals(updateDatePlusOneWeek)) {
             return true;
         } else {
             return false;
         }
+    }
+
+    private static LocalDate convertStringToDate (String strDate) {
+
+        if (strDate != null) {
+
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+            LocalDate date = LocalDate.parse(strDate, formatter);
+            return date;
+        } else {
+            return null;
+        }
+
     }
 
     public static GradeQuality convertStringIntoGradeQuality(String gradeString) {
@@ -161,7 +156,7 @@ public class Utils {
     }
 
     public static String convertCoordinatesPhraseToCoordinates (String coordinatesPhrase) {
-        return coordinatesPhrase.split(": ")[1];
+        return coordinatesPhrase.split(": ")[1].trim();
     }
 
     public static int convertRoadDifficultyPhraseToInt(String roadDifficultyPhrase) {
