@@ -1,26 +1,16 @@
 package mysql.update;
 
-import models.FourteenerRoute;
+import models.HikeSuggesterDatabase;
 import models.Trailhead;
 import mysql.MySqlConnection;
+import picocli.CommandLine;
 import utility.Utils;
-import webscraper.FourteenerRouteScraper;
 import webscraper.TrailheadScraper;
-
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.util.ArrayList;
 
 public class UpdateTrailheads {
-
-    public static void main (String[] args) throws Exception {
-
-        updateAllRowsByUpdateDateCoordinates();
-        System.out.print("Fingers crossed");
-
-    }
 
 
     public static void weeklyUpdate (String strDate, String trailheadUrl) throws Exception {
@@ -39,17 +29,17 @@ public class UpdateTrailheads {
     static String mySqlSyntaxWeeklyUpdate(Trailhead trailhead) throws ParseException {
 
         if (trailhead == null) {
-            return "SELECT * FROM trailheads";
+            return "SELECT * FROM " + HikeSuggesterDatabase.TRAILHEADS;
         } else {
             return
-                    "UPDATE hikesuggester.trailheads \n" +
-                            "SET trailheads.name = '" + trailhead.getName() + "', \n" +
-                            "trailheads.coordinates = '" + trailhead.getCoordinates() + "', \n" +
-                            "trailheads.roadDifficulty= " + trailhead.getRoadDifficulty() + ", \n" +
-                            "trailheads.roadDescription = '" + trailhead.getRoadDescription() + "', \n" +
-                            "trailheads.winterAccess = '" + trailhead.getWinterAccess() + "', \n" +
-                            "trailheads.updateDate = '" + java.time.LocalDate.now() + "' \n" +
-                            "WHERE trailheads.url = '" + trailhead.getUrl() + "';";
+                    "UPDATE " + HikeSuggesterDatabase.TRAILHEADS + "\n" +
+                            "SET " + HikeSuggesterDatabase.TRAILHEAD_NAME + " = '" + trailhead.getName() + "', \n" +
+                            HikeSuggesterDatabase.COORDINATES + " = '" + trailhead.getCoordinates() + "', \n" +
+                            HikeSuggesterDatabase.ROAD_DIFFICULTY + " = " + trailhead.getRoadDifficulty() + ", \n" +
+                            HikeSuggesterDatabase.ROAD_DESCRIPTION + " = '" + trailhead.getRoadDescription() + "', \n" +
+                            HikeSuggesterDatabase.WINTER_ACCESS + " = '" + trailhead.getWinterAccess() + "', \n" +
+                            HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE + " = '" + java.time.LocalDate.now() + "' \n" +
+                            "WHERE " + HikeSuggesterDatabase.TRAILHEAD_URL + " = '" + trailhead.getUrl() + "';";
 
         }
     }
@@ -71,13 +61,13 @@ public class UpdateTrailheads {
     static String mySqlSyntaxUpdateDateCoordinates (Trailhead trailhead) throws ParseException {
 
         if (trailhead == null) {
-            return "SELECT * FROM trailheads";
+            return "SELECT * FROM " + HikeSuggesterDatabase.TRAILHEADS;
         } else {
             return
-                    "UPDATE trailheads \n" +
-                            "SET trailheads.coordinates = '" + trailhead.getCoordinates() + "', \n" +
-                            "trailheads.updateDate = '" + java.time.LocalDate.now() + "' \n" +
-                            "WHERE trailheads.url = '" + trailhead.getUrl() + "';";
+                    "UPDATE " + HikeSuggesterDatabase.TRAILHEADS  + "\n" +
+                            "SET " + HikeSuggesterDatabase.COORDINATES + " = '" + trailhead.getCoordinates() + "', \n" +
+                            HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE + " = '" + java.time.LocalDate.now() + "' \n" +
+                            "WHERE " + HikeSuggesterDatabase.TRAILHEAD_URL + " = '" + trailhead.getUrl() + "';";
 
         }
     }
@@ -99,12 +89,12 @@ public class UpdateTrailheads {
     static String mySqlSyntaxUpdateUrl (Trailhead trailhead) {
 
         if (trailhead == null) {
-            return "SELECT * FROM trailheads";
+            return "SELECT * FROM " + HikeSuggesterDatabase.TRAILHEADS;
         } else {
             return
-                    "UPDATE trailheads \n" +
-                            "SET trailheads.url = '" + trailhead.getUrl() + "' \n" +
-                            "WHERE trailheads.trailheadId = " + trailhead.getTrailheadId() + ";";
+                    "UPDATE " + HikeSuggesterDatabase.TRAILHEADS + "\n" +
+                            "SET " + HikeSuggesterDatabase.TRAILHEAD_URL + " = '" + trailhead.getUrl() + "' \n" +
+                            "WHERE " + HikeSuggesterDatabase.TRAILHEAD_ID + " = " + trailhead.getTrailheadId() + ";";
 
         }
     }

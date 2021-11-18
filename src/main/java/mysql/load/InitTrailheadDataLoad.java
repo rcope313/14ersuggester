@@ -1,5 +1,6 @@
 package mysql.load;
 
+import models.HikeSuggesterDatabase;
 import models.Trailhead;
 import mysql.MySqlConnection;
 import utility.Utils;
@@ -12,16 +13,6 @@ import java.util.ArrayList;
 
 public class InitTrailheadDataLoad {
 
-    static final String TABLE = "hike_suggester.trailheads";
-
-    public static void main(String[] args) throws Exception {
-
-        ArrayList<Trailhead> trailheads = TrailheadScraper.createListOfTrailheads();
-        insertAllTrailheadsIntoTable(trailheads);
-
-
-
-    }
 
     private static void insertAllTrailheadsIntoTable (ArrayList<Trailhead> trailheads) {
 
@@ -40,7 +31,7 @@ public class InitTrailheadDataLoad {
         updateForSqlSyntax(trailhead);
 
         try {
-            String sql = "INSERT INTO " + TABLE + " VALUES (" +
+            String sql = "INSERT INTO " + HikeSuggesterDatabase.TRAILHEADS + " VALUES (" +
                     trailhead.getTrailheadId() + ", " +
                     "'" + trailhead.getName() + "', " +
                     "'" + trailhead.getCoordinates() + "', " +
@@ -81,5 +72,6 @@ public class InitTrailheadDataLoad {
 
         return trailhead;
     }
+
 }
 

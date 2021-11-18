@@ -1,26 +1,15 @@
 package mysql.load;
 
 import models.FourteenerRoute;
+import models.HikeSuggesterDatabase;
 import mysql.MySqlConnection;
 import utility.Utils;
 import webscraper.FourteenerRouteScraper;
 import java.sql.*;
 import java.util.ArrayList;
 
-
-
 public class InitFourteenerRotueDataLoad {
-    static final String TABLE = "fourteener_routes";
 
-    public static void main(String[] args) throws Exception {
-
-        ArrayList<FourteenerRoute> routes = FourteenerRouteScraper.createListOfFourteenerRoutes();
-        insertAllFourteenerRoutesIntoTable(routes);
-
-        System.out.print("Nice work!");
-
-
-    }
 
     private static void insertAllFourteenerRoutesIntoTable(ArrayList<FourteenerRoute> fourteenerRoutes) {
 
@@ -43,7 +32,7 @@ public class InitFourteenerRotueDataLoad {
             updateForSqlSyntax(route);
 
             try {
-                String sql = "INSERT INTO " + TABLE + " VALUES (" +
+                String sql = "INSERT INTO " + HikeSuggesterDatabase.FOURTEENER_ROUTES + " VALUES (" +
                         route.getFourteenerRouteId() + ", " +
                         "'" + route.getRouteName() + "', " +
                         "'" + route.getMountainName() + "', " +
