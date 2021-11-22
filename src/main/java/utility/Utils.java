@@ -1,6 +1,9 @@
 package utility;
 
 import models.GradeQuality;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -8,6 +11,18 @@ import java.util.*;
 
 public class Utils {
 
+
+
+    public static boolean convertIntToBoolean (int x) {
+        if (x == 0) {
+            return false;
+        }
+        if (x == 1) {
+            return true;
+        } else {
+            throw new IllegalArgumentException("Value neither 0 or 1");
+        }
+    }
 
     public static ArrayList<Integer> convertArrayToArrayList (Integer[] array) {
         if (array == null) {

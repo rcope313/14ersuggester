@@ -1,8 +1,11 @@
 package subcommands;
 
+import models.CliColumn;
 import mysql.query.MySqlSearchQuery;
 import picocli.CommandLine;
 import utility.Utils;
+
+import java.util.ArrayList;
 
 
 @CommandLine.Command(name = "search", mixinStandardHelpOptions = true)
@@ -114,7 +117,16 @@ public class SearchSubCommand implements Runnable {
         MySqlSearchQuery searchQuery = setSearchQuery();
 
         try {
-            searchQuery.viewMySqlTableWithWeeklyUpdate();
+            String searchQuerySyntax = searchQuery.createMySqlSyntaxForSearchQuery();
+            ArrayList<CliColumn> cliColumnFields;
+
+            if (searchQuery.isVerbose()) {
+                cliColumnFields = searchQuery.designateCliColumnFieldsVerbose();
+            } else {
+                cliColumnFields = searchQuery.designateCliColumnFieldsNonVerbose();
+
+            }
+            searchQuery.viewCliTable(cliColumnFields, searchQuerySyntax);
 
         } catch (Exception e) {
             e.printStackTrace();

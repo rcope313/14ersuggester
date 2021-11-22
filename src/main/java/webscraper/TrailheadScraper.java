@@ -10,17 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TrailheadScraper {
-
     final private static WebClient webClient = new WebClient();
     final private static Logger LOG = LoggerFactory.getLogger(TrailheadScraper.class);
-
-    public static void main (String[] args) throws Exception {
-
-        var trailhead = scrapeTrailhead("https://www.14ers.com/php14ers/trailheadsview.php?thparm=fr07");
-        System.out.print(trailhead);
-
-
-    }
 
 
     public static ArrayList<Trailhead> createListOfTrailheads() throws Exception {
@@ -130,7 +121,6 @@ public class TrailheadScraper {
         return trailHeadUrls;
 
     }
-
 
     private static void filterDomAttrValue (DomAttr domAttr, ArrayList<String> trailheadUrls) {
         if (domAttr.getValue().length() < 35) {

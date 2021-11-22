@@ -1,6 +1,13 @@
 package subcommands;
 
+import models.CliColumn;
+import models.FourteenerRoute;
+import mysql.query.MySqlCompareQuery;
+import mysql.query.MySqlSearchQuery;
 import picocli.CommandLine;
+import utility.Utils;
+
+import java.util.ArrayList;
 
 @CommandLine.Command(name = "compare", mixinStandardHelpOptions = true)
 public class CompareSubCommand implements Runnable {
@@ -22,7 +29,7 @@ public class CompareSubCommand implements Runnable {
     public boolean verbose = false;
 
     @CommandLine.Option(names = {"-u", "--url"}, arity = "1..2",
-            description = "Rather than entering in two seperate Route and Mountain Names, enter two urls to compare.")
+            description = "Rather than entering in two separate Route and Mountain Names, enter two urls to compare.")
     public String[] routeUrls;
 
     @CommandLine.Option(names = {"-q", "--query"}, interactive = true,
@@ -32,6 +39,31 @@ public class CompareSubCommand implements Runnable {
 
     @Override
     public void run() {
+
+        MySqlCompareQuery compareQuery = setCompareQuery();
+
+        String compareQuerySyntax = compareQuery.createMySqlSyntaxForCompareQuery();
+        ArrayList<FourteenerRoute> routeList = compareQuery.createFourteenerRoutesFromCliInput(compareQuerySyntax);
+        ArrayList<CliColumn> cliColumnFields = compareQuery.buildCliColumnFieldsByCliInput(routeList.get(0), routeList.get(1));
+
+        compareQuery.viewCliTable(cliColumnFields, compareQuerySyntax);
+
+    }
+
+    private MySqlCompareQuery setCompareQuery() {
+
+        MySqlCompareQuery compareQuery = new MySqlCompareQuery();
+
+        compareQuery.setVerbose(verbose);
+        compareQuery.setMountainName1(mountainName1);
+        compareQuery.setRouteName1(routeName1);
+        compareQuery.setMountainName2(mountainName2);
+        compareQuery.setRouteName2(routeName2);
+        compareQuery.setRouteUrls(Utils.convertArrayToArrayList(routeUrls));
+        compareQuery.setVerbose(verbose);
+
+        return compareQuery;
+
 
     }
 }

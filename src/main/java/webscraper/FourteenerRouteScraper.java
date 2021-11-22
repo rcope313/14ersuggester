@@ -17,13 +17,6 @@ public class FourteenerRouteScraper {
     final private static Logger LOG = LoggerFactory.getLogger(FourteenerRouteScraper.class);
 
 
-    public static void main (String[] args) throws Exception {
-
-        ArrayList<FourteenerRoute> fourteenerRoutes = new FourteenerRouteScraper().createListOfFourteenerRoutes();
-        System.out.print(fourteenerRoutes);
-
-    }
-
     public static ArrayList<FourteenerRoute> createListOfFourteenerRoutes() throws Exception {
 
         HashSet<String> urlsSeen = new HashSet<>();

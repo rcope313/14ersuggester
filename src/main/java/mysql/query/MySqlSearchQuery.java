@@ -1,15 +1,12 @@
 package mysql.query;
 
+import models.CliColumn;
 import models.HikeSuggesterDatabase;
-import mysql.MySqlConnection;
-import mysql.update.UpdateFourteenerRoutes;
-import mysql.update.UpdateTrailheads;
-import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.StringJoiner;
 
-public class MySqlSearchQuery {
+public class MySqlSearchQuery extends MySqlQuery {
 
     private boolean isVerbose = false;
     private String query = null;
@@ -35,149 +32,43 @@ public class MySqlSearchQuery {
     private ArrayList<String> trailheadUrls;
 
 
+    public static void main (String[] args) {
+        MySqlSearchQuery searchQuery = new MySqlSearchQuery();
+        searchQuery.setMountainNames(new ArrayList<>(Arrays.asList("Handies Peak")));
+        searchQuery.setRouteNames(new ArrayList<>(Arrays.asList("East Slopes")));
+        searchQuery.setVerbose(true);
 
-    public void viewMySqlTableWithWeeklyUpdate()  {
-        if (isVerbose()) {
-            viewMySqlTableVerboseWithWeeklyUpdate();
+
+        String searchQuerySyntax = searchQuery.createMySqlSyntaxForSearchQuery();
+        ArrayList<CliColumn> cliColumnFields;
+
+        if (searchQuery.isVerbose()) {
+            cliColumnFields = searchQuery.designateCliColumnFieldsVerbose();
         } else {
-            viewMySqlTableNonVerboseWithWeeklyUpdate();
+            cliColumnFields = searchQuery.designateCliColumnFieldsNonVerbose();
+
         }
+        searchQuery.viewCliTable(cliColumnFields, searchQuerySyntax);
+
 
     }
 
-    private void viewMySqlTableNonVerboseWithWeeklyUpdate() {
-
-        System.out.format("%-35s%-25s%-15s%-15s%-40s\n", "Route Name", "Mountain Name", "Total Gain", "Route Length", "URL");
-        String query = createSearchQuery();
-
-        try (Statement stmt = MySqlConnection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
-
-            while (rs.next()) {
-                String routeName = rs.getString(HikeSuggesterDatabase.ROUTE_NAME);
-                String mountainName = rs.getString(HikeSuggesterDatabase.MOUNTAIN_NAME);
-                int totalGain = rs.getInt(HikeSuggesterDatabase.TOTAL_GAIN);
-                double routeLength = rs.getDouble(HikeSuggesterDatabase.ROUTE_LENGTH);
-                String routeUrl = rs.getString(HikeSuggesterDatabase.ROUTE_URL);
-                String routeUpdateDate = rs.getString (HikeSuggesterDatabase.ROUTE_UPDATE_DATE);
-                String trailheadUrl = rs.getString(HikeSuggesterDatabase.TRAILHEAD_URL);
-                String trailheadUpdateDate = rs.getString (HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE);
-
-                System.out.format("%-35s%-25s%-15d%-15f%-40s\n", routeName, mountainName, totalGain, routeLength, routeUrl);
-                UpdateFourteenerRoutes.weeklyUpdate(routeUpdateDate, routeUrl);
-                UpdateTrailheads.weeklyUpdate(trailheadUpdateDate, trailheadUrl);
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void viewMySqlTableVerboseWithWeeklyUpdate()  {
-
-        System.out.format
-                ("%-10s%-35s%-25s%-15s" +
-                 "%-17s%-10s%-17s%-20s" +
-                 "%-20s%-17s%-17s%-20s" +
-                 "%-20s%-20s%-20s%-20s" +
-                 "%-50s%-20s\n",
-
-                 "ID",
-                 "Route Name",
-                 "Mountain Name",
-                 "Snow Route",
-
-                 "Standard Route",
-                 "Grade",
-                 "Grade Quality",
-                 "Start Elevation",
-
-                 "Summit Elevation",
-                 "Total Gain",
-                 "Route Length",
-                 "Exposure",
-
-                 "Rockfall Potential",
-                 "Route Finding",
-                 "Commitment",
-                 "Multiple Routes?",
-
-                 "URL",
-                 "Trailhead");
-
-        String query = createSearchQuery();
 
 
-        try (Statement stmt = MySqlConnection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
-
-            while (rs.next()) {
-                int id = rs.getInt(HikeSuggesterDatabase.FOURTEENER_ROUTE_ID);
-                String routeName = rs.getString(HikeSuggesterDatabase.ROUTE_NAME);
-                String mountainName = rs.getString(HikeSuggesterDatabase.MOUNTAIN_NAME);
-                int isSnowRoute = rs.getInt(HikeSuggesterDatabase.IS_SNOW_ROUTE);
-
-                int isStandardRoute = rs.getInt(HikeSuggesterDatabase.IS_STANDARD_ROUTE);
-                int grade = rs.getInt(HikeSuggesterDatabase.GRADE);
-                String gradeQuality = rs.getString(HikeSuggesterDatabase.GRADE_QUALITY);
-                int startElevation = rs.getInt(HikeSuggesterDatabase.START_ELEVATION);
-
-                int summitElevation = rs.getInt(HikeSuggesterDatabase.SUMMIT_ELEVATION);
-                int totalGain = rs.getInt(HikeSuggesterDatabase.TOTAL_GAIN);
-                double routeLength = rs.getDouble(HikeSuggesterDatabase.ROUTE_LENGTH);
-                String exposure = rs.getString(HikeSuggesterDatabase.EXPOSURE);
-
-                String rockfallPotential = rs.getString(HikeSuggesterDatabase.ROCKFALL_POTENTIAL);
-                String routeFinding = rs.getString(HikeSuggesterDatabase.ROUTE_FINDING);
-                String commitment = rs.getString(HikeSuggesterDatabase.COMMITMENT);
-                int hasMultipleRoutes = rs.getInt(HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES);
-
-                String routeUrl = rs.getString(HikeSuggesterDatabase.ROUTE_URL);
-                String trailhead = rs.getString(HikeSuggesterDatabase.ROUTE_TRAILHEAD);
-
-                String routeUpdateDate = rs.getString(HikeSuggesterDatabase.ROUTE_UPDATE_DATE);
-                String trailheadUrl = rs.getString(HikeSuggesterDatabase.TRAILHEAD_URL);
-                String trailheadUpdateDate = rs.getString(HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE);
-
-
-                System.out.format(
-                        "%-10d%-35s%-25s%-15d" +
-                        "%-17d%-10d%-17s%-20d" +
-                        "%-20d%-17d%-17f%-20s" +
-                        "%-20s%-20s%-20s%-20d" +
-                        "%-50s%-20s\n",
-                        id, routeName, mountainName, isSnowRoute,
-                        isStandardRoute, grade, gradeQuality, startElevation,
-                        summitElevation, totalGain, routeLength, exposure,
-                        rockfallPotential, routeFinding, commitment, hasMultipleRoutes,
-                        routeUrl, trailhead);
-
-                UpdateFourteenerRoutes.weeklyUpdate(routeUpdateDate, routeUrl);
-                UpdateTrailheads.weeklyUpdate(trailheadUpdateDate, trailheadUrl);
-
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public String createSearchQuery() {
+    public String createMySqlSyntaxForSearchQuery() {
         if (getQuery() == null) {
-            return createSelectStatement() + createWhereStatements();
+            return createSelectStatementMySqlSyntax() + createWhereStatementsMySqlSyntax();
         } else {
-            return createSearchQueryByInputOnly();
+            return createMySqlSyntaxForSearchQueryByCliInputOnly();
         }
     }
 
-    private String createSearchQueryByInputOnly() {
-        return createSelectStatement() + getQuery();
+    private String createMySqlSyntaxForSearchQueryByCliInputOnly() {
+        return createSelectStatementMySqlSyntax() + getQuery();
 
     }
 
-    private String createSelectStatement() {
+    private String createSelectStatementMySqlSyntax() {
         return
                 "SELECT *" +
                         " FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES  +
@@ -186,40 +77,40 @@ public class MySqlSearchQuery {
 
     }
 
-    private String createWhereStatements() {
-        return "WHERE " + HikeSuggesterDatabase.FOURTEENER_ROUTE_ID + " >= 0 " + createSearchQueryString();
+    private String createWhereStatementsMySqlSyntax() {
+        return "WHERE " + HikeSuggesterDatabase.FOURTEENER_ROUTE_ID + " >= 0 " + createBodyStatementsMySqlSyntax();
 
     }
 
-    private String createSearchQueryString() {
+    private String createBodyStatementsMySqlSyntax() {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        stringJoiner.add(createMountainNamesSyntax());
-        stringJoiner.add(createRouteNamesSyntax());
-        stringJoiner.add(createIsSnowRouteSyntax());
-        stringJoiner.add(createIsStandardRouteSyntax());
-        stringJoiner.add(createGradeSyntax());
-        stringJoiner.add(createGradeQualitySyntax());
-        stringJoiner.add(createTrailheadsSyntax());
-        stringJoiner.add(createStartElevationSyntax());
-        stringJoiner.add(createSummitElevationSyntax());
-        stringJoiner.add(createTotalGainSyntax());
-        stringJoiner.add(createRouteLengthSyntax());
-        stringJoiner.add(createExposureSyntax());
-        stringJoiner.add(createRockfallPotentialSyntax());
-        stringJoiner.add(createRouteFindingSyntax());
-        stringJoiner.add(createCommitmentSyntax());
-        stringJoiner.add(createHasMultipleRoutesSyntax());
-        stringJoiner.add(createRouteUrlsSyntax());
-        stringJoiner.add(createTrailheadCoordinatesSyntax());
-        stringJoiner.add(createRoadDifficultiesSyntax());
-        stringJoiner.add(createTrailheadUrlsSyntax());
+        stringJoiner.add(createMountainNamesMySqlSyntax());
+        stringJoiner.add(createRouteNamesMySqlSyntax());
+        stringJoiner.add(createIsSnowRouteMySqlSyntax());
+        stringJoiner.add(createIsStandardRouteMySqlSyntax());
+        stringJoiner.add(createGradeMySqlSyntax());
+        stringJoiner.add(createGradeQualityMySqlSyntax());
+        stringJoiner.add(createTrailheadsMySqlSyntax());
+        stringJoiner.add(createStartElevationMySqlSyntax());
+        stringJoiner.add(createSummitElevationMySqlSyntax());
+        stringJoiner.add(createTotalGainMySqlSyntax());
+        stringJoiner.add(createRouteLengthMySqlSyntax());
+        stringJoiner.add(createExposureMySqlSyntax());
+        stringJoiner.add(createRockfallPotentialMySqlSyntax());
+        stringJoiner.add(createRouteFindingMySqlSyntax());
+        stringJoiner.add(createCommitmentMySqlSyntax());
+        stringJoiner.add(createHasMultipleRoutesMySqlSyntax());
+        stringJoiner.add(createRouteUrlsMySqlSyntax());
+        stringJoiner.add(createTrailheadCoordinatesMySqlSyntax());
+        stringJoiner.add(createRoadDifficultiesMySqlSyntax());
+        stringJoiner.add(createTrailheadUrlsMySqlSyntax());
 
         return stringJoiner.toString() + ";";
     }
 
 
 
-    private CharSequence createMountainNamesSyntax() {
+    private CharSequence createMountainNamesMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.MOUNTAIN_NAME + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getMountainNames() != null) {
@@ -230,7 +121,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createRouteNamesSyntax() {
+    private CharSequence createRouteNamesMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.ROUTE_NAME + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getRouteNames() != null) {
@@ -241,7 +132,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createIsSnowRouteSyntax() {
+    private CharSequence createIsSnowRouteMySqlSyntax() {
         if (isSnowRoute()) {
             return "AND " + HikeSuggesterDatabase.IS_SNOW_ROUTE + " = true";
         } else {
@@ -249,7 +140,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createIsStandardRouteSyntax() {
+    private CharSequence createIsStandardRouteMySqlSyntax() {
         if (isStandardRoute()) {
             return "AND " + HikeSuggesterDatabase.IS_STANDARD_ROUTE + " = true";
         } else {
@@ -257,7 +148,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createGradeSyntax() {
+    private CharSequence createGradeMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.GRADE + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getGrades() != null) {
@@ -268,7 +159,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createGradeQualitySyntax() {
+    private CharSequence createGradeQualityMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.GRADE_QUALITY + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getGradeQualities() != null) {
@@ -279,7 +170,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createTrailheadsSyntax() {
+    private CharSequence createTrailheadsMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.TRAILHEAD_NAME + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getTrailheads() != null) {
@@ -290,7 +181,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createStartElevationSyntax() {
+    private CharSequence createStartElevationMySqlSyntax() {
         if (getStartElevation() != 0) {
             String startElevationString = String.valueOf(getStartElevation());
             return "AND " + HikeSuggesterDatabase.START_ELEVATION + " >= " + startElevationString;
@@ -299,7 +190,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createSummitElevationSyntax() {
+    private CharSequence createSummitElevationMySqlSyntax() {
         if (getSummitElevation() != 0) {
             String summitElevationString = String.valueOf(getSummitElevation());
             return "AND " + HikeSuggesterDatabase.SUMMIT_ELEVATION + " >= " + summitElevationString;
@@ -308,7 +199,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createTotalGainSyntax() {
+    private CharSequence createTotalGainMySqlSyntax() {
         if (getTotalGain() != 0) {
             String totalGainString = String.valueOf(getTotalGain());
             return "AND " + HikeSuggesterDatabase.TOTAL_GAIN + " >= " + totalGainString;
@@ -317,7 +208,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createRouteLengthSyntax() {
+    private CharSequence createRouteLengthMySqlSyntax() {
         if (getRouteLength() != 0) {
             String routeLengthString = String.valueOf(getRouteLength());
             return "AND " + HikeSuggesterDatabase.ROUTE_LENGTH + " >= " + routeLengthString;
@@ -326,7 +217,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createExposureSyntax() {
+    private CharSequence createExposureMySqlSyntax() {
         if (getExposure() != null) {
             return "AND " + HikeSuggesterDatabase.EXPOSURE + " = '" + getExposure() + "'";
         } else {
@@ -334,7 +225,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createRockfallPotentialSyntax() {
+    private CharSequence createRockfallPotentialMySqlSyntax() {
         if (getRockfallPotential() != null) {
             return "AND " + HikeSuggesterDatabase.ROCKFALL_POTENTIAL + " = '" + getRockfallPotential() + "'";
         } else {
@@ -342,7 +233,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createRouteFindingSyntax() {
+    private CharSequence createRouteFindingMySqlSyntax() {
         if (getRouteFinding() != null) {
             return "AND " + HikeSuggesterDatabase.ROUTE_FINDING + " = '" + getRouteFinding() + "'";
         } else {
@@ -350,7 +241,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createCommitmentSyntax() {
+    private CharSequence createCommitmentMySqlSyntax() {
         if (getCommitment() != null) {
             return "AND " + HikeSuggesterDatabase.COMMITMENT + " = '" + getCommitment() + "'";
         } else {
@@ -358,7 +249,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createHasMultipleRoutesSyntax() {
+    private CharSequence createHasMultipleRoutesMySqlSyntax() {
         if (isHasMultipleRoutes()) {
             return "AND " + HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES + " = true";
         } else {
@@ -366,7 +257,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createRouteUrlsSyntax() {
+    private CharSequence createRouteUrlsMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.ROUTE_URL + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getRouteUrls() != null) {
@@ -377,7 +268,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createTrailheadCoordinatesSyntax() {
+    private CharSequence createTrailheadCoordinatesMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.COORDINATES + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getTrailheadCoordinates() != null) {
@@ -388,7 +279,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createRoadDifficultiesSyntax() {
+    private CharSequence createRoadDifficultiesMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.ROAD_DIFFICULTY + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getRoadDifficulties() != null) {
@@ -399,7 +290,7 @@ public class MySqlSearchQuery {
         }
     }
 
-    private CharSequence createTrailheadUrlsSyntax() {
+    private CharSequence createTrailheadUrlsMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.TRAILHEAD_URL + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (getTrailheadUrls() != null) {
