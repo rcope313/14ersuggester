@@ -123,7 +123,7 @@ public class SearchSubCommand implements Runnable {
             if (searchQuery.isVerbose()) {
                 cliColumnFields = searchQuery.designateCliColumnFieldsVerbose();
             } else {
-                cliColumnFields = searchQuery.designateCliColumnFieldsNonVerbose();
+                cliColumnFields = searchQuery.designateCliColumnFieldsGeneral();
 
             }
             searchQuery.viewCliTable(cliColumnFields, searchQuerySyntax);

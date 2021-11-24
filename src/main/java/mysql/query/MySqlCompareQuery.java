@@ -4,9 +4,12 @@ package mysql.query;
 import models.*;
 import mysql.MySqlConnection;
 import utility.Utils;
+
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.StringJoiner;
 
 
 public class MySqlCompareQuery extends MySqlQuery {
@@ -15,26 +18,12 @@ public class MySqlCompareQuery extends MySqlQuery {
     private String mountainName2;
     private String routeName2;
     private ArrayList<String> routeUrls;
-    private boolean isVerbose;
+
 
     public MySqlCompareQuery() {
         checkFieldsOfMySqlCompareQuery();
     }
 
-    public static void main (String[] args) {
-        MySqlCompareQuery compareQuery = new MySqlCompareQuery();
-        compareQuery.setMountainName1("Humboldt Peak");
-        compareQuery.setRouteName1("West Ridge");
-        compareQuery.setMountainName2("Handies Peak");
-        compareQuery.setRouteName2("East Slopes");
-
-        String compareQuerySyntax = compareQuery.createMySqlSyntaxForCompareQuery();
-        ArrayList<FourteenerRoute> routeList = compareQuery.createFourteenerRoutesFromCliInput(compareQuerySyntax);
-        ArrayList<CliColumn> cliColumnFields = compareQuery.buildCliColumnFieldsByCliInput(routeList.get(0), routeList.get(1));
-
-        compareQuery.viewCliTable(cliColumnFields, compareQuerySyntax);
-
-    }
 
 
 
@@ -119,103 +108,128 @@ public class MySqlCompareQuery extends MySqlQuery {
         return fourteenerRoutes;
     }
 
-    public ArrayList<CliColumn> buildCliColumnFieldsByCliInput(FourteenerRoute route0, FourteenerRoute route1) {
-        ArrayList<CliColumn> cliColumnFields = new ArrayList<>();
-        cliColumnFields.add(CliColumnDesign.MOUNTAIN_NAME);
-        cliColumnFields.add(CliColumnDesign.ROUTE_NAME);
+    public String createDifferenceString (FourteenerRoute route0, FourteenerRoute route1) {
+        StringJoiner differencesStringJoiner = new StringJoiner("\n");
 
-        if (isSnowRouteDiff(route0, route1)) { cliColumnFields.add(CliColumnDesign.SNOW_ROUTE); }
-        if (isStandardRouteDiff(route0, route1)) { cliColumnFields.add(CliColumnDesign.STANDARD_ROUTE); }
-        if (gradeDiff(route0, route1)) { cliColumnFields.add(CliColumnDesign.GRADE); }
-        if (gradeQualityDiff(route0, route1)) { cliColumnFields.add(CliColumnDesign.GRADE_QUALITY); }
-        if (startElevationDiff(route0, route1)) { cliColumnFields.add(CliColumnDesign.START_ELEVATION); }
-        if (summitElevationDiff(route0, route1)) { cliColumnFields.add(CliColumnDesign.SUMMIT_ELEVATION); }
-        if (totalGainDiff(route0, route1)) { cliColumnFields.add(CliColumnDesign.TOTAL_GAIN); }
-        if (routeLengthDiff(route0, route1)) {
-            cliColumnFields.add(CliColumnDesign.ROUTE_LENGTH); }
-        if (exposureDiff(route0, route1)) {
-            cliColumnFields.add(CliColumnDesign.EXPOSURE); }
-        if (rockfallPotentialDiff(route0, route1)) {
-            cliColumnFields.add(CliColumnDesign.ROCKFALL_POTENTIAL); }
-        if (routeFindingDiff(route0, route1)) {
-            cliColumnFields.add(CliColumnDesign.ROUTE_FINDING); }
-        if (commitmentDiff(route0, route1)) {
-            cliColumnFields.add(CliColumnDesign.COMMITMENT); }
-        if (hasMultipleRoutesDiff(route0, route1)) {
-            cliColumnFields.add(CliColumnDesign.MULTIPLE_ROUTES); }
-        if (trailheadDiff(route0, route1)) {
-            cliColumnFields.add(CliColumnDesign.TRAILHEAD); }
+        snowRouteDiff(differencesStringJoiner, route0, route1);
+        standardRouteDiff(differencesStringJoiner, route0, route1);
+        gradeDiff(differencesStringJoiner, route0, route1);
+        gradeQualityDiff(differencesStringJoiner, route0, route1);
+        startElevationDiff(differencesStringJoiner, route0, route1);
+        summitElevationDiff(differencesStringJoiner, route0, route1);
+        totalGainDiff(differencesStringJoiner, route0, route1);
+        routeLengthDiff(differencesStringJoiner, route0, route1);
+        exposureDiff(differencesStringJoiner, route0, route1);
+        rockfallPotentialDiff(differencesStringJoiner, route0, route1);
+        routeFindingDiff(differencesStringJoiner, route0, route1);
+        commitmentDiff(differencesStringJoiner, route0, route1);
+        hasMultipleRoutesDiff(differencesStringJoiner, route0, route1);
+        trailheadDiff(differencesStringJoiner, route0, route1);
 
-        cliColumnFields.add(CliColumnDesign.ROUTE_URL);
-        return cliColumnFields;
+        return differencesStringJoiner.toString();
 
     }
 
-
-
-
-    private boolean isSnowRouteDiff (FourteenerRoute route1, FourteenerRoute route2) {
-        return route1.isSnowRoute() != route2.isSnowRoute();
+    private void snowRouteDiff (StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if  (route0.isSnowRoute() != route1.isSnowRoute()) {
+             differencesStringJoiner.add("Snow Route: " + route0.isSnowRoute() + ", " + route1.isSnowRoute() + "\n");
+        }
 
     }
 
-    private boolean isStandardRouteDiff (FourteenerRoute route1, FourteenerRoute route2) {
-        return route1.isStandardRoute() != route2.isStandardRoute();
+    private void standardRouteDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (route0.isStandardRoute() != route1.isStandardRoute()) {
+            differencesStringJoiner.add("Standard Route: " + route0.isStandardRoute() + ", " + route1.isStandardRoute());
+
+        }
     }
 
-    private boolean gradeDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return route1.getGradeQuality().getGrade() != route2.getGradeQuality().getGrade();
+    private void gradeDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (route0.getGradeQuality().getGrade() != route1.getGradeQuality().getGrade()) {
+            differencesStringJoiner.add("Grade: " + route0.getGradeQuality().getGrade() + ", " + route1.getGradeQuality().getGrade());
+
+        }
     }
 
-    private boolean gradeQualityDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return !route1.getGradeQuality().getQuality().equals(route2.getGradeQuality().getQuality());
+    private void gradeQualityDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (!route0.getGradeQuality().getQuality().equals(route1.getGradeQuality().getQuality())) {
+            differencesStringJoiner.add("Grade Quality: " + route0.getGradeQuality().getQuality() + ", " + route1.getGradeQuality().getQuality());
+
+        }
     }
 
-    private boolean startElevationDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return route1.getStartElevation() != route2.getStartElevation();
+    private void startElevationDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (route0.getStartElevation() != route1.getStartElevation()) {
+            differencesStringJoiner.add("Start Elevation: " + route0.getStartElevation() + ", " + route1.getStartElevation());
+
+        }
     }
 
-    private boolean summitElevationDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return route1.getSummitElevation() != route2.getSummitElevation();
+    private void summitElevationDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (route0.getSummitElevation() != route1.getSummitElevation()) {
+            differencesStringJoiner.add("Summit Elevation: " + route0.getSummitElevation() + ", " + route1.getSummitElevation());
+
+        }
+
     }
 
-    private boolean totalGainDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return route1.getTotalGain() != route2.getTotalGain();
+    private void totalGainDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (route0.getTotalGain() != route1.getTotalGain()) {
+            differencesStringJoiner.add("Total Gain: " + route0.getTotalGain() + ", " + route1.getTotalGain());
+
+        }
     }
 
-    private boolean routeLengthDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return route1.getRouteLength() != route2.getRouteLength();
+    private void routeLengthDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (route0.getRouteLength() != route1.getRouteLength()) {
+            differencesStringJoiner.add("Route Length: " + route0.getRouteLength() + ", " + route1.getRouteLength());
+
+        }
+
     }
 
-    private boolean exposureDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return !route1.getExposure().equals(route2.getExposure());
+    private void exposureDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (!route0.getExposure().equals(route1.getExposure())) {
+            differencesStringJoiner.add("Exposure: " + route0.getExposure() + ", " + route1.getExposure());
+
+        }
     }
 
-    private boolean rockfallPotentialDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return !route1.getRockfallPotential().equals(route2.getRockfallPotential());
+    private void rockfallPotentialDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (!route0.getRockfallPotential().equals(route1.getRockfallPotential())) {
+            differencesStringJoiner.add("Rockfall Potential: " + route0.getRockfallPotential() + ", " + route1.getRockfallPotential());
+
+        }
     }
 
-    private boolean routeFindingDiff (FourteenerRoute route1, FourteenerRoute route2) {
-        return !route1.getRouteFinding().equals(route2.getRouteFinding());
+    private void routeFindingDiff (StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (!route0.getRouteFinding().equals(route1.getRouteFinding())) {
+            differencesStringJoiner.add("Route Finding: " + route0.getRouteFinding() + ", " + route1.getRouteFinding());
+
+
+        }
     }
 
-    private boolean commitmentDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return !route1.getCommitment().equals(route2.getCommitment());
+    private void commitmentDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (!route0.getCommitment().equals(route1.getCommitment())) {
+            differencesStringJoiner.add("Commitment: " + route0.getCommitment() + ", " + route1.getCommitment());
+
+        }
     }
 
-    private boolean hasMultipleRoutesDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return route1.hasMultipleRoutes() != route2.hasMultipleRoutes();
+    private void hasMultipleRoutesDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (route0.hasMultipleRoutes() != route1.hasMultipleRoutes()) {
+            differencesStringJoiner.add("Multiple Routes: " + route0.hasMultipleRoutes() + ", " + route1.hasMultipleRoutes());
+
+        }
     }
 
-    private boolean trailheadDiff(FourteenerRoute route1, FourteenerRoute route2) {
-        return !route1.getTrailhead().equals(route2.getTrailhead());
+    private void trailheadDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+        if (!route0.getTrailhead().equals(route1.getTrailhead())) {
+            differencesStringJoiner.add("Trailhead: " + route0.getTrailhead()+ ", \n" + route1.getTrailhead());
+
+        }
     }
-
-
-
-
-
-
 
 
 
@@ -270,11 +284,5 @@ public class MySqlCompareQuery extends MySqlQuery {
         this.routeUrls = routeUrls;
     }
 
-    public boolean isVerbose() {
-        return isVerbose;
-    }
 
-    public void setVerbose(boolean verbose) {
-        isVerbose = verbose;
-    }
 }

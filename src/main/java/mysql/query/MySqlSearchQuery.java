@@ -1,6 +1,7 @@
 package mysql.query;
 
 import models.CliColumn;
+import models.CliColumnDesign;
 import models.HikeSuggesterDatabase;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,24 +33,30 @@ public class MySqlSearchQuery extends MySqlQuery {
     private ArrayList<String> trailheadUrls;
 
 
-    public static void main (String[] args) {
-        MySqlSearchQuery searchQuery = new MySqlSearchQuery();
-        searchQuery.setMountainNames(new ArrayList<>(Arrays.asList("Handies Peak")));
-        searchQuery.setRouteNames(new ArrayList<>(Arrays.asList("East Slopes")));
-        searchQuery.setVerbose(true);
+    public ArrayList<CliColumn> designateCliColumnFieldsVerbose() {
+        ArrayList<CliColumn> cliColumnFields = new ArrayList<>();
+        cliColumnFields.add(CliColumnDesign.MOUNTAIN_NAME);
+        cliColumnFields.add(CliColumnDesign.ROUTE_NAME);
+
+        if (isSnowRoute() == true) { cliColumnFields.add(CliColumnDesign.SNOW_ROUTE); }
+        if (isStandardRoute() == true) { cliColumnFields.add(CliColumnDesign.STANDARD_ROUTE); }
+        if (getGradeQualities() != null) { cliColumnFields.add(CliColumnDesign.GRADE_QUALITY); }
+        if (getStartElevation() != 0) { cliColumnFields.add(CliColumnDesign.START_ELEVATION); }
+        if (getSummitElevation() != 0) { cliColumnFields.add(CliColumnDesign.SUMMIT_ELEVATION); }
+        if (getExposure() != null) { cliColumnFields.add(CliColumnDesign.EXPOSURE); }
+        if (getRockfallPotential() != null) { cliColumnFields.add(CliColumnDesign.ROCKFALL_POTENTIAL); }
+        if (getRouteFinding() != null) { cliColumnFields.add(CliColumnDesign.ROUTE_FINDING); }
+        if (getCommitment() != null) { cliColumnFields.add(CliColumnDesign.COMMITMENT); }
+        if (isHasMultipleRoutes() == true) { cliColumnFields.add(CliColumnDesign.MULTIPLE_ROUTES); }
+        if (getTrailheads() != null) { cliColumnFields.add(CliColumnDesign.TRAILHEAD); }
+
+        cliColumnFields.add(CliColumnDesign.GRADE);
+        cliColumnFields.add(CliColumnDesign.TOTAL_GAIN);
+        cliColumnFields.add(CliColumnDesign.ROUTE_LENGTH);
+        cliColumnFields.add(CliColumnDesign.ROUTE_URL);
 
 
-        String searchQuerySyntax = searchQuery.createMySqlSyntaxForSearchQuery();
-        ArrayList<CliColumn> cliColumnFields;
-
-        if (searchQuery.isVerbose()) {
-            cliColumnFields = searchQuery.designateCliColumnFieldsVerbose();
-        } else {
-            cliColumnFields = searchQuery.designateCliColumnFieldsNonVerbose();
-
-        }
-        searchQuery.viewCliTable(cliColumnFields, searchQuerySyntax);
-
+        return cliColumnFields;
 
     }
 
@@ -107,8 +114,6 @@ public class MySqlSearchQuery extends MySqlQuery {
 
         return stringJoiner.toString() + ";";
     }
-
-
 
     private CharSequence createMountainNamesMySqlSyntax() {
         String syntax = "AND " + HikeSuggesterDatabase.MOUNTAIN_NAME + " IN (";
@@ -300,9 +305,6 @@ public class MySqlSearchQuery extends MySqlQuery {
             return "";
         }
     }
-
-
-
 
 
 

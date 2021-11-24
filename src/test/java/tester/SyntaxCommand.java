@@ -14,7 +14,7 @@ public class SyntaxCommand implements Runnable {
         table[2] = new String[] { "Pop tarts", "1", "4" };
         table[3] = new String[] { "Sun Chips", "5", "2" };
 
-        String itemId = CommandLine.Help.Ansi.AUTO.string("@|bold,green,underline Items#|@");
+        String itemId = CommandLine.Help.Ansi.AUTO.string("@|bold,red,underline Items#|@");
 
         System.out.format("%-15s%-15s%-15s%-15s\n", "ItemId", "Item", "Price", "Quantity");
         for (int i = 0; i < table.length; i++) {

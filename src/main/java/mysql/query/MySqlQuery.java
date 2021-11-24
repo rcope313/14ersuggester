@@ -2,8 +2,7 @@ package mysql.query;
 
 import models.*;
 import mysql.MySqlConnection;
-import mysql.update.UpdateFourteenerRoutes;
-import mysql.update.UpdateTrailheads;
+import picocli.CommandLine;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -14,18 +13,13 @@ import java.util.StringJoiner;
 public abstract class MySqlQuery {
 
 
+    public void viewCliTable(ArrayList<CliColumn> cliColumnFields, String querySyntax, String differenceString)  {
+        buildCliTableHeaders(cliColumnFields);
+        inputDataIntoCliTable(querySyntax, cliColumnFields, differenceString);
 
-    public void weeklyTrailheadUpdate(String strDate, Trailhead trailhead) throws Exception {
-        UpdateTrailheads.weeklyUpdate(strDate, trailhead.getUrl());
     }
 
-    public void weeklyFourteenerRouteUpdate(String strDate, FourteenerRoute route) throws Exception {
-        UpdateFourteenerRoutes.weeklyUpdate(strDate, route.getUrl());
-    }
-
-
-
-    public void viewCliTable(ArrayList<CliColumn> cliColumnFields, String querySyntax )  {
+    public void viewCliTable(ArrayList<CliColumn> cliColumnFields, String querySyntax)  {
         buildCliTableHeaders(cliColumnFields);
         inputDataIntoCliTable(querySyntax, cliColumnFields);
 
@@ -33,56 +27,98 @@ public abstract class MySqlQuery {
 
     private void buildCliTableHeaders(ArrayList<CliColumn> cliColumnFields) {
 
+        ArrayList<String> cliTableHeaders = new ArrayList<>();
+        cliColumnFields.forEach((cliColumn) -> cliTableHeaders.add(cliColumn.hikeSuggesterCliColumn));
+        var cliTableHeadersArray = cliTableHeaders.toArray();
 
-        ArrayList<String> columnNamesList = new ArrayList<>();
-        cliColumnFields.forEach((cliColumn) -> columnNamesList.add(cliColumn.hikeSuggesterCliColumn));
-        var columnNamesArray = columnNamesList.toArray();
+        System.out.format(buildCliHeaderFormatter(cliColumnFields), cliTableHeadersArray);
 
-        StringJoiner formatHeaderStringJoiner = new StringJoiner("");
-        cliColumnFields.forEach((cliColumn) -> formatHeaderStringJoiner.add(cliColumn.formatString + "s"));
-        formatHeaderStringJoiner.add("\n");
 
-        System.out.format(formatHeaderStringJoiner.toString(), columnNamesArray);
+    }
+
+    private void inputDataIntoCliTable (String compareQueryMySqlSyntax, ArrayList<CliColumn> cliColumnFields, String differenceString) {
+
+        try (Statement stmt = MySqlConnection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(compareQueryMySqlSyntax);
+
+            while (rs.next()) {
+
+                ArrayList<Object> columnDataList = new ArrayList<>();
+
+                for (int idx = 0; idx < cliColumnFields.size(); idx ++) {
+                    columnDataList.add(getResultSetValue(rs, cliColumnFields.get(idx)));
+
+                }
+
+                var columnDataArray = columnDataList.toArray();
+                System.out.format(buildCliDataFormatter(cliColumnFields), columnDataArray);
+
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        String differences = CommandLine.Help.Ansi.AUTO.string("@|bold,red,underline Differences|@");
+        System.out.print("\n" + differences + "\n");
+        System.out.print(differenceString + "\n" + "\n");
+
 
 
     }
 
     private void inputDataIntoCliTable (String compareQueryMySqlSyntax, ArrayList<CliColumn> cliColumnFields) {
 
-        StringJoiner formatDataStringJoiner = new StringJoiner("");
-        cliColumnFields.forEach((cliColumn) -> formatDataStringJoiner.add(cliColumn.formatString + cliColumn.formatRegex));
-        formatDataStringJoiner.add("\n");
-
         try (Statement stmt = MySqlConnection.createStatement()) {
             ResultSet rs = stmt.executeQuery(compareQueryMySqlSyntax);
 
             while (rs.next()) {
-                ArrayList<Object> columnDataList = new ArrayList<>();
-                cliColumnFields.forEach((cliColumn) -> {
-                    try {
-                        columnDataList.add(getResultSetValue(rs, cliColumn));
-                    } catch (SQLException throwables) {
-                        throwables.printStackTrace();
-                    }
-                });
 
+                ArrayList<Object> columnDataList = new ArrayList<>();
+
+                for (int idx = 0; idx < cliColumnFields.size(); idx ++) {
+                    columnDataList.add(getResultSetValue(rs, cliColumnFields.get(idx)));
+
+                }
 
                 var columnDataArray = columnDataList.toArray();
-                System.out.format(formatDataStringJoiner.toString(), columnDataArray);
+                System.out.format(buildCliDataFormatter(cliColumnFields), columnDataArray);
 
             }
 
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
+
+
+    }
+
+    private static String buildCliDataFormatter(ArrayList<CliColumn> cliColumnFields) {
+        StringJoiner formatDataStringJoiner = new StringJoiner("");
+        cliColumnFields.forEach((cliColumn) -> formatDataStringJoiner.add(cliColumn.formatString + cliColumn.formatRegex));
+        formatDataStringJoiner.add("\n");
+
+        return formatDataStringJoiner.toString();
+
+    }
+
+    private static String buildCliHeaderFormatter(ArrayList<CliColumn> cliColumnFields) {
+        StringJoiner formatHeaderStringJoiner = new StringJoiner("");
+        cliColumnFields.forEach((cliColumn) -> formatHeaderStringJoiner.add(cliColumn.formatString + "s"));
+        formatHeaderStringJoiner.add("\n");
+
+        return formatHeaderStringJoiner.toString();
+
     }
 
     private static Object getResultSetValue (ResultSet rs, CliColumn cliColumn) throws SQLException {
 
-        if (cliColumn.databaseColumn.equals(HikeSuggesterDatabase.ROUTE_UPDATE_DATE)) {
+        if (cliColumn.databaseColumn == null ||
+            cliColumn.databaseColumn.equals(HikeSuggesterDatabase.ROUTE_UPDATE_DATE)) {
+            return "";
 
         }
-
 
         if (cliColumn.formatRegex.equals("s")) {
             return rs.getString(cliColumn.databaseColumn);
@@ -110,9 +146,7 @@ public abstract class MySqlQuery {
 
     }
 
-
-
-    public ArrayList<CliColumn> designateCliColumnFieldsNonVerbose() {
+    public ArrayList<CliColumn> designateCliColumnFieldsGeneral() {
         ArrayList<CliColumn> cliColumnFields = new ArrayList<>();
         cliColumnFields.add(CliColumnDesign.MOUNTAIN_NAME);
         cliColumnFields.add(CliColumnDesign.ROUTE_NAME);
@@ -125,30 +159,7 @@ public abstract class MySqlQuery {
         return cliColumnFields;
     }
 
-    public ArrayList<CliColumn> designateCliColumnFieldsVerbose() {
-        ArrayList<CliColumn> cliColumnFields = new ArrayList<>();
-        cliColumnFields.add(CliColumnDesign.MOUNTAIN_NAME);
-        cliColumnFields.add(CliColumnDesign.ROUTE_NAME);
-        cliColumnFields.add(CliColumnDesign.SNOW_ROUTE);
-        cliColumnFields.add(CliColumnDesign.STANDARD_ROUTE);
-        cliColumnFields.add(CliColumnDesign.GRADE);
-        cliColumnFields.add(CliColumnDesign.GRADE_QUALITY);
-        cliColumnFields.add(CliColumnDesign.START_ELEVATION);
-        cliColumnFields.add(CliColumnDesign.SUMMIT_ELEVATION);
-        cliColumnFields.add(CliColumnDesign.TOTAL_GAIN);
-        cliColumnFields.add(CliColumnDesign.ROUTE_LENGTH);
-        cliColumnFields.add(CliColumnDesign.EXPOSURE);
-        cliColumnFields.add(CliColumnDesign.ROCKFALL_POTENTIAL);
-        cliColumnFields.add(CliColumnDesign.ROUTE_FINDING);
-        cliColumnFields.add(CliColumnDesign.COMMITMENT);
-        cliColumnFields.add(CliColumnDesign.MULTIPLE_ROUTES);
-        cliColumnFields.add(CliColumnDesign.TRAILHEAD);
-        cliColumnFields.add(CliColumnDesign.ROUTE_URL);
 
-
-        return cliColumnFields;
-
-    }
 
 
 

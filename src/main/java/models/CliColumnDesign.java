@@ -9,16 +9,16 @@ public class CliColumnDesign {
             (HikeSuggesterDatabase.ROUTE_NAME, "Route Name", "%-35", "s");
 
     final public static CliColumn MOUNTAIN_NAME = new CliColumn
-            (HikeSuggesterDatabase.MOUNTAIN_NAME, "Mountain Name", "%-25", "s");
+            (HikeSuggesterDatabase.MOUNTAIN_NAME, "Mountain Name", "%-22", "s");
 
     final public static CliColumn SNOW_ROUTE = new CliColumn
             (HikeSuggesterDatabase.IS_SNOW_ROUTE, "Snow Route", "%-15", "d");
 
     final public static CliColumn STANDARD_ROUTE = new CliColumn
-            (HikeSuggesterDatabase.IS_STANDARD_ROUTE, "Standard Roue", "%-17", "d");
+            (HikeSuggesterDatabase.IS_STANDARD_ROUTE, "Standard Roue", "%-15", "d");
 
     final public static CliColumn GRADE = new CliColumn
-            (HikeSuggesterDatabase.GRADE, "Grade", "%-10", "d");
+            (HikeSuggesterDatabase.GRADE, "Grade", "%-7", "d");
 
     final public static CliColumn GRADE_QUALITY = new CliColumn
             (HikeSuggesterDatabase.GRADE_QUALITY, "Grade Quality", "%-17", "s");
@@ -30,22 +30,22 @@ public class CliColumnDesign {
             (HikeSuggesterDatabase.SUMMIT_ELEVATION, "Summit Elevation", "%-20", "d");
 
     final public static CliColumn TOTAL_GAIN = new CliColumn
-            (HikeSuggesterDatabase.TOTAL_GAIN, "Total Gain", "%-17", "d");
+            (HikeSuggesterDatabase.TOTAL_GAIN, "Total Gain", "%-12", "d");
 
     final public static CliColumn ROUTE_LENGTH = new CliColumn
-            (HikeSuggesterDatabase.ROUTE_LENGTH, "Route Length", "%-17", "f");
+            (HikeSuggesterDatabase.ROUTE_LENGTH, "Route Length", "%-15", "f");
 
     final public static CliColumn EXPOSURE = new CliColumn
-            (HikeSuggesterDatabase.EXPOSURE, "Exposure", "%-20", "s");
+            (HikeSuggesterDatabase.EXPOSURE, "Exposure", "%-13", "s");
 
     final public static CliColumn ROCKFALL_POTENTIAL = new CliColumn
-            (HikeSuggesterDatabase.ROCKFALL_POTENTIAL, "Rockfall Potential", "%-20", "s");
+            (HikeSuggesterDatabase.ROCKFALL_POTENTIAL, "Rockfall Potential", "%-15", "s");
 
     final public static CliColumn ROUTE_FINDING = new CliColumn
-            (HikeSuggesterDatabase.ROUTE_FINDING, "Route Finding", "%-17", "s");
+            (HikeSuggesterDatabase.ROUTE_FINDING, "Route Finding", "%-15", "s");
 
     final public static CliColumn COMMITMENT = new CliColumn
-            (HikeSuggesterDatabase.COMMITMENT, "Commitment", "%-17", "s");
+            (HikeSuggesterDatabase.COMMITMENT, "Commitment", "%-13", "s");
 
     final public static CliColumn MULTIPLE_ROUTES = new CliColumn
             (HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES, "Multiple Routes", "%-20", "d");

@@ -3,7 +3,6 @@ package subcommands;
 import models.CliColumn;
 import models.FourteenerRoute;
 import mysql.query.MySqlCompareQuery;
-import mysql.query.MySqlSearchQuery;
 import picocli.CommandLine;
 import utility.Utils;
 
@@ -24,17 +23,12 @@ public class CompareSubCommand implements Runnable {
     @CommandLine.Parameters(index = "3", description = "Second argument, route name")
     String routeName2;
 
-    @CommandLine.Option(names = {"-v", "--verbose"},
-            description = "Verbose. Result output will yield all table columns, rather than only differences in arguments")
-    public boolean verbose = false;
 
     @CommandLine.Option(names = {"-u", "--url"}, arity = "1..2",
             description = "Rather than entering in two separate Route and Mountain Names, enter two urls to compare.")
     public String[] routeUrls;
 
-    @CommandLine.Option(names = {"-q", "--query"}, interactive = true,
-            description = "Write MySql query. Tables name: hikesuggester.fourtneer_routes, hikesuggester.trailheads")
-    public String query;
+
 
 
     @Override
@@ -44,9 +38,12 @@ public class CompareSubCommand implements Runnable {
 
         String compareQuerySyntax = compareQuery.createMySqlSyntaxForCompareQuery();
         ArrayList<FourteenerRoute> routeList = compareQuery.createFourteenerRoutesFromCliInput(compareQuerySyntax);
-        ArrayList<CliColumn> cliColumnFields = compareQuery.buildCliColumnFieldsByCliInput(routeList.get(0), routeList.get(1));
+        String differenceString = compareQuery.createDifferenceString(routeList.get(0), routeList.get(1));
 
-        compareQuery.viewCliTable(cliColumnFields, compareQuerySyntax);
+        compareQuery.viewCliTable
+                (compareQuery.designateCliColumnFieldsGeneral(),
+                compareQuerySyntax,
+                differenceString);
 
     }
 
@@ -54,13 +51,12 @@ public class CompareSubCommand implements Runnable {
 
         MySqlCompareQuery compareQuery = new MySqlCompareQuery();
 
-        compareQuery.setVerbose(verbose);
         compareQuery.setMountainName1(mountainName1);
         compareQuery.setRouteName1(routeName1);
         compareQuery.setMountainName2(mountainName2);
         compareQuery.setRouteName2(routeName2);
         compareQuery.setRouteUrls(Utils.convertArrayToArrayList(routeUrls));
-        compareQuery.setVerbose(verbose);
+
 
         return compareQuery;
 
