@@ -6,8 +6,15 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="hikesuggesterDatabase" />
+        <module name="hikesuggesterCli" />
+        <module name="hikesuggesterWebScraper" />
         <module name="hikesuggesterCore" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="hikesuggesterCLI" target="14" />
+      <module name="hikesuggesterClient" target="14" />
+    </bytecodeTargetLevel>
   </component>
 </project>

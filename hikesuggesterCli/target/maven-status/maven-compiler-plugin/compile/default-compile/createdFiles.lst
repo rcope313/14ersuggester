@@ -1,0 +1,4 @@
+subcommands/SubCommand.class
+subcommands/CompareSubCommand.class
+subcommands/SearchSubCommand.class
+HikeSuggesterCli.class

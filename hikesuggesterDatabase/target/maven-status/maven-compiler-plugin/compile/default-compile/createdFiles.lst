@@ -1,0 +1,8 @@
+database/query/CompareQuery.class
+database/DatabaseConnection.class
+database/update/UpdateTrailheads.class
+database/load/InitTrailheadDataLoad.class
+database/query/SearchQuery.class
+database/load/InitFourteenerRouteDataLoad.class
+database/query/Query.class
+database/update/UpdateFourteenerRoutes.class
