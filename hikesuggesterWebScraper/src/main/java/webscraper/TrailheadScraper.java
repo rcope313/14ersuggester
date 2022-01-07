@@ -8,7 +8,6 @@ import models.Trailhead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utility.Utils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,32 +15,23 @@ public class TrailheadScraper {
     final private static WebClient webClient = new WebClient();
     final private static Logger LOG = LoggerFactory.getLogger(TrailheadScraper.class);
 
-
     public static ArrayList<Trailhead> createListOfTrailheads() throws Exception {
-
         ArrayList<String> trailHeadUrls = getTrailHeadUrlList();
         ArrayList<Trailhead> trailHeads = new ArrayList<>();
         int idx = 1;
 
-
         for (String url : trailHeadUrls) {
-
             try {
                 trailHeads.add(scrapeTrailhead("https://www.14ers.com/php14ers" + url, idx));
                 idx ++;
             } catch (Exception e) {
                 LOG.warn("Unable to scrape " + url);
             }
-
         }
-
-
         return trailHeads;
-
     }
 
     public static Trailhead scrapeTrailhead (String url) throws Exception {
-
         Trailhead resultTrailhead = new Trailhead();
         resultTrailhead.setUrl(url);
 
@@ -54,11 +44,9 @@ public class TrailheadScraper {
     }
 
     private static Trailhead scrapeTrailhead (String url, int idx) throws Exception {
-
         Trailhead resultTrailhead = new Trailhead();
         resultTrailhead.setTrailheadId(idx);
         resultTrailhead.setUrl(url);
-
 
         final HtmlPage page = webClient.getPage(url);
         final HtmlDivision pageTitle = (HtmlDivision) page.getByXPath("//div[@class='pagetitle']").get(0);
@@ -69,7 +57,6 @@ public class TrailheadScraper {
     }
 
     private static Trailhead scrapeTrailhead(String[] statsBoxAsNormalizedText, HtmlDivision pageTitle, Trailhead resultTrailhead) {
-
         scrapeName(pageTitle.asNormalizedText(), resultTrailhead);
 
         if (statsBoxAsNormalizedText.length == 11) {
@@ -83,14 +70,9 @@ public class TrailheadScraper {
             scrapeRoadDifficulty(statsBoxAsNormalizedText[3], resultTrailhead);
             scrapeRoadDescription(statsBoxAsNormalizedText[6], resultTrailhead);
             scrapeWinterAccess(statsBoxAsNormalizedText[8], resultTrailhead);
-
-
         }
-
         return resultTrailhead;
-
     }
-
 
     private static void scrapeName(String str, Trailhead resultTrailhead) {
         resultTrailhead.setName(str);
@@ -113,16 +95,13 @@ public class TrailheadScraper {
     }
 
     private static ArrayList<String> getTrailHeadUrlList() throws Exception {
-
         ArrayList<String> trailHeadUrls = new ArrayList<>();
 
         final HtmlPage page = webClient.getPage("https://www.14ers.com/php14ers/trailheadsmain.php");
         final List<DomAttr> domList = page.getByXPath("//div[@class='singlerange']//a/@href");
-
         domList.forEach((domAttr) -> filterDomAttrValue(domAttr, trailHeadUrls));
 
         return trailHeadUrls;
-
     }
 
     private static void filterDomAttrValue (DomAttr domAttr, ArrayList<String> trailheadUrls) {
@@ -130,5 +109,4 @@ public class TrailheadScraper {
             trailheadUrls.add(domAttr.getValue().substring(1));
         }
     }
-
 }
