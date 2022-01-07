@@ -31,7 +31,7 @@ public class TrailheadScraper {
         return trailHeads;
     }
 
-    public static Trailhead scrapeTrailhead (String url) throws Exception {
+    public static Trailhead scrapeTrailhead(String url) throws Exception {
         Trailhead resultTrailhead = new Trailhead();
         resultTrailhead.setUrl(url);
 
@@ -43,7 +43,7 @@ public class TrailheadScraper {
         return scrapeTrailhead(statsBoxAsNormalizedText, pageTitle, resultTrailhead);
     }
 
-    private static Trailhead scrapeTrailhead (String url, int idx) throws Exception {
+    private static Trailhead scrapeTrailhead(String url, int idx) throws Exception {
         Trailhead resultTrailhead = new Trailhead();
         resultTrailhead.setTrailheadId(idx);
         resultTrailhead.setUrl(url);
@@ -104,7 +104,7 @@ public class TrailheadScraper {
         return trailHeadUrls;
     }
 
-    private static void filterDomAttrValue (DomAttr domAttr, ArrayList<String> trailheadUrls) {
+    private static void filterDomAttrValue(DomAttr domAttr, ArrayList<String> trailheadUrls) {
         if (domAttr.getValue().length() < 35) {
             trailheadUrls.add(domAttr.getValue().substring(1));
         }

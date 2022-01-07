@@ -19,7 +19,7 @@ public class MountainForecastScraper {
         var result = new MountainForecastScraper().scrapeMountainForecast("Mt. Evans");
     }
 
-    public MountainForecast scrapeMountainForecast (String mountainName) throws IOException {
+    public MountainForecast scrapeMountainForecast(String mountainName) throws IOException {
         MountainForecast resultMountainForecast = new MountainForecast();
         String mountainForecastUrl = getMountainForecastUrl(mountainName);
         resultMountainForecast.setUrl(mountainForecastUrl);
@@ -45,7 +45,7 @@ public class MountainForecastScraper {
         return resultMountainForecast;
     }
 
-    private String getMountainForecastUrl (String mountainName) {
+    private String getMountainForecastUrl(String mountainName) {
         if (mountainName.substring(0,2).equals("Mt")) {
             return "Mount" + "-" + mountainName.split(". ")[1];
         }
