@@ -8,28 +8,21 @@ import com.gargoylesoftware.htmlunit.html.HtmlSelect;
 import models.MountainForecast;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.io.IOException;
 import java.util.List;
 
 public class MountainForecastScraper {
-
     final private static WebClient webClient = new WebClient();
     final private static Logger LOG = LoggerFactory.getLogger(MountainForecastScraper.class);
 
-
-
     public static void main (String[] args) throws IOException {
         var result = new MountainForecastScraper().scrapeMountainForecast("Mt. Evans");
-
     }
-
 
     public MountainForecast scrapeMountainForecast (String mountainName) throws IOException {
         MountainForecast resultMountainForecast = new MountainForecast();
         String mountainForecastUrl = getMountainForecastUrl(mountainName);
         resultMountainForecast.setUrl(mountainForecastUrl);
-
         webClient.getOptions().setThrowExceptionOnScriptError(false);
 
         final HtmlPage page = webClient.getPage("https://www.mountain-forecast.com/peaks/"
@@ -38,7 +31,6 @@ public class MountainForecastScraper {
 //        HtmlButton elevationButton = (HtmlButton) page.getByXPath("//button[@class='forecast-table-elevation__dropdown']").get(0);
         List<HtmlButton> buttons = page.getByXPath("//button");
         List<HtmlSelect> selects = page.getByXPath("//select");
-
 
         HtmlParagraph paragraph0 = (HtmlParagraph) page.getByXPath("//p[@class='location-summary__text']").get(0);
         HtmlParagraph paragraph1 = (HtmlParagraph) page.getByXPath("//p[@class='location-summary__text']").get(1);
@@ -50,11 +42,6 @@ public class MountainForecastScraper {
                 e.printStackTrace();
             }
         });
-
-
-
-
-
         return resultMountainForecast;
     }
 
@@ -65,6 +52,5 @@ public class MountainForecastScraper {
         else {
             return mountainName;
         }
-
     }
 }
