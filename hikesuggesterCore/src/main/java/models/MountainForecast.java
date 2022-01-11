@@ -1,67 +1,46 @@
 package models;
 
 public class MountainForecast {
-    private String shortTermForecastBase;
-    private String shortTermForecastMid;
-    private String shortTermForecastSummit;
-    private String longTermForecastBase;
-    private String longTermForecastMid;
-    private String longTermForecastSummit;
-    private String url;
+    private final String time;
+    private final String abbreviatedForecast;
+    private final int temp;
+    private final String detailedForecast;
+    private final String hourlyWeatherForecastUrl;
 
-    public String getShortTermForecastBase() {
-        return shortTermForecastBase;
+    public MountainForecast(String time, String abbreviatedForecast, int temp, String detailedForecast, String hourlyWeatherForecastUrl) {
+        this.time = time;
+        this.abbreviatedForecast = abbreviatedForecast;
+        this.temp = temp;
+        this.detailedForecast = detailedForecast;
+        this.hourlyWeatherForecastUrl = hourlyWeatherForecastUrl;
     }
 
-    public void setShortTermForecastBase(String shortTermForecastBase) {
-        this.shortTermForecastBase = shortTermForecastBase;
+    public MountainForecast(String time, int temp, String detailedForecast) {
+        this.time = time;
+        this.temp = temp;
+        this.detailedForecast = detailedForecast;
+        this.abbreviatedForecast = "";
+        this.hourlyWeatherForecastUrl = "";
     }
 
-    public String getShortTermForecastMid() {
-        return shortTermForecastMid;
+    public String getTime() {
+        return time;
     }
 
-    public void setShortTermForecastMid(String shortTermForecastMid) {
-        this.shortTermForecastMid = shortTermForecastMid;
+    public String getAbbreviatedForecast() {
+        return abbreviatedForecast;
     }
 
-    public String getShortTermForecastSummit() {
-        return shortTermForecastSummit;
+    public int getTemp() {
+        return temp;
     }
 
-    public void setShortTermForecastSummit(String shortTermForecastSummit) {
-        this.shortTermForecastSummit = shortTermForecastSummit;
+    public String getDetailedForecast() {
+        return detailedForecast;
     }
 
-    public String getLongTermForecastBase() {
-        return longTermForecastBase;
-    }
-
-    public void setLongTermForecastBase(String longTermForecastBase) {
-        this.longTermForecastBase = longTermForecastBase;
-    }
-
-    public String getLongTermForecastMid() {
-        return longTermForecastMid;
-    }
-
-    public void setLongTermForecastMid(String longTermForecastMid) {
-        this.longTermForecastMid = longTermForecastMid;
-    }
-
-    public String getLongTermForecastSummit() {
-        return longTermForecastSummit;
-    }
-
-    public void setLongTermForecastSummit(String longTermForecastSummit) {
-        this.longTermForecastSummit = longTermForecastSummit;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public String getHourlyWeatherForecastUrl() {
+        return hourlyWeatherForecastUrl;
     }
 }
+
