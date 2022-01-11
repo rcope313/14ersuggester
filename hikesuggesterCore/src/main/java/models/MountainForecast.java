@@ -1,46 +1,63 @@
 package models;
 
+import java.util.Date;
+
 public class MountainForecast {
-    private final String time;
-    private final String abbreviatedForecast;
-    private final int temp;
-    private final String detailedForecast;
-    private final String hourlyWeatherForecastUrl;
+    private final Date date;
+    private final int temperature;
+    private final int windChill;
+    private final int windSpeed;
+    private final int windDirection;
+    private final int humidity;
+    private final int cloudCover;
+    private final int precipProbability;
+    private final int precipAmount;
 
-    public MountainForecast(String time, String abbreviatedForecast, int temp, String detailedForecast, String hourlyWeatherForecastUrl) {
-        this.time = time;
-        this.abbreviatedForecast = abbreviatedForecast;
-        this.temp = temp;
-        this.detailedForecast = detailedForecast;
-        this.hourlyWeatherForecastUrl = hourlyWeatherForecastUrl;
+    public MountainForecast(Date date, int temperature, int windChill, int windSpeed, int windDirection, int humidity, int cloudCover, int precipProbability, int precipAmount) {
+        this.date = date;
+        this.temperature = temperature;
+        this.windChill = windChill;
+        this.windSpeed = windSpeed;
+        this.windDirection = windDirection;
+        this.humidity = humidity;
+        this.cloudCover = cloudCover;
+        this.precipProbability = precipProbability;
+        this.precipAmount = precipAmount;
     }
 
-    public MountainForecast(String time, int temp, String detailedForecast) {
-        this.time = time;
-        this.temp = temp;
-        this.detailedForecast = detailedForecast;
-        this.abbreviatedForecast = "";
-        this.hourlyWeatherForecastUrl = "";
+    public Date getDate() {
+        return date;
     }
 
-    public String getTime() {
-        return time;
+    public int getTemperature() {
+        return temperature;
     }
 
-    public String getAbbreviatedForecast() {
-        return abbreviatedForecast;
+    public int getWindChill() {
+        return windChill;
     }
 
-    public int getTemp() {
-        return temp;
+    public int getWindSpeed() {
+        return windSpeed;
     }
 
-    public String getDetailedForecast() {
-        return detailedForecast;
+    public int getWindDirection() {
+        return windDirection;
     }
 
-    public String getHourlyWeatherForecastUrl() {
-        return hourlyWeatherForecastUrl;
+    public int getHumidity() {
+        return humidity;
+    }
+
+    public int getCloudCover() {
+        return cloudCover;
+    }
+
+    public int getPrecipProbability() {
+        return precipProbability;
+    }
+
+    public int getPrecipAmount() {
+        return precipAmount;
     }
 }
-
