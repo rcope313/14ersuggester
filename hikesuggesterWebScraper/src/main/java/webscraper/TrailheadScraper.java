@@ -7,7 +7,6 @@ import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import models.Trailhead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import utility.Utils;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,11 +78,11 @@ public class TrailheadScraper {
     }
 
     private static void scrapeCoordinates(String str, Trailhead resultTrailhead) {
-        resultTrailhead.setCoordinates(Utils.convertCoordinatesPhraseToCoordinates(str));
+        resultTrailhead.setCoordinates(convertCoordinatesPhraseToCoordinates(str));
     }
 
     private static void scrapeRoadDifficulty(String str, Trailhead resultTrailhead) {
-        resultTrailhead.setRoadDifficulty(Utils.convertRoadDifficultyPhraseToInt(str));
+        resultTrailhead.setRoadDifficulty(convertRoadDifficultyPhraseToInt(str));
     }
 
     private static void scrapeRoadDescription(String str, Trailhead resultTrailhead) {
@@ -108,5 +107,13 @@ public class TrailheadScraper {
         if (domAttr.getValue().length() < 35) {
             trailheadUrls.add(domAttr.getValue().substring(1));
         }
+    }
+
+    private static String convertCoordinatesPhraseToCoordinates (String coordinatesPhrase) {
+        return coordinatesPhrase.split(": ")[1].trim();
+    }
+
+    private static int convertRoadDifficultyPhraseToInt(String roadDifficultyPhrase) {
+        return Integer.parseInt(roadDifficultyPhrase.split(" ")[1]);
     }
 }

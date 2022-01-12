@@ -63,11 +63,9 @@ public class CompareQuery implements Query {
                 currentRoute.setFourteenerRouteId(rs.getInt(HikeSuggesterDatabase.FOURTEENER_ROUTE_ID));
                 currentRoute.setRouteName(rs.getString(HikeSuggesterDatabase.ROUTE_NAME));
                 currentRoute.setMountainName(rs.getString(HikeSuggesterDatabase.MOUNTAIN_NAME));
-                currentRoute.setSnowRoute
-                        (Utils.convertIntToBoolean(rs.getInt(HikeSuggesterDatabase.IS_SNOW_ROUTE)));
+                currentRoute.setSnowRoute(convertIntToBoolean(rs.getInt(HikeSuggesterDatabase.IS_SNOW_ROUTE)));
 
-                currentRoute.setStandardRoute
-                        (Utils.convertIntToBoolean(rs.getInt(HikeSuggesterDatabase.IS_STANDARD_ROUTE)));
+                currentRoute.setStandardRoute(convertIntToBoolean(rs.getInt(HikeSuggesterDatabase.IS_STANDARD_ROUTE)));
                 gradeQuality.setGrade(rs.getInt(HikeSuggesterDatabase.GRADE));
                 gradeQuality.setQuality(rs.getString(HikeSuggesterDatabase.GRADE_QUALITY));
                 currentRoute.setGradeQuality(gradeQuality);
@@ -81,8 +79,7 @@ public class CompareQuery implements Query {
                 currentRoute.setRockfallPotential(rs.getString(HikeSuggesterDatabase.ROCKFALL_POTENTIAL));
                 currentRoute.setRouteFinding(rs.getString(HikeSuggesterDatabase.ROUTE_FINDING));
                 currentRoute.setCommitment(rs.getString(HikeSuggesterDatabase.COMMITMENT));
-                currentRoute.setHasMultipleRoutes
-                        (Utils.convertIntToBoolean(rs.getInt(HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES)));
+                currentRoute.setHasMultipleRoutes(convertIntToBoolean(rs.getInt(HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES)));
 
                 currentRoute.setUrl(rs.getString(HikeSuggesterDatabase.ROUTE_URL));
                 currentRoute.setTrailhead(rs.getString(HikeSuggesterDatabase.ROUTE_TRAILHEAD));
@@ -227,6 +224,17 @@ public class CompareQuery implements Query {
         if (!route0.getTrailhead().equals(route1.getTrailhead())) {
             differencesStringJoiner.add("Trailhead: " + route0.getTrailhead()+ ", \n" + route1.getTrailhead());
 
+        }
+    }
+
+    private static boolean convertIntToBoolean (int x) {
+        if (x == 0) {
+            return false;
+        }
+        if (x == 1) {
+            return true;
+        } else {
+            throw new IllegalArgumentException("Value neither 0 or 1");
         }
     }
 

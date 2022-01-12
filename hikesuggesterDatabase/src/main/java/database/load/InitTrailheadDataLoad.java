@@ -58,15 +58,15 @@ public class InitTrailheadDataLoad {
     private static Trailhead updateForSqlSyntax(Trailhead trailhead) {
 
         if (trailhead.getName().contains("'")) {
-            trailhead.setName(Utils.insertApostrophe(trailhead.getName()));
+            trailhead.setName(LoadUtils.insertApostrophe(trailhead.getName()));
         }
 
         if (trailhead.getRoadDescription().contains("'")) {
-            trailhead.setRoadDescription(Utils.insertApostrophe(trailhead.getRoadDescription()));
+            trailhead.setRoadDescription(LoadUtils.insertApostrophe(trailhead.getRoadDescription()));
         }
 
         if (trailhead.getWinterAccess().contains("'")) {
-            trailhead.setWinterAccess(Utils.insertApostrophe(trailhead.getWinterAccess()));
+            trailhead.setWinterAccess(LoadUtils.insertApostrophe(trailhead.getWinterAccess()));
         }
 
         return trailhead;

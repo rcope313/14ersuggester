@@ -3,6 +3,7 @@ package webscraper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import models.FourteenerRoute;
+import models.GradeQuality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import utility.Utils;
@@ -97,7 +98,7 @@ public class FourteenerRouteScraper {
 
     private static void scrapeTotalGain(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(5);
-        int totalGain = Utils.convertTotalGainIntoInteger(cell.asNormalizedText());
+        int totalGain = convertTotalGainIntoInteger(cell.asNormalizedText());
 
         if (totalGain == 0) {
             resultFourteenerRoute.setHasMultipleRoutes(true);
@@ -108,14 +109,14 @@ public class FourteenerRouteScraper {
 
     private static void scrapeRouteLength(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(6);
-        double routeLength = Utils.convertRouteLengthIntoInteger(cell.asNormalizedText());
+        double routeLength = convertRouteLengthIntoInteger(cell.asNormalizedText());
 
         if (routeLength == 0) {
             resultFourteenerRoute.setHasMultipleRoutes(true);
         } else {
             resultFourteenerRoute.setRouteLength(routeLength);
         }
-        resultFourteenerRoute.setRouteLength(Utils.convertRouteLengthIntoInteger(cell.asNormalizedText()));
+        resultFourteenerRoute.setRouteLength(convertRouteLengthIntoInteger(cell.asNormalizedText()));
     }
 
     private static void scrapeMountainAndRouteName(HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
@@ -146,7 +147,7 @@ public class FourteenerRouteScraper {
     private static void scrapeGradeQuality(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(0);
         String gradeString = cell.asNormalizedText().split("\n")[0];
-        resultFourteenerRoute.setGradeQuality(Utils.convertStringIntoGradeQuality(gradeString));
+        resultFourteenerRoute.setGradeQuality(convertStringIntoGradeQuality(gradeString));
     }
 
     private static void scrapeTrailhead(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
@@ -156,12 +157,12 @@ public class FourteenerRouteScraper {
 
     private static void scrapeSummitElevation(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(4);
-        resultFourteenerRoute.setSummitElevation(Utils.convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
+        resultFourteenerRoute.setSummitElevation(convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
     }
 
     private static void scrapeStartElevation(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(3);
-        resultFourteenerRoute.setStartElevation(Utils.convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
+        resultFourteenerRoute.setStartElevation(convertStartAndSummitElevationStringToInteger(cell.asNormalizedText()));
     }
 
     private static void scrapeExposure(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
@@ -244,6 +245,92 @@ public class FourteenerRouteScraper {
                 String[] resultString = url.split("14er.php?");
                 listOfPeakIds.add(resultString[1]);
             }
+        }
+    }
+
+    private static GradeQuality convertStringIntoGradeQuality(String gradeString) {
+        GradeQuality resultGradeQuality = new GradeQuality();
+
+        if (gradeString.split(" ")[1].equals("Difficult")) {
+            resultGradeQuality.setGrade(Integer.parseInt(gradeString.split(" ")[3]));
+            resultGradeQuality.setQuality("Difficult");
+        }
+        else if (gradeString.split(" ")[1].equals("Easy")) {
+            resultGradeQuality.setGrade(Integer.parseInt(gradeString.split(" ")[3]));
+            resultGradeQuality.setQuality("Easy");
+        } else {
+            resultGradeQuality.setGrade(Integer.parseInt(gradeString.split(" ")[2]));
+            resultGradeQuality.setQuality("");
+        }
+        return resultGradeQuality;
+    }
+
+    public static int convertStartAndSummitElevationStringToInteger(String elevation) {
+        String elevationWithoutFeet = elevation.substring(0, elevation.length() - 5);
+        char[] charArray = elevationWithoutFeet.toCharArray();
+
+        if (charArray.length < 5) {
+            return (Character.getNumericValue(charArray[0]) * 100)
+                    + (Character.getNumericValue(charArray[1]) * 10)
+                    + Character.getNumericValue(charArray[2]);
+        }
+
+        else if (charArray.length < 6) {
+            return (Character.getNumericValue(charArray[0]) * 1000)
+                    + (Character.getNumericValue(charArray[2]) * 100)
+                    + (Character.getNumericValue(charArray[3]) * 10)
+                    + Character.getNumericValue(charArray[4]);
+        } else {
+            return (Character.getNumericValue(charArray[0]) * 10000)
+                    + (Character.getNumericValue(charArray[1]) * 1000)
+                    + (Character.getNumericValue(charArray[3]) * 100)
+                    + (Character.getNumericValue(charArray[4]) * 10)
+                    + Character.getNumericValue(charArray[5]);
+        }
+    }
+
+    public static int convertTotalGainIntoInteger(String str) {
+        if (str.split("\n").length > 1) {
+            return 0;
+        }
+        String[] stringArray = str.split(" feet");
+        return convertElevationIntoInteger(stringArray[0]);
+    }
+
+    public static int convertElevationIntoInteger (String str) {
+        char[] charArray = str.toCharArray();
+
+        if (charArray.length < 5) {
+            return (Character.getNumericValue(charArray[0]) * 100)
+                    + (Character.getNumericValue(charArray[1]) * 10)
+                    + Character.getNumericValue(charArray[2]);
+        }
+
+        else if (charArray.length < 6) {
+            return (Character.getNumericValue(charArray[0]) * 1000)
+                    + (Character.getNumericValue(charArray[2]) * 100)
+                    + (Character.getNumericValue(charArray[3]) * 10)
+                    + Character.getNumericValue(charArray[4]);
+        } else {
+            return (Character.getNumericValue(charArray[0]) * 10000)
+                    + (Character.getNumericValue(charArray[1]) * 1000)
+                    + (Character.getNumericValue(charArray[3]) * 100)
+                    + (Character.getNumericValue(charArray[4]) * 10)
+                    + Character.getNumericValue(charArray[5]);
+        }
+    }
+
+    public static double convertRouteLengthIntoInteger(String str) {
+        if (str.split("\n").length > 1) {
+            return 0;
+        }
+        String[] stringArrayMiles = str.split(" miles");
+        String[] stringArrayMi = str.split(" mi");
+
+        if (stringArrayMiles.length == 1) {
+            return Double.parseDouble(stringArrayMi[0]);
+        } else {
+            return Double.parseDouble(stringArrayMiles[0]);
         }
     }
 }

@@ -1,12 +1,11 @@
 package subcommands;
 
-import models.CliColumn;
 import database.query.SearchQuery;
 import picocli.CommandLine;
 import utility.Utils;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
 
 @CommandLine.Command(name = "search", mixinStandardHelpOptions = true)
 public class SearchSubCommand extends SubCommand implements Runnable {
@@ -109,35 +108,27 @@ public class SearchSubCommand extends SubCommand implements Runnable {
             description = "Search by trailhead url. If searching by more than one url, split list with ','.")
     public String[] trailheadUrls;
 
-
-
     @Override
     public void run() {
-
 //        spec.commandLine().getOut().println(setSearchQuery().createQuerySyntax());
 //        ** use to create tests
 
         SearchQuery searchQuery = setSearchQuery();
         viewCliTableSearchSubCommand(searchQuery);
-
-
     }
 
-
-
     private SearchQuery setSearchQuery() {
-
         SearchQuery searchQuery = new SearchQuery();
 
         searchQuery.setVerbose(verbose);
         searchQuery.setQuery(optionQuery);
-        searchQuery.setMountainNames(Utils.convertArrayToArrayList(mountainNames));
-        searchQuery.setRouteNames(Utils.convertArrayToArrayList(routeNames));
+        searchQuery.setMountainNames(convertArrayToArrayList(mountainNames));
+        searchQuery.setRouteNames(convertArrayToArrayList(routeNames));
         searchQuery.setStandardRoute(isStandardRoute);
         searchQuery.setSnowRoute(isSnowRoute);
-        searchQuery.setGrades(Utils.convertArrayToArrayList(grades));
-        searchQuery.setGradeQualities(Utils.convertArrayToArrayList(gradeQualities));
-        searchQuery.setTrailheads(Utils.convertArrayToArrayList(trailheads));
+        searchQuery.setGrades(convertArrayToArrayList(grades));
+        searchQuery.setGradeQualities(convertArrayToArrayList(gradeQualities));
+        searchQuery.setTrailheads(convertArrayToArrayList(trailheads));
         searchQuery.setStartElevation(startElevation);
         searchQuery.setSummitElevation(summitElevation);
         searchQuery.setTotalGain(totalGain);
@@ -147,13 +138,28 @@ public class SearchSubCommand extends SubCommand implements Runnable {
         searchQuery.setRouteFinding(routeFinding);
         searchQuery.setCommitment(commitment);
         searchQuery.setHasMultipleRoutes(hasMultipleRoutes);
-        searchQuery.setRouteUrls(Utils.convertArrayToArrayList(routeUrls));
-        searchQuery.setTrailheadCoordinates(Utils.convertArrayToArrayList(trailheadCoordinates));
-        searchQuery.setRoadDifficulties(Utils.convertArrayToArrayList(roadDifficulties));
-        searchQuery.setTrailheadUrls(Utils.convertArrayToArrayList(trailheadUrls));
+        searchQuery.setRouteUrls(convertArrayToArrayList(routeUrls));
+        searchQuery.setTrailheadCoordinates(convertArrayToArrayList(trailheadCoordinates));
+        searchQuery.setRoadDifficulties(convertArrayToArrayList(roadDifficulties));
+        searchQuery.setTrailheadUrls(convertArrayToArrayList(trailheadUrls));
 
         return searchQuery;
-
-
     }
+
+    private static ArrayList<Integer> convertArrayToArrayList (Integer[] array) {
+        if (array == null) {
+            return null;
+        } else {
+            return new ArrayList<>(Arrays.asList(array));
+        }
+    }
+
+    private static ArrayList<String> convertArrayToArrayList (String[] array) {
+        if (array == null) {
+            return null;
+        } else {
+            return new ArrayList<>(Arrays.asList(array));
+        }
+    }
+
 }

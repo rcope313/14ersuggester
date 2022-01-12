@@ -13,7 +13,7 @@ public class UpdateFourteenerRoutes {
 
     public static void weeklyUpdate (String strDate, String routeUrl) throws Exception {
 
-        if (Utils.checkDateWeekly(strDate)) {
+        if (UpdateUtils.checkDateWeekly(strDate)) {
 
             FourteenerRoute updatedRoute = FourteenerRouteScraper.scrapeFourteener(routeUrl);
             String sql = mySqlSyntaxWeeklyUpdate(updatedRoute);

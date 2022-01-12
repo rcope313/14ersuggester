@@ -69,13 +69,13 @@ public class InitFourteenerRouteDataLoad {
     private static FourteenerRoute updateForSqlSyntax (FourteenerRoute route) {
 
         if (route.getMountainName().contains("'")) {
-            route.setMountainName(Utils.insertApostrophe(route.getMountainName()));
+            route.setMountainName(LoadUtils.insertApostrophe(route.getMountainName()));
         }
         if (route.getRouteName().contains("'")) {
-            route.setRouteName(Utils.insertApostrophe(route.getRouteName()));
+            route.setRouteName(LoadUtils.insertApostrophe(route.getRouteName()));
         }
         if (route.getTrailhead().contains("'")) {
-            route.setTrailhead(Utils.insertApostrophe(route.getTrailhead()));
+            route.setTrailhead(LoadUtils.insertApostrophe(route.getTrailhead()));
         }
 
         return route;

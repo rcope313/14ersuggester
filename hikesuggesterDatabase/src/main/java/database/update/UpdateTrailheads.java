@@ -12,18 +12,12 @@ import java.util.ArrayList;
 
 public class UpdateTrailheads {
 
-
     public static void weeklyUpdate (String strDate, String trailheadUrl) throws Exception {
-
-        if (Utils.checkDateWeekly(strDate)) {
-
+        if (UpdateUtils.checkDateWeekly(strDate)) {
             Trailhead updatedTrailhead = TrailheadScraper.scrapeTrailhead(trailheadUrl);
             String sql = mySqlSyntaxWeeklyUpdate(updatedTrailhead);
             DatabaseConnection.createStatement().execute(sql);
-
         }
-
-
     }
 
     static String mySqlSyntaxWeeklyUpdate(Trailhead trailhead) throws ParseException {
@@ -98,12 +92,4 @@ public class UpdateTrailheads {
 
         }
     }
-
-
-
-
-
-
-
-
 }

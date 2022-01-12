@@ -4,6 +4,9 @@ import database.query.CompareQuery;
 import picocli.CommandLine;
 import utility.Utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 @CommandLine.Command(name = "compare", mixinStandardHelpOptions = true)
 public class CompareSubCommand extends SubCommand implements Runnable {
 
@@ -43,11 +46,27 @@ public class CompareSubCommand extends SubCommand implements Runnable {
         compareQuery.setRouteName1(routeName1);
         compareQuery.setMountainName2(mountainName2);
         compareQuery.setRouteName2(routeName2);
-        compareQuery.setRouteUrls(Utils.convertArrayToArrayList(routeUrls));
+        compareQuery.setRouteUrls(convertArrayToArrayList(routeUrls));
 
 
         return compareQuery;
 
 
+    }
+
+    private static ArrayList<Integer> convertArrayToArrayList (Integer[] array) {
+        if (array == null) {
+            return null;
+        } else {
+            return new ArrayList<>(Arrays.asList(array));
+        }
+    }
+
+    private static ArrayList<String> convertArrayToArrayList (String[] array) {
+        if (array == null) {
+            return null;
+        } else {
+            return new ArrayList<>(Arrays.asList(array));
+        }
     }
 }
