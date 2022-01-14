@@ -1,10 +1,7 @@
 package models;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
 public class MountainForecast {
-    private final LocalDateTime date;
+    private final String date;
     private final int temperature;
     private final int windChill;
     private final int windSpeed;
@@ -14,7 +11,7 @@ public class MountainForecast {
     private final int precipProbability;
     private final int precipAmount;
 
-    public MountainForecast(LocalDateTime date, int temperature, int windChill, int windSpeed, int windDirection, int humidity, int cloudCover, int precipProbability, int precipAmount) {
+    public MountainForecast(String date, int temperature, int windChill, int windSpeed, int windDirection, int humidity, int cloudCover, int precipProbability, int precipAmount) {
         this.date = date;
         this.temperature = temperature;
         this.windChill = windChill;
@@ -26,7 +23,7 @@ public class MountainForecast {
         this.precipAmount = precipAmount;
     }
 
-    public LocalDateTime getDate() {
+    public String getDate() {
         return date;
     }
 

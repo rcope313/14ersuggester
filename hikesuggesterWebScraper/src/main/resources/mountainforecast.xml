@@ -16,7 +16,7 @@
 <area-description>5 Miles NE Twin Lakes CO</area-description>
 <height datum="mean sea level" height-units="feet">10197</height>
 </location>
-<moreWeatherInformation applicable-location="point1">//forecast.weather.gov/MapClick.php?lat=39.15&lon=-106.42&FcstType=digital</moreWeatherInformation>
+<moreWeatherInformation applicable-location="point1">//forecast.weather.gov/MapClick.php?lat=39.15&amp;lon=-106.42&amp;FcstType=digital</moreWeatherInformation>
 <time-layout time-coordinate="local" summarization="none">
 <layout-key>k-p1h-n1-0</layout-key>
 <start-valid-time>2022-01-11T16:00:00-07:00</start-valid-time>

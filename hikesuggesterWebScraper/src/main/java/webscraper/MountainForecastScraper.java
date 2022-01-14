@@ -1,83 +1,75 @@
 package webscraper;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import models.MountainForecast;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class MountainForecastScraper {
-    final private static WebClient webClient = new WebClient();
-    final private static Logger LOG = LoggerFactory.getLogger(MountainForecastScraper.class);
+    private final String pathName;
+    private final Document xmlDocument;
 
-    public static void main (String[] args) throws IOException, SAXException, ParserConfigurationException {
-        buildAMountainForecast("/Users/rachelcope/Documents/hikesuggester/hikesuggesterWebScraper/src/main/resources/mountainforecast.xml");
+    public MountainForecastScraper(String pathName) throws ParserConfigurationException, IOException, SAXException {
+        this.pathName = pathName;
+        this.xmlDocument = buildXMLDocument();
     }
 
-    public ArrayList<MountainForecast> buildListOfMountainForecast(String url) throws IOException {
-        final HtmlPage page = webClient.getPage(url);
-        return new ArrayList<>();
+    public void buildAMountainForecasts() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+        ArrayList<MountainForecast> mountainForecasts = new ArrayList<>();
+
+        String[] dateArray = retrieveStartValidTimeOnly(parseElements(getXmlDocument(), "//time-layout"));
+        String[] windSpeedArray = parseElements(getXmlDocument(), "//wind-speed[@type='sustained']");
+        String[] cloudCoverArray = parseElements(getXmlDocument(), "//cloud-amount");
+        String[] probOfPrecipArray = parseElements(getXmlDocument(), "//probability-of-precipitation");
+        String[] humidityArray = parseElements(getXmlDocument(), "//humidity");
+        String[] windDirectionArray = parseElements(getXmlDocument(), "//direction");
+        String[] tempArray = parseElements(getXmlDocument(), "//temperature[@type='hourly']");
+        String[] precipAmountArray = parseElements(getXmlDocument(), "//hourly-qpf");
+        String[] windChillArray = parseElements(getXmlDocument(), "//temperature[@type='wind chill']");
+
+        for (int idx = 0; idx < windChillArray.length; idx++) {
+            MountainForecast mountainForecast = new MountainForecast(
+                            dateArray[idx], Integer.parseInt(tempArray[idx]), Integer.parseInt(windChillArray[idx]),
+                            Integer.parseInt(windSpeedArray[idx]), Integer.parseInt(windDirectionArray[idx]),
+                            Integer.parseInt(humidityArray[idx]), Integer.parseInt(cloudCoverArray[idx]),
+                            Integer.parseInt(probOfPrecipArray[idx]), Integer.parseInt(precipAmountArray[idx]));
+            mountainForecasts.add(mountainForecast);
+        }
     }
 
-    public static void buildAMountainForecast(String pathName) throws ParserConfigurationException, IOException, SAXException {
-        //Get Document Builder
+    private Document buildXMLDocument() throws ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-
-        //Build Document
-        Document document = builder.parse(new File(pathName));
-
-        //Normalize the XML Structure; It's just too important !!
+        Document document = builder.parse(new File(getPathName()));
         document.getDocumentElement().normalize();
-
-        //Here comes the root node
-        Element root = document.getDocumentElement();
-        System.out.println(root.getNodeName());
+        return document;
     }
 
-    private LocalDateTime parseDate() {
-        return null;
+    private String[] parseElements(Document document, String expression) throws XPathExpressionException {
+        XPath xPath =  XPathFactory.newInstance().newXPath();
+        NodeList nodelist = (NodeList) xPath.compile(expression).evaluate(document, XPathConstants.NODESET);
+        return nodelist.toString().split("\n");
     }
 
-    private int parseTemperature() {
-        return 0;
+    private static String[] retrieveStartValidTimeOnly(String[] dateArray) {
+        return dateArray;
     }
 
-    private int parseWindChill() {
-        return 0;
+    public String getPathName() {
+        return pathName;
     }
 
-    private int parseWindSpeed() {
-        return 0;
-    }
-
-    private int parseWindDirection() {
-        return 0;
-    }
-
-    private int parseHumidity() {
-        return 0;
-    }
-
-    private int parseCloudCover() {
-        return 0;
-    }
-
-    private int parsePrecipProbability() {
-        return 0;
-    }
-
-    private int paresePrecipAmount() {
-        return 0;
+    public Document getXmlDocument() {
+        return xmlDocument;
     }
 }
