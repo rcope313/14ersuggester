@@ -1,6 +1,8 @@
 package webscraper;
 
 import models.MountainForecast;
+import org.apache.xml.dtm.ref.DTMNodeList;
+import org.assertj.core.util.VisibleForTesting;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -24,7 +26,7 @@ public class MountainForecastScraper {
         this.xmlDocument = buildXMLDocument();
     }
 
-    public void buildAMountainForecasts() throws ParserConfigurationException, IOException, SAXException, XPathExpressionException {
+    public void buildAMountainForecasts() throws XPathExpressionException {
         ArrayList<MountainForecast> mountainForecasts = new ArrayList<>();
 
         String[] dateArray = retrieveStartValidTimeOnly(parseElements(getXmlDocument(), "//time-layout"));
@@ -55,10 +57,11 @@ public class MountainForecastScraper {
         return document;
     }
 
-    private String[] parseElements(Document document, String expression) throws XPathExpressionException {
+    @VisibleForTesting
+    String[] parseElements(Document document, String expression) throws XPathExpressionException {
         XPath xPath =  XPathFactory.newInstance().newXPath();
         NodeList nodelist = (NodeList) xPath.compile(expression).evaluate(document, XPathConstants.NODESET);
-        return nodelist.toString().split("\n");
+        return ((DTMNodeList) nodelist).getDTMIterator().toString().split("\n");
     }
 
     private static String[] retrieveStartValidTimeOnly(String[] dateArray) {
