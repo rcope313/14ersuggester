@@ -2,8 +2,6 @@ package subcommands;
 
 import database.query.CompareQuery;
 import picocli.CommandLine;
-import utility.Utils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 

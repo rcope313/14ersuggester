@@ -3,7 +3,6 @@ package database.load;
 import models.FourteenerRoute;
 import models.HikeSuggesterDatabase;
 import database.DatabaseConnection;
-import utility.Utils;
 import java.sql.SQLException;
 import java.util.ArrayList;
 

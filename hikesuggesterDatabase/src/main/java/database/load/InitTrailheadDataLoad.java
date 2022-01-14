@@ -3,10 +3,7 @@ package database.load;
 import models.HikeSuggesterDatabase;
 import models.Trailhead;
 import database.DatabaseConnection;
-import utility.Utils;
-
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 
 

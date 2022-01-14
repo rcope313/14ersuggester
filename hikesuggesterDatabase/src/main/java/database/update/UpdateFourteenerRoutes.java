@@ -3,7 +3,6 @@ package database.update;
 import models.FourteenerRoute;
 import models.HikeSuggesterDatabase;
 import database.DatabaseConnection;
-import utility.Utils;
 import webscraper.FourteenerRouteScraper;
 import java.util.ArrayList;
 

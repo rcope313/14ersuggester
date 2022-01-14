@@ -3,10 +3,7 @@ package database.update;
 import models.HikeSuggesterDatabase;
 import models.Trailhead;
 import database.DatabaseConnection;
-import utility.Utils;
 import webscraper.TrailheadScraper;
-
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 

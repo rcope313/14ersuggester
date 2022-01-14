@@ -4,7 +4,6 @@ import models.FourteenerRoute;
 import models.GradeQuality;
 import models.HikeSuggesterDatabase;
 import database.DatabaseConnection;
-import utility.Utils;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
