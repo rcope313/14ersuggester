@@ -30,6 +30,15 @@ public class MountainForecastScraperTest {
     }
 
     @Test
+    public void itParsesXMLDocumentIntoDateArray() throws Exception {
+        this.initData();
+        String[] dateArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//time-layout");
+        assertThat(dateArray.length).isEqualTo(338);
+        assertThat(dateArray[2]).isEqualTo("2022-01-11T16:00:00-07:00");
+        assertThat(dateArray[10]).isEqualTo("2022-01-11T20:00:00-07:00");
+    }
+
+    @Test
     public void itParsesXMLDocumentIntoTemperatureArray() throws Exception {
         this.initData();
         String[] tempArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='hourly']");

@@ -29,7 +29,7 @@ public class MountainForecastScraper {
     public void buildAMountainForecasts() throws XPathExpressionException {
         ArrayList<MountainForecast> mountainForecasts = new ArrayList<>();
 
-        String[] dateArray = retrieveStartValidTimeOnly(parseElements(getXmlDocument(), "//time-layout"));
+        String[] dateArray = parseElements(getXmlDocument(), "//time-layout");
         String[] windSpeedArray = parseElements(getXmlDocument(), "//wind-speed[@type='sustained']");
         String[] cloudCoverArray = parseElements(getXmlDocument(), "//cloud-amount");
         String[] probOfPrecipArray = parseElements(getXmlDocument(), "//probability-of-precipitation");
@@ -62,10 +62,6 @@ public class MountainForecastScraper {
         XPath xPath =  XPathFactory.newInstance().newXPath();
         NodeList nodelist = (NodeList) xPath.compile(expression).evaluate(document, XPathConstants.NODESET);
         return ((DTMNodeList) nodelist).getDTMIterator().toString().split("\n");
-    }
-
-    private static String[] retrieveStartValidTimeOnly(String[] dateArray) {
-        return dateArray;
     }
 
     public String getPathName() {
