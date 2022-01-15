@@ -26,7 +26,7 @@ public class MountainForecastScraper {
         this.xmlDocument = buildXMLDocument();
     }
 
-    public void buildAMountainForecasts() throws XPathExpressionException {
+    public ArrayList<MountainForecast> buildMountainForecasts() throws XPathExpressionException {
         ArrayList<MountainForecast> mountainForecasts = new ArrayList<>();
 
         String[] dateArray = parseElements(getXmlDocument(), "//time-layout");
@@ -38,15 +38,26 @@ public class MountainForecastScraper {
         String[] tempArray = parseElements(getXmlDocument(), "//temperature[@type='hourly']");
         String[] precipAmountArray = parseElements(getXmlDocument(), "//hourly-qpf");
         String[] windChillArray = parseElements(getXmlDocument(), "//temperature[@type='wind chill']");
+        int idx = 1;
+        int dateIdx = 2;
 
-        for (int idx = 0; idx < windChillArray.length; idx++) {
-            MountainForecast mountainForecast = new MountainForecast(
-                            dateArray[idx], Integer.parseInt(tempArray[idx]), Integer.parseInt(windChillArray[idx]),
-                            Integer.parseInt(windSpeedArray[idx]), Integer.parseInt(windDirectionArray[idx]),
-                            Integer.parseInt(humidityArray[idx]), Integer.parseInt(cloudCoverArray[idx]),
-                            Integer.parseInt(probOfPrecipArray[idx]), Integer.parseInt(precipAmountArray[idx]));
-            mountainForecasts.add(mountainForecast);
+        while (idx < windChillArray.length) {
+            mountainForecasts.add(buildAMountainForecast(idx, dateIdx, dateArray, windSpeedArray, cloudCoverArray, probOfPrecipArray,
+                    humidityArray, windDirectionArray, tempArray, precipAmountArray, windChillArray));
+            idx++;
+            dateIdx += 2;
         }
+        return mountainForecasts;
+    }
+
+    MountainForecast buildAMountainForecast(int idx, int dateIdx, String[] dateArray,String[] windSpeedArray, String[] cloudCoverArray,
+                                            String[] probOfPrecipArray, String[] humidityArray, String[] windDirectionArray,
+                                            String[] tempArray, String[] precipAmountArray, String[] windChillArray) {
+        return new MountainForecast(
+                    dateArray[dateIdx], Integer.parseInt(tempArray[idx]), Integer.parseInt(windChillArray[idx]),
+                    Integer.parseInt(windSpeedArray[idx]), Integer.parseInt(windDirectionArray[idx]),
+                    Integer.parseInt(humidityArray[idx]), Integer.parseInt(cloudCoverArray[idx]),
+                    Integer.parseInt(probOfPrecipArray[idx]), Integer.parseInt(precipAmountArray[idx]));
     }
 
     private Document buildXMLDocument() throws ParserConfigurationException, IOException, SAXException {

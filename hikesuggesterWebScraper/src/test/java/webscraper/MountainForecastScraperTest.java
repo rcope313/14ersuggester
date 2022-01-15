@@ -8,19 +8,43 @@ import static org.assertj.core.api.Assertions.*;
 public class MountainForecastScraperTest {
     MountainForecast forecastJanuary11th4pm, forecastJanuary11th5pm;
     MountainForecastScraper mountainForecastXMLFile;
+    String[] dateArray, windSpeedArray, cloudCoverArray, probOfPrecipArray, humidityArray, windDirectionArray,
+            tempArray, precipAmountArray,  windChillArray;
 
     void initData() throws Exception {
+
         forecastJanuary11th4pm =
                 new MountainForecast(
                         "2022-01-11T16:00:00-07:00", 28, 16, 16, 300,
                         29, 14, 0, 0);
-
         forecastJanuary11th5pm =
                 new MountainForecast(
                         "2022-01-11T17:00:00-07:00", 23, 11, 13, 290,
-                        36, 5, 0, 0);
-
+                        36, 6, 0, 0);
         mountainForecastXMLFile = new MountainForecastScraper("/Users/rachelcope/Documents/hikesuggester/hikesuggesterWebScraper/src/main/resources/mountainforecast.xml");
+
+        dateArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//time-layout");
+        windSpeedArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//wind-speed[@type='sustained']");
+        cloudCoverArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//cloud-amount");
+        probOfPrecipArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//probability-of-precipitation");
+        humidityArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//humidity");
+        windDirectionArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//direction");
+        tempArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='hourly']");
+        precipAmountArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//hourly-qpf");
+        windChillArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='wind chill']");
+    }
+
+    @Test
+    public void itBuildsAMountainForecast() throws Exception {
+        this.initData();
+        assertThat(mountainForecastXMLFile.buildAMountainForecast(1, 2, dateArray, windSpeedArray, cloudCoverArray,
+                probOfPrecipArray, humidityArray, windDirectionArray, tempArray, precipAmountArray, windChillArray))
+                .usingRecursiveComparison()
+                .isEqualTo(forecastJanuary11th4pm);
+        assertThat(mountainForecastXMLFile.buildAMountainForecast(2, 4, dateArray, windSpeedArray, cloudCoverArray,
+                probOfPrecipArray, humidityArray, windDirectionArray, tempArray, precipAmountArray, windChillArray))
+                .usingRecursiveComparison()
+                .isEqualTo(forecastJanuary11th5pm);
     }
 
     @Test
