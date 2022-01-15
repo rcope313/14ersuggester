@@ -50,6 +50,7 @@ public class MountainForecastScraper {
         return mountainForecasts;
     }
 
+    @VisibleForTesting
     MountainForecast buildAMountainForecast(int idx, int dateIdx, String[] dateArray,String[] windSpeedArray, String[] cloudCoverArray,
                                             String[] probOfPrecipArray, String[] humidityArray, String[] windDirectionArray,
                                             String[] tempArray, String[] precipAmountArray, String[] windChillArray) {
@@ -57,7 +58,7 @@ public class MountainForecastScraper {
                     dateArray[dateIdx], Integer.parseInt(tempArray[idx]), Integer.parseInt(windChillArray[idx]),
                     Integer.parseInt(windSpeedArray[idx]), Integer.parseInt(windDirectionArray[idx]),
                     Integer.parseInt(humidityArray[idx]), Integer.parseInt(cloudCoverArray[idx]),
-                    Integer.parseInt(probOfPrecipArray[idx]), Integer.parseInt(precipAmountArray[idx]));
+                    Integer.parseInt(probOfPrecipArray[idx]), Double.parseDouble(precipAmountArray[idx]));
     }
 
     private Document buildXMLDocument() throws ParserConfigurationException, IOException, SAXException {

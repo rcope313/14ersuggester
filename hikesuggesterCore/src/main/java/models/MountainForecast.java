@@ -9,9 +9,9 @@ public class MountainForecast {
     private final int humidity;
     private final int cloudCover;
     private final int precipProbability;
-    private final int precipAmount;
+    private final double precipAmount;
 
-    public MountainForecast(String date, int temperature, int windChill, int windSpeed, int windDirection, int humidity, int cloudCover, int precipProbability, int precipAmount) {
+    public MountainForecast(String date, int temperature, int windChill, int windSpeed, int windDirection, int humidity, int cloudCover, int precipProbability, double precipAmount) {
         this.date = date;
         this.temperature = temperature;
         this.windChill = windChill;
@@ -55,7 +55,7 @@ public class MountainForecast {
         return precipProbability;
     }
 
-    public int getPrecipAmount() {
+    public double getPrecipAmount() {
         return precipAmount;
     }
 }

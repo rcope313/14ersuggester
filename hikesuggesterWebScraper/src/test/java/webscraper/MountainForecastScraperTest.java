@@ -21,7 +21,7 @@ public class MountainForecastScraperTest {
                 new MountainForecast(
                         "2022-01-11T17:00:00-07:00", 23, 11, 13, 290,
                         36, 6, 0, 0);
-        mountainForecastXMLFile = new MountainForecastScraper("/Users/rachelcope/Documents/hikesuggester/hikesuggesterWebScraper/src/main/resources/mountainforecast.xml");
+        mountainForecastXMLFile = new MountainForecastScraper("/Users/rachelcope/Documents/hikesuggester/hikesuggesterWebScraper/src/main/resources/mountainforecastEx1.xml");
 
         dateArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//time-layout");
         windSpeedArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//wind-speed[@type='sustained']");
@@ -32,6 +32,14 @@ public class MountainForecastScraperTest {
         tempArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='hourly']");
         precipAmountArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//hourly-qpf");
         windChillArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='wind chill']");
+    }
+
+    @Test
+    public void itBuildsAnArrayListOfMountainForecast() throws Exception {
+        this.initData();
+        assertThat(mountainForecastXMLFile.buildMountainForecasts().size()).isEqualTo(168);
+        assertThat(mountainForecastXMLFile.buildMountainForecasts().get(0)).usingRecursiveComparison().isEqualTo(forecastJanuary11th4pm);
+        assertThat(mountainForecastXMLFile.buildMountainForecasts().get(1)).usingRecursiveComparison().isEqualTo(forecastJanuary11th5pm);
     }
 
     @Test
