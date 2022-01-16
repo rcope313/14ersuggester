@@ -2,16 +2,16 @@ package models;
 
 public class MountainForecast {
     private final String date;
-    private final int temperature;
-    private final int windChill;
-    private final int windSpeed;
-    private final int windDirection;
-    private final int humidity;
-    private final int cloudCover;
-    private final int precipProbability;
-    private final double precipAmount;
+    private final String temperature;
+    private final String windChill;
+    private final String windSpeed;
+    private final String windDirection;
+    private final String humidity;
+    private final String cloudCover;
+    private final String precipProbability;
+    private final String precipAmount;
 
-    public MountainForecast(String date, int temperature, int windChill, int windSpeed, int windDirection, int humidity, int cloudCover, int precipProbability, double precipAmount) {
+    public MountainForecast(String date, String temperature, String windChill, String windSpeed, String windDirection, String humidity, String cloudCover, String precipProbability, String precipAmount) {
         this.date = date;
         this.temperature = temperature;
         this.windChill = windChill;
@@ -27,35 +27,35 @@ public class MountainForecast {
         return date;
     }
 
-    public int getTemperature() {
+    public String getTemperature() {
         return temperature;
     }
 
-    public int getWindChill() {
+    public String getWindChill() {
         return windChill;
     }
 
-    public int getWindSpeed() {
+    public String getWindSpeed() {
         return windSpeed;
     }
 
-    public int getWindDirection() {
+    public String getWindDirection() {
         return windDirection;
     }
 
-    public int getHumidity() {
+    public String getHumidity() {
         return humidity;
     }
 
-    public int getCloudCover() {
+    public String getCloudCover() {
         return cloudCover;
     }
 
-    public int getPrecipProbability() {
+    public String getPrecipProbability() {
         return precipProbability;
     }
 
-    public double getPrecipAmount() {
+    public String getPrecipAmount() {
         return precipAmount;
     }
 }

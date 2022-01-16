@@ -5,146 +5,106 @@ import org.junit.Test;
 import org.w3c.dom.Document;
 
 import java.net.URL;
+import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class MountainForecastScraperTest {
-    MountainForecast forecastJanuary15th11am, forecastJanuary15th12pm;
-    MountainForecastScraper mountainForecastXMLFile, mountainForecastUrl;
-    String[] dateArray, windSpeedArray, cloudCoverArray, probOfPrecipArray, humidityArray, windDirectionArray,
-            tempArray, precipAmountArray,  windChillArray;
+    MountainForecastScraper mountainForecastUrl;
+    ArrayList<String> dateList, windSpeedList, cloudCoverList, probOfPrecipList, humidityList, windDirectionList,
+            tempList, precipAmountList,  windChillList;
 
     void initData() throws Exception {
 
-        forecastJanuary15th11am =
-                new MountainForecast(
-                        "2022-01-15T11:00:00-07:00", 10, 12, 10, 340,
-                        33, 3, 0, 0);
-        forecastJanuary15th12pm =
-                new MountainForecast(
-                        "2022-01-15T12:00:00-07:00", 10, 20, 10, 340,
-                        28, 3, 0, 0);
-
-        mountainForecastXMLFile = new MountainForecastScraper("/Users/rachelcope/Documents/hikesuggester/hikesuggesterWebScraper/src/main/resources/mountainForecast.xml");
         mountainForecastUrl = new MountainForecastScraper(new URL("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&FcstType=digitalDWML"));
 
-        dateArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//time-layout");
-        windSpeedArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//wind-speed[@type='sustained']");
-        cloudCoverArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//cloud-amount");
-        probOfPrecipArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//probability-of-precipitation");
-        humidityArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//humidity");
-        windDirectionArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//direction");
-        tempArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='hourly']");
-        precipAmountArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//hourly-qpf");
-        windChillArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='wind chill']");
+        dateList = mountainForecastUrl.parseElements("//time-layout", "[start-valid-time: null]");
+        windSpeedList = mountainForecastUrl.parseElements("//wind-speed[@type='sustained']", "[value: null]");
+        cloudCoverList = mountainForecastUrl.parseElements("//cloud-amount", "[value: null]");
+        probOfPrecipList = mountainForecastUrl.parseElements("//probability-of-precipitation", "[value: null]");
+        humidityList = mountainForecastUrl.parseElements("//humidity", "[value: null]");
+        windDirectionList = mountainForecastUrl.parseElements("//direction", "[value: null]");
+        tempList = mountainForecastUrl.parseElements("//temperature[@type='hourly']", "[value: null]");
+        precipAmountList = mountainForecastUrl.parseElements("//hourly-qpf", "[value: null]");
+        windChillList = mountainForecastUrl.parseElements("//temperature[@type='wind chill']", "[value: null]");
     }
 
     @Test
     public void itBuildsAnArrayListOfMountainForecast() throws Exception {
         this.initData();
-        assertThat(mountainForecastXMLFile.buildMountainForecasts().size()).isEqualTo(168);
-        assertThat(mountainForecastXMLFile.buildMountainForecasts().get(0)).usingRecursiveComparison().isEqualTo(forecastJanuary15th11am);
-        assertThat(mountainForecastXMLFile.buildMountainForecasts().get(1)).usingRecursiveComparison().isEqualTo(forecastJanuary15th12pm);
-    }
-
-    @Test
-    public void itBuildsAMountainForecast() throws Exception {
-        this.initData();
-        assertThat(mountainForecastXMLFile.buildAMountainForecast(1, 2, dateArray, windSpeedArray, cloudCoverArray,
-                probOfPrecipArray, humidityArray, windDirectionArray, tempArray, precipAmountArray, windChillArray))
-                .usingRecursiveComparison()
-                .isEqualTo(forecastJanuary15th11am);
-        assertThat(mountainForecastXMLFile.buildAMountainForecast(2, 4, dateArray, windSpeedArray, cloudCoverArray,
-                probOfPrecipArray, humidityArray, windDirectionArray, tempArray, precipAmountArray, windChillArray))
-                .usingRecursiveComparison()
-                .isEqualTo(forecastJanuary15th12pm);
+        var list = mountainForecastUrl.buildMountainForecasts();
+        assertThat(mountainForecastUrl.buildMountainForecasts().size()).isEqualTo(167);
+        for (MountainForecast forecast : list) {
+            assertThat(forecast).isInstanceOf(MountainForecast.class);
+        }
     }
 
     @Test
     public void itCreatesClassInstanceOfDocumentField() throws Exception {
         this.initData();
-        assertThat(mountainForecastXMLFile.getXmlDocument()).isInstanceOf(Document.class);
         assertThat(mountainForecastUrl.getXmlDocument()).isInstanceOf(Document.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoDateArray() throws Exception {
+    public void itParsesXMLDocumentIntoDateList() throws Exception {
         this.initData();
-        String[] dateArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//time-layout");
-        assertThat(dateArray.length).isEqualTo(338);
-        assertThat(dateArray[2]).isEqualTo("2022-01-11T16:00:00-07:00");
-        assertThat(dateArray[10]).isEqualTo("2022-01-11T20:00:00-07:00");
+        assertThat(dateList.size()).isEqualTo(168);
+        assertThat(dateList.get(5)).isInstanceOf(String.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoTemperatureArray() throws Exception {
+    public void itParsesXMLDocumentIntoTemperatureList() throws Exception {
         this.initData();
-        String[] tempArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='hourly']");
-        assertThat(tempArray.length).isEqualTo(169);
-        assertThat(tempArray[1]).isEqualTo("28");
-        assertThat(tempArray[5]).isEqualTo("16");
+        assertThat(tempList.size()).isEqualTo(167);
+        assertThat(tempList.get(5)).isInstanceOf(String.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoWindChillArray() throws Exception {
+    public void itParsesXMLDocumentIntoWindChillList() throws Exception {
         this.initData();
-        String[] windChillArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//temperature[@type='wind chill']");
-        assertThat(windChillArray.length).isEqualTo(169);
-        assertThat(windChillArray[1]).isEqualTo("16");
-        assertThat(windChillArray[5]).isEqualTo("3");
+        assertThat(windChillList.size()).isEqualTo(167);
+        assertThat(windChillList.get(5)).isInstanceOf(String.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoWindSpeedArray() throws Exception {
+    public void itParsesXMLDocumentIntoWindSpeedList() throws Exception {
         this.initData();
-        String[] windSpeedArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//wind-speed[@type='sustained']");
-        assertThat(windSpeedArray.length).isEqualTo(169);
-        assertThat(windSpeedArray[1]).isEqualTo("16");
-        assertThat(windSpeedArray[5]).isEqualTo("11");
+        assertThat(windSpeedList.size()).isEqualTo(167);
+        assertThat(windSpeedList.get(5)).isInstanceOf(String.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoWindDirectionArray() throws Exception {
+    public void itParsesXMLDocumentIntoWindDirectionList() throws Exception {
         this.initData();
-        String[] windDirectionArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//direction");
-        assertThat(windDirectionArray.length).isEqualTo(169);
-        assertThat(windDirectionArray[1]).isEqualTo("300");
-        assertThat(windDirectionArray[5]).isEqualTo("300");
+        assertThat(windDirectionList.size()).isEqualTo(167);
+        assertThat(windDirectionList.get(5)).isInstanceOf(String.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoHumidityArray() throws Exception {
+    public void itParsesXMLDocumentIntoHumidityList() throws Exception {
         this.initData();
-        String[] humidityArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//humidity");
-        assertThat(humidityArray.length).isEqualTo(169);
-        assertThat(humidityArray[1]).isEqualTo("29");
-        assertThat(humidityArray[5]).isEqualTo("42");
+        assertThat(humidityList.size()).isEqualTo(167);
+        assertThat(humidityList.get(5)).isInstanceOf(String.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoCloudCoverArray() throws Exception {
+    public void itParsesXMLDocumentIntoCloudCoverList() throws Exception {
         this.initData();
-        String[] cloudCoverArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//cloud-amount");
-        assertThat(cloudCoverArray.length).isEqualTo(169);
-        assertThat(cloudCoverArray[1]).isEqualTo("14");
-        assertThat(cloudCoverArray[5]).isEqualTo("4");
+        assertThat(cloudCoverList.size()).isEqualTo(167);
+        assertThat(cloudCoverList.get(5)).isInstanceOf(String.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoPrecipProbabilityArray() throws Exception {
+    public void itParsesXMLDocumentIntoPrecipProbabilityList() throws Exception {
         this.initData();
-        String[] precipProbArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//probability-of-precipitation");
-        assertThat(precipProbArray.length).isEqualTo(169);
-        assertThat(precipProbArray[1]).isEqualTo("0");
-        assertThat(precipProbArray[70]).isEqualTo("30");
+        assertThat(probOfPrecipList.size()).isEqualTo(167);
+        assertThat(probOfPrecipList.get(5)).isInstanceOf(String.class);
     }
 
     @Test
-    public void itParsesXMLDocumentIntoPrecipAmountArray() throws Exception {
+    public void itParsesXMLDocumentIntoPrecipAmountList() throws Exception {
         this.initData();
-        String[] precipProbArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//hourly-qpf");
-        assertThat(precipProbArray.length).isEqualTo(169);
-        assertThat(precipProbArray[1]).isEqualTo("0");
-        assertThat(precipProbArray[65]).isEqualTo("0.0033");
+        assertThat(precipAmountList.size()).isEqualTo(167);
+        assertThat(precipAmountList.get(5)).isInstanceOf(String.class);
     }
 }
