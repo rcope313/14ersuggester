@@ -74,17 +74,19 @@ public class MountainForecastScraper {
     }
 
     //HARD-CODED**
-    private static String getHourlyWeatherForecastFromNOAA() throws IOException {
-        org.jsoup.nodes.Document doc = Jsoup.connect("https://forecast.weather.gov/MapClick.php?lat=39.249507922353814&lon=-106.2945362630374").get();
+    @VisibleForTesting
+    static String getHourlyWeatherForecastFromNOAA(String url) throws IOException {
+        org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
         String unescapedXml = StringEscapeUtils.unescapeXml(doc.select("a[href]:contains(Hourly)").get(1).attributes().toString());
         return "https://forecast.weather.gov/" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
     //HARD-CODED**
-    private static String getHourlyWeatherForecastXMLFileUrl() throws IOException {
-        org.jsoup.nodes.Document doc = Jsoup.connect("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical").get();
+    @VisibleForTesting
+    static String getHourlyWeatherForecastXMLFileUrl(String url) throws IOException {
+        org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
         String unescapedXml =StringEscapeUtils.unescapeXml(doc.select("a[href*=digitalDWML]").get(0).attributes().toString());
-        return unescapedXml.substring(7,unescapedXml.length()-1);
+        return "https:" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
     private Document buildXMLDocumentFromUrl() throws Exception {

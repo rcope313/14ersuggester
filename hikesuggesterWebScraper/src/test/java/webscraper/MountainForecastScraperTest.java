@@ -30,6 +30,20 @@ public class MountainForecastScraperTest {
     }
 
     @Test
+    public void itRetrievesNOAAXMLUrl() throws Exception {
+        this.initData();
+        assertThat(MountainForecastScraper.getHourlyWeatherForecastXMLFileUrl("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical"))
+                .isEqualTo("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&FcstType=digitalDWML");
+    }
+
+    @Test
+    public void itRetrievesNOAAHourlyForecast() throws Exception {
+        this.initData();
+        assertThat(MountainForecastScraper.getHourlyWeatherForecastFromNOAA("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&lg=english&&FcstType=text"))
+                .isEqualTo("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical");
+    }
+
+    @Test
     public void itBuildsAnArrayListOfMountainForecast() throws Exception {
         this.initData();
         var list = mountainForecastUrl.buildMountainForecasts();
