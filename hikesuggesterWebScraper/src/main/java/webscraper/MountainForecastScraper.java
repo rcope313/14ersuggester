@@ -4,9 +4,11 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import models.MountainForecast;
+import org.apache.commons.text.StringEscapeUtils;
 import org.apache.xerces.dom.DeferredElementImpl;
 import org.apache.xml.dtm.ref.DTMNodeList;
 import org.assertj.core.util.VisibleForTesting;
+import org.jsoup.Jsoup;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -29,12 +31,6 @@ public class MountainForecastScraper {
     public MountainForecastScraper(URL url) throws Exception {
         this.url = url;
         this.xmlDocument = buildXMLDocumentFromUrl();
-    }
-
-    private static String getHourlyWeatherForecastXMLFileUrl() throws IOException {
-        final HtmlPage page = webClient.getPage("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical");
-        final HtmlAnchor anchor = (HtmlAnchor) page.getByXPath("//a").get(10);
-        return anchor.getPage().toString().substring(9);
     }
 
     public ArrayList<MountainForecast> buildMountainForecasts() throws XPathExpressionException {
@@ -75,6 +71,20 @@ public class MountainForecastScraper {
             aNode = aNode.getNextSibling();
         }
         return elementList;
+    }
+
+    //HARD-CODED**
+    private static String getHourlyWeatherForecastFromNOAA() throws IOException {
+        org.jsoup.nodes.Document doc = Jsoup.connect("https://forecast.weather.gov/MapClick.php?lat=39.249507922353814&lon=-106.2945362630374").get();
+        String unescapedXml = StringEscapeUtils.unescapeXml(doc.select("a[href]:contains(Hourly)").get(1).attributes().toString());
+        return "https://forecast.weather.gov/" + unescapedXml.substring(7,unescapedXml.length()-1);
+    }
+
+    //HARD-CODED**
+    private static String getHourlyWeatherForecastXMLFileUrl() throws IOException {
+        org.jsoup.nodes.Document doc = Jsoup.connect("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical").get();
+        String unescapedXml =StringEscapeUtils.unescapeXml(doc.select("a[href*=digitalDWML]").get(0).attributes().toString());
+        return unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
     private Document buildXMLDocumentFromUrl() throws Exception {
