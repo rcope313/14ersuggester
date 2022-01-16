@@ -1,53 +1,62 @@
 package webscraper;
 
+import models.FourteenerRoute;
 import models.MountainForecast;
 import org.junit.Test;
 import org.w3c.dom.Document;
-
-import java.net.URL;
 import java.util.ArrayList;
 
 import static org.assertj.core.api.Assertions.*;
 
 public class MountainForecastScraperTest {
-    MountainForecastScraper mountainForecastUrl;
+    FourteenerRoute elbe1;
+    MountainForecastScraper mountainForecastElbe1;
     ArrayList<String> dateList, windSpeedList, cloudCoverList, probOfPrecipList, humidityList, windDirectionList,
             tempList, precipAmountList,  windChillList;
 
     void initData() throws Exception {
 
-        mountainForecastUrl = new MountainForecastScraper(new URL("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&FcstType=digitalDWML"));
+        elbe1 = new FourteenerRoute();
+        elbe1.setUrl("https://www.14ers.com/route.php?route=elbe1");
 
-        dateList = mountainForecastUrl.parseElements("//time-layout", "[start-valid-time: null]");
-        windSpeedList = mountainForecastUrl.parseElements("//wind-speed[@type='sustained']", "[value: null]");
-        cloudCoverList = mountainForecastUrl.parseElements("//cloud-amount", "[value: null]");
-        probOfPrecipList = mountainForecastUrl.parseElements("//probability-of-precipitation", "[value: null]");
-        humidityList = mountainForecastUrl.parseElements("//humidity", "[value: null]");
-        windDirectionList = mountainForecastUrl.parseElements("//direction", "[value: null]");
-        tempList = mountainForecastUrl.parseElements("//temperature[@type='hourly']", "[value: null]");
-        precipAmountList = mountainForecastUrl.parseElements("//hourly-qpf", "[value: null]");
-        windChillList = mountainForecastUrl.parseElements("//temperature[@type='wind chill']", "[value: null]");
+        mountainForecastElbe1 = new MountainForecastScraper(elbe1);
+
+        dateList = mountainForecastElbe1.parseElements("//time-layout", "[start-valid-time: null]");
+        windSpeedList = mountainForecastElbe1.parseElements("//wind-speed[@type='sustained']", "[value: null]");
+        cloudCoverList = mountainForecastElbe1.parseElements("//cloud-amount", "[value: null]");
+        probOfPrecipList = mountainForecastElbe1.parseElements("//probability-of-precipitation", "[value: null]");
+        humidityList = mountainForecastElbe1.parseElements("//humidity", "[value: null]");
+        windDirectionList = mountainForecastElbe1.parseElements("//direction", "[value: null]");
+        tempList = mountainForecastElbe1.parseElements("//temperature[@type='hourly']", "[value: null]");
+        precipAmountList = mountainForecastElbe1.parseElements("//hourly-qpf", "[value: null]");
+        windChillList = mountainForecastElbe1.parseElements("//temperature[@type='wind chill']", "[value: null]");
     }
 
     @Test
     public void itRetrievesNOAAXMLUrl() throws Exception {
         this.initData();
-        assertThat(MountainForecastScraper.getHourlyWeatherForecastXMLFileUrl("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical"))
+        assertThat(MountainForecastScraper.getNOAAXmlHourlyWeatherForecast("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical"))
                 .isEqualTo("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&FcstType=digitalDWML");
     }
 
     @Test
     public void itRetrievesNOAAHourlyForecast() throws Exception {
         this.initData();
-        assertThat(MountainForecastScraper.getHourlyWeatherForecastFromNOAA("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&lg=english&&FcstType=text"))
+        assertThat(MountainForecastScraper.getNOAAHourlyWeatherForecast("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&lg=english&&FcstType=text"))
                 .isEqualTo("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical");
+    }
+
+    @Test
+    public void itRetrievesNOAASevenDayForecast() throws Exception {
+        this.initData();
+        assertThat(mountainForecastElbe1.getNOAASevenDayWeatherForecast()).isEqualTo("http://forecast.weather.gov/MapClick.php?lat=39.118075&lon=-106.445417");
     }
 
     @Test
     public void itBuildsAnArrayListOfMountainForecast() throws Exception {
         this.initData();
-        var list = mountainForecastUrl.buildMountainForecasts();
-        assertThat(mountainForecastUrl.buildMountainForecasts().size()).isEqualTo(167);
+        var list = mountainForecastElbe1.buildMountainForecasts();
+        assertThat(mountainForecastElbe1.buildMountainForecasts().size()).isEqualTo(167);
         for (MountainForecast forecast : list) {
             assertThat(forecast).isInstanceOf(MountainForecast.class);
         }
@@ -56,7 +65,7 @@ public class MountainForecastScraperTest {
     @Test
     public void itCreatesClassInstanceOfDocumentField() throws Exception {
         this.initData();
-        assertThat(mountainForecastUrl.getXmlDocument()).isInstanceOf(Document.class);
+        assertThat(mountainForecastElbe1.getXmlDocument()).isInstanceOf(Document.class);
     }
 
     @Test

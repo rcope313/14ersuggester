@@ -1,6 +1,5 @@
 package models;
 
-
 public class FourteenerRoute {
     private int fourteenerRouteId;
     private String mountainName;
@@ -19,7 +18,6 @@ public class FourteenerRoute {
     private String commitment;
     private boolean hasMultipleRoutes = false;
     private String url;
-
 
     public FourteenerRoute() {}
 

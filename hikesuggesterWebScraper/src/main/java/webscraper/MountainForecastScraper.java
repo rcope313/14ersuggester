@@ -1,36 +1,65 @@
 package webscraper;
 
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import models.FourteenerRoute;
 import models.MountainForecast;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.xerces.dom.DeferredElementImpl;
-import org.apache.xml.dtm.ref.DTMNodeList;
 import org.assertj.core.util.VisibleForTesting;
 import org.jsoup.Jsoup;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 
 public class MountainForecastScraper {
-    private final URL url;
     private final Document xmlDocument;
-    private final static WebClient webClient = new WebClient();
+    private final FourteenerRoute route;
 
-    public MountainForecastScraper(URL url) throws Exception {
-        this.url = url;
-        this.xmlDocument = buildXMLDocumentFromUrl();
+    public MountainForecastScraper(FourteenerRoute route) throws Exception {
+        this.route = route;
+        this.xmlDocument = buildXMLDocumentFromFourteenerRoute();
+    }
+
+    private Document buildXMLDocumentFromFourteenerRoute() throws Exception {
+        URL url = new URL
+                (getNOAAXmlHourlyWeatherForecast
+                        (getNOAAHourlyWeatherForecast
+                            (getNOAASevenDayWeatherForecast())));
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(url.openStream());
+        document.getDocumentElement().normalize();
+        return document;
+    }
+
+    @VisibleForTesting
+    String getNOAASevenDayWeatherForecast() throws IOException {
+        org.jsoup.nodes.Document doc = Jsoup.connect(this.getRoute().getUrl()).get();
+        String unescapedXml = StringEscapeUtils.unescapeXml(doc.select("a:contains(NOAA Forecast)").get(0).attributes().toString());
+        return unescapedXml.substring(24,unescapedXml.length()-1);
+    }
+
+    @VisibleForTesting
+    static String getNOAAHourlyWeatherForecast(String url) throws IOException {
+        org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
+        String unescapedXml = StringEscapeUtils.unescapeXml(doc.select("a[href]:contains(Hourly)").get(1).attributes().toString());
+        return "https://forecast.weather.gov/" + unescapedXml.substring(7,unescapedXml.length()-1);
+    }
+
+    @VisibleForTesting
+    static String getNOAAXmlHourlyWeatherForecast(String url) throws IOException {
+        org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
+        String unescapedXml =StringEscapeUtils.unescapeXml(doc.select("a[href*=digitalDWML]").get(0).attributes().toString());
+        return "https:" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
     public ArrayList<MountainForecast> buildMountainForecasts() throws XPathExpressionException {
@@ -73,35 +102,11 @@ public class MountainForecastScraper {
         return elementList;
     }
 
-    //HARD-CODED**
-    @VisibleForTesting
-    static String getHourlyWeatherForecastFromNOAA(String url) throws IOException {
-        org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
-        String unescapedXml = StringEscapeUtils.unescapeXml(doc.select("a[href]:contains(Hourly)").get(1).attributes().toString());
-        return "https://forecast.weather.gov/" + unescapedXml.substring(7,unescapedXml.length()-1);
-    }
-
-    //HARD-CODED**
-    @VisibleForTesting
-    static String getHourlyWeatherForecastXMLFileUrl(String url) throws IOException {
-        org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
-        String unescapedXml =StringEscapeUtils.unescapeXml(doc.select("a[href*=digitalDWML]").get(0).attributes().toString());
-        return "https:" + unescapedXml.substring(7,unescapedXml.length()-1);
-    }
-
-    private Document buildXMLDocumentFromUrl() throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(getUrl().openStream());
-        document.getDocumentElement().normalize();
-        return document;
-    }
-
-    public URL getUrl() {
-        return url;
-    }
-
     public Document getXmlDocument() {
         return xmlDocument;
+    }
+
+    public FourteenerRoute getRoute() {
+        return route;
     }
 }
