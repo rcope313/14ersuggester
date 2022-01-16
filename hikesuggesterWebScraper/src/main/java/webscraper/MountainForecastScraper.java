@@ -1,29 +1,47 @@
 package webscraper;
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import models.MountainForecast;
 import org.apache.xml.dtm.ref.DTMNodeList;
 import org.assertj.core.util.VisibleForTesting;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 
 public class MountainForecastScraper {
-    private final String pathName;
+    private final String fileName;
+    private final URL url;
     private final Document xmlDocument;
+    private final static WebClient webClient = new WebClient();
 
-    public MountainForecastScraper(String pathName) throws ParserConfigurationException, IOException, SAXException {
-        this.pathName = pathName;
-        this.xmlDocument = buildXMLDocument();
+    public MountainForecastScraper(URL url) throws Exception {
+        this.fileName = null;
+        this.url = url;
+        this.xmlDocument = buildXMLDocumentFromUrl();
+    }
+
+    @VisibleForTesting
+    MountainForecastScraper(String fileName) throws Exception {
+        this.fileName = fileName;
+        this.url = null;
+        this.xmlDocument = buildXMLDocumentFromFile();
+    }
+
+    private static String getHourlyWeatherForecastXMLFileUrl() throws IOException {
+        final HtmlPage page = webClient.getPage("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&unit=0&lg=english&FcstType=graphical");
+        final HtmlAnchor anchor = (HtmlAnchor) page.getByXPath("//a").get(10);
+        return anchor.getPage().toString().substring(9);
     }
 
     public ArrayList<MountainForecast> buildMountainForecasts() throws XPathExpressionException {
@@ -61,10 +79,18 @@ public class MountainForecastScraper {
                     Integer.parseInt(probOfPrecipArray[idx]), Double.parseDouble(precipAmountArray[idx]));
     }
 
-    private Document buildXMLDocument() throws ParserConfigurationException, IOException, SAXException {
+    private Document buildXMLDocumentFromUrl() throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-        Document document = builder.parse(new File(getPathName()));
+        Document document = builder.parse(getUrl().openStream());
+        document.getDocumentElement().normalize();
+        return document;
+    }
+
+    private Document buildXMLDocumentFromFile() throws Exception {
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        Document document = builder.parse(new File(getFileName()));
         document.getDocumentElement().normalize();
         return document;
     }
@@ -76,8 +102,12 @@ public class MountainForecastScraper {
         return ((DTMNodeList) nodelist).getDTMIterator().toString().split("\n");
     }
 
-    public String getPathName() {
-        return pathName;
+    private String getFileName() {
+        return fileName;
+    }
+
+    public URL getUrl() {
+        return url;
     }
 
     public Document getXmlDocument() {

@@ -3,25 +3,30 @@ package webscraper;
 import models.MountainForecast;
 import org.junit.Test;
 import org.w3c.dom.Document;
+
+import java.net.URL;
+
 import static org.assertj.core.api.Assertions.*;
 
 public class MountainForecastScraperTest {
-    MountainForecast forecastJanuary11th4pm, forecastJanuary11th5pm;
-    MountainForecastScraper mountainForecastXMLFile;
+    MountainForecast forecastJanuary15th11am, forecastJanuary15th12pm;
+    MountainForecastScraper mountainForecastXMLFile, mountainForecastUrl;
     String[] dateArray, windSpeedArray, cloudCoverArray, probOfPrecipArray, humidityArray, windDirectionArray,
             tempArray, precipAmountArray,  windChillArray;
 
     void initData() throws Exception {
 
-        forecastJanuary11th4pm =
+        forecastJanuary15th11am =
                 new MountainForecast(
-                        "2022-01-11T16:00:00-07:00", 28, 16, 16, 300,
-                        29, 14, 0, 0);
-        forecastJanuary11th5pm =
+                        "2022-01-15T11:00:00-07:00", 10, 12, 10, 340,
+                        33, 3, 0, 0);
+        forecastJanuary15th12pm =
                 new MountainForecast(
-                        "2022-01-11T17:00:00-07:00", 23, 11, 13, 290,
-                        36, 6, 0, 0);
-        mountainForecastXMLFile = new MountainForecastScraper("/Users/rachelcope/Documents/hikesuggester/hikesuggesterWebScraper/src/main/resources/mountainforecastEx1.xml");
+                        "2022-01-15T12:00:00-07:00", 10, 20, 10, 340,
+                        28, 3, 0, 0);
+
+        mountainForecastXMLFile = new MountainForecastScraper("/Users/rachelcope/Documents/hikesuggester/hikesuggesterWebScraper/src/main/resources/mountainForecast.xml");
+        mountainForecastUrl = new MountainForecastScraper(new URL("https://forecast.weather.gov/MapClick.php?lat=39.2495&lon=-106.2945&FcstType=digitalDWML"));
 
         dateArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//time-layout");
         windSpeedArray = mountainForecastXMLFile.parseElements(mountainForecastXMLFile.getXmlDocument(), "//wind-speed[@type='sustained']");
@@ -38,8 +43,8 @@ public class MountainForecastScraperTest {
     public void itBuildsAnArrayListOfMountainForecast() throws Exception {
         this.initData();
         assertThat(mountainForecastXMLFile.buildMountainForecasts().size()).isEqualTo(168);
-        assertThat(mountainForecastXMLFile.buildMountainForecasts().get(0)).usingRecursiveComparison().isEqualTo(forecastJanuary11th4pm);
-        assertThat(mountainForecastXMLFile.buildMountainForecasts().get(1)).usingRecursiveComparison().isEqualTo(forecastJanuary11th5pm);
+        assertThat(mountainForecastXMLFile.buildMountainForecasts().get(0)).usingRecursiveComparison().isEqualTo(forecastJanuary15th11am);
+        assertThat(mountainForecastXMLFile.buildMountainForecasts().get(1)).usingRecursiveComparison().isEqualTo(forecastJanuary15th12pm);
     }
 
     @Test
@@ -48,17 +53,18 @@ public class MountainForecastScraperTest {
         assertThat(mountainForecastXMLFile.buildAMountainForecast(1, 2, dateArray, windSpeedArray, cloudCoverArray,
                 probOfPrecipArray, humidityArray, windDirectionArray, tempArray, precipAmountArray, windChillArray))
                 .usingRecursiveComparison()
-                .isEqualTo(forecastJanuary11th4pm);
+                .isEqualTo(forecastJanuary15th11am);
         assertThat(mountainForecastXMLFile.buildAMountainForecast(2, 4, dateArray, windSpeedArray, cloudCoverArray,
                 probOfPrecipArray, humidityArray, windDirectionArray, tempArray, precipAmountArray, windChillArray))
                 .usingRecursiveComparison()
-                .isEqualTo(forecastJanuary11th5pm);
+                .isEqualTo(forecastJanuary15th12pm);
     }
 
     @Test
     public void itCreatesClassInstanceOfDocumentField() throws Exception {
         this.initData();
         assertThat(mountainForecastXMLFile.getXmlDocument()).isInstanceOf(Document.class);
+        assertThat(mountainForecastUrl.getXmlDocument()).isInstanceOf(Document.class);
     }
 
     @Test
@@ -141,6 +147,4 @@ public class MountainForecastScraperTest {
         assertThat(precipProbArray[1]).isEqualTo("0");
         assertThat(precipProbArray[65]).isEqualTo("0.0033");
     }
-
-
 }
