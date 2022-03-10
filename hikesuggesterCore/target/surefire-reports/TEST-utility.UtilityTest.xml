@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite tests="1" failures="0" name="utility.UtilityTest" time="0.103" errors="0" skipped="0">
+<testsuite tests="1" failures="0" name="utility.UtilityTest" time="0.173" errors="0" skipped="0">
   <properties>
     <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
     <property name="java.vm.version" value="16.0.2+0"/>
@@ -57,5 +57,5 @@
     <property name="socksNonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
     <property name="ftp.nonProxyHosts" value="local|*.local|169.254/16|*.169.254/16"/>
   </properties>
-  <testcase classname="utility.UtilityTest" name="withAssertions_examples" time="0.103"/>
+  <testcase classname="utility.UtilityTest" name="withAssertions_examples" time="0.173"/>
 </testsuite>

@@ -17,13 +17,11 @@ public class FourteenerRouteScraper {
 
     public static ArrayList<FourteenerRoute> createListOfFourteenerRoutes() throws Exception {
         HashSet<String> urlsSeen = new HashSet<>();
-
         ArrayList<FourteenerRoute> fourteenerRouteArrayList = new ArrayList<>();
         List<List<String>> allRouteIds = getAllRouteIdLists();
         int idx = 0;
 
         for (List<String> routeIdsByMountain : allRouteIds) {
-
             for (String routeId : routeIdsByMountain) {
                 try {
                     fourteenerRouteArrayList.add(scrapeFourteener(routeId.substring(1), urlsSeen, idx));
@@ -47,8 +45,8 @@ public class FourteenerRouteScraper {
         final HtmlDivision div = (HtmlDivision) page.getByXPath("//div[@class='BldHdr2 bold1']").get(0);
         final HtmlTable table = (HtmlTable) page.getByXPath("//table[@class='routestatsbox']").get(0);
 
-        scrapeTotalGain(url, table, resultFourteenerRoute);
-        scrapeRouteLength(url, table, resultFourteenerRoute);
+        scrapeTotalGain(table, resultFourteenerRoute);
+        scrapeRouteLength(table, resultFourteenerRoute);
         scrapeMountainAndRouteName(div, resultFourteenerRoute);
         scrapeSnowRouteOnly(div, resultFourteenerRoute);
         scrapeStandardRoute(div, resultFourteenerRoute);
@@ -68,7 +66,6 @@ public class FourteenerRouteScraper {
         if (routesSeen.contains(url)) {
             return null;
         }
-
         routesSeen.add(url);
         FourteenerRoute resultFourteenerRoute = new FourteenerRoute();
         resultFourteenerRoute.setUrl("https://www.14ers.com" + url);
@@ -78,8 +75,8 @@ public class FourteenerRouteScraper {
         final HtmlDivision div = (HtmlDivision) page.getByXPath("//div[@class='BldHdr2 bold1']").get(0);
         final HtmlTable table = (HtmlTable) page.getByXPath("//table[@class='routestatsbox']").get(0);
 
-        scrapeTotalGain(url, table, resultFourteenerRoute);
-        scrapeRouteLength(url, table, resultFourteenerRoute);
+        scrapeTotalGain(table, resultFourteenerRoute);
+        scrapeRouteLength(table, resultFourteenerRoute);
         scrapeMountainAndRouteName(div, resultFourteenerRoute);
         scrapeSnowRouteOnly(div, resultFourteenerRoute);
         scrapeStandardRoute(div, resultFourteenerRoute);
@@ -91,14 +88,12 @@ public class FourteenerRouteScraper {
         scrapeRockfallPotential(table, resultFourteenerRoute);
         scrapeRouteFinding(table, resultFourteenerRoute);
         scrapeCommitment(table, resultFourteenerRoute);
-
         return resultFourteenerRoute;
     }
 
-    private static void scrapeTotalGain(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
+    private static void scrapeTotalGain(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(5);
         int totalGain = convertTotalGainIntoInteger(cell.asNormalizedText());
-
         if (totalGain == 0) {
             resultFourteenerRoute.setHasMultipleRoutes(true);
         } else {
@@ -106,10 +101,9 @@ public class FourteenerRouteScraper {
         }
     }
 
-    private static void scrapeRouteLength(String url, HtmlTable table, FourteenerRoute resultFourteenerRoute) {
+    private static void scrapeRouteLength(HtmlTable table, FourteenerRoute resultFourteenerRoute) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath("//td[@class='data_box_cell2']").get(6);
         double routeLength = convertRouteLengthIntoInteger(cell.asNormalizedText());
-
         if (routeLength == 0) {
             resultFourteenerRoute.setHasMultipleRoutes(true);
         } else {
@@ -121,7 +115,6 @@ public class FourteenerRouteScraper {
     private static void scrapeMountainAndRouteName(HtmlDivision div, FourteenerRoute resultFourteenerRoute) {
         String[] divArray0 = div.asNormalizedText().split("\n ");
         String[] divArray1 = div.asNormalizedText().split("\n");
-
         if (divArray1.length == 1 && divArray0.length == 1) {
             resultFourteenerRoute.setMountainName("Approach Route");
             resultFourteenerRoute.setRouteName(divArray1[0]);
@@ -187,7 +180,7 @@ public class FourteenerRouteScraper {
         resultFourteenerRoute.setCommitment(commitment.substring(0, commitment.length() - 2));
     }
 
-    public static List<List<String>> getAllRouteIdLists() throws Exception {
+    private static List<List<String>> getAllRouteIdLists() throws Exception {
         List<List<String>> listOfListOfRouteIds = new ArrayList<>();
         getPeakIdList().forEach((peakId) -> {
             try {
@@ -199,14 +192,12 @@ public class FourteenerRouteScraper {
         return listOfListOfRouteIds;
     }
 
-    public static List<String> getARouteIdList(String peakId) throws IOException {
+    private static List<String> getARouteIdList(String peakId) throws IOException {
         List<String> listOfRouteIds = new ArrayList<>();
         HashSet<String> routesSeen = new HashSet<>();
-
         String peakIdUrl = "https://www.14ers.com/routelist.php" + peakId;
         final HtmlPage page = webClient.getPage(peakIdUrl);
         final HtmlTable table = page.getHtmlElementById("routeResults");
-
         for (final HtmlTableRow row : table.getRows()) {
             row.getCells().forEach((cell) -> getARouteIdList(cell, listOfRouteIds, routesSeen));
         }
@@ -224,9 +215,8 @@ public class FourteenerRouteScraper {
         }
     }
 
-    public static List<String> getPeakIdList() throws Exception {
+    private static List<String> getPeakIdList() throws Exception {
         List<String> listOfPeakIds = new ArrayList<>();
-
         final HtmlPage page = webClient.getPage("https://www.14ers.com/php14ers/14ers.php");
         final HtmlTable table = page.getHtmlElementById("peakTable");
 
@@ -249,7 +239,6 @@ public class FourteenerRouteScraper {
 
     private static GradeQuality convertStringIntoGradeQuality(String gradeString) {
         GradeQuality resultGradeQuality = new GradeQuality();
-
         if (gradeString.split(" ")[1].equals("Difficult")) {
             resultGradeQuality.setGrade(Integer.parseInt(gradeString.split(" ")[3]));
             resultGradeQuality.setQuality("Difficult");
@@ -264,7 +253,7 @@ public class FourteenerRouteScraper {
         return resultGradeQuality;
     }
 
-    public static int convertStartAndSummitElevationStringToInteger(String elevation) {
+    private static int convertStartAndSummitElevationStringToInteger(String elevation) {
         String elevationWithoutFeet = elevation.substring(0, elevation.length() - 5);
         char[] charArray = elevationWithoutFeet.toCharArray();
 
@@ -288,7 +277,7 @@ public class FourteenerRouteScraper {
         }
     }
 
-    public static int convertTotalGainIntoInteger(String str) {
+    private static int convertTotalGainIntoInteger(String str) {
         if (str.split("\n").length > 1) {
             return 0;
         }
@@ -296,7 +285,7 @@ public class FourteenerRouteScraper {
         return convertElevationIntoInteger(stringArray[0]);
     }
 
-    public static int convertElevationIntoInteger (String str) {
+    private static int convertElevationIntoInteger (String str) {
         char[] charArray = str.toCharArray();
 
         if (charArray.length < 5) {
@@ -319,7 +308,7 @@ public class FourteenerRouteScraper {
         }
     }
 
-    public static double convertRouteLengthIntoInteger(String str) {
+    private static double convertRouteLengthIntoInteger(String str) {
         if (str.split("\n").length > 1) {
             return 0;
         }

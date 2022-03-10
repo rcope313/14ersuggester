@@ -57,7 +57,6 @@ public class TrailheadScraper {
 
     private static Trailhead scrapeTrailhead(String[] statsBoxAsNormalizedText, HtmlDivision pageTitle, Trailhead resultTrailhead) {
         scrapeName(pageTitle.asNormalizedText(), resultTrailhead);
-
         if (statsBoxAsNormalizedText.length == 11) {
             scrapeCoordinates(statsBoxAsNormalizedText[2], resultTrailhead);
             scrapeRoadDifficulty(statsBoxAsNormalizedText[5], resultTrailhead);
@@ -95,7 +94,6 @@ public class TrailheadScraper {
 
     private static ArrayList<String> getTrailHeadUrlList() throws Exception {
         ArrayList<String> trailHeadUrls = new ArrayList<>();
-
         final HtmlPage page = webClient.getPage("https://www.14ers.com/php14ers/trailheadsmain.php");
         final List<DomAttr> domList = page.getByXPath("//div[@class='singlerange']//a/@href");
         domList.forEach((domAttr) -> filterDomAttrValue(domAttr, trailHeadUrls));

@@ -13,5 +13,4 @@ public class LoadUtils {
         }
         return resultString;
     }
-
 }

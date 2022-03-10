@@ -31,9 +31,4 @@ public class HikeSuggesterDatabase {
     public final static String WINTER_ACCESS = "trailheads.winterAccess";
     public final static String TRAILHEAD_URL = "trailheads.url";
     public final static String TRAILHEAD_UPDATE_DATE = "trailheads.updateDate";
-
-
-
-
-
 }

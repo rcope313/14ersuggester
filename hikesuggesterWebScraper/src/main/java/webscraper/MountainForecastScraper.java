@@ -8,7 +8,6 @@ import org.assertj.core.util.VisibleForTesting;
 import org.jsoup.Jsoup;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -64,7 +63,6 @@ public class MountainForecastScraper {
 
     public ArrayList<MountainForecast> buildMountainForecasts() throws XPathExpressionException {
         ArrayList<MountainForecast> mountainForecasts = new ArrayList<>();
-
         ArrayList<String> dateList = parseElements("//time-layout", "[start-valid-time: null]");
         ArrayList<String> windSpeedList = parseElements("//wind-speed[@type='sustained']", "[value: null]");
         ArrayList<String> cloudCoverList = parseElements("//cloud-amount", "[value: null]");

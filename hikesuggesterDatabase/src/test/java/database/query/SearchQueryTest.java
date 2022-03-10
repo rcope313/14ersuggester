@@ -49,8 +49,6 @@ public class SearchQueryTest {
         q10 = new SearchQuery();
             q10.setQuery("WHERE fourteenerRouteId >= 0;");
 
-
-
         str0 = "SELECT * FROM fourteener_routes" +
                 " LEFT OUTER JOIN trailheads" +
                 " ON fourteener_routes.trailhead = trailheads.name" +
@@ -117,8 +115,6 @@ public class SearchQueryTest {
                 " FROM fourteener_routes" +
                 " LEFT OUTER JOIN trailheads ON fourteener_routes.trailhead = trailheads.name" +
                 " WHERE fourteenerRouteId >= 0;";
-
-
     }
 
     @Test
@@ -135,7 +131,5 @@ public class SearchQueryTest {
         assertThat(q8.createQuerySyntax()).isEqualTo(str8);
         assertThat(q9.createQuerySyntax()).isEqualTo(str9);
         assertThat(q10.createQuerySyntax()).isEqualTo(str10);
-
     }
-
 }
