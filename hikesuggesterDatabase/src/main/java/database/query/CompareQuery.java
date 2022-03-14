@@ -5,7 +5,7 @@ import models.HikeSuggesterDatabase;
 import java.util.ArrayList;
 import java.util.StringJoiner;
 
-public class CompareQuery implements Query{
+public class CompareQuery extends Query {
     private String mountainName1;
     private String routeName1;
     private String mountainName2;
@@ -16,6 +16,7 @@ public class CompareQuery implements Query{
         checkFieldsOfMySqlCompareQuery();
     }
 
+    @Override
     public String createQuerySyntax() {
         if (getRouteUrls() == null) {
             return "SELECT * " +

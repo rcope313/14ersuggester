@@ -11,7 +11,7 @@ public class CliColumnDesign {
     final public static CliColumn SNOW_ROUTE = new CliColumn
             (HikeSuggesterDatabase.IS_SNOW_ROUTE, "Snow Route", "%-15", "d");
     final public static CliColumn STANDARD_ROUTE = new CliColumn
-            (HikeSuggesterDatabase.IS_STANDARD_ROUTE, "Standard Roue", "%-15", "d");
+            (HikeSuggesterDatabase.IS_STANDARD_ROUTE, "Standard Route", "%-15", "d");
     final public static CliColumn GRADE = new CliColumn
             (HikeSuggesterDatabase.GRADE, "Grade", "%-7", "d");
     final public static CliColumn GRADE_QUALITY = new CliColumn

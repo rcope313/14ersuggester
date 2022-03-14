@@ -1,4 +1,7 @@
 package database.query;
 
-public interface Query {
+public abstract class Query {
+
+    public abstract String createQuerySyntax();
+
 }

@@ -4,7 +4,7 @@ import models.HikeSuggesterDatabase;
 import java.util.ArrayList;
 import java.util.StringJoiner;
 
-public class SearchQuery implements Query {
+public class SearchQuery extends Query {
     private boolean isVerbose = false;
     private String query = null;
     private ArrayList<String> mountainNames;
@@ -28,6 +28,7 @@ public class SearchQuery implements Query {
     private ArrayList<Integer> roadDifficulties;
     private ArrayList<String> trailheadUrls;
 
+    @Override
     public String createQuerySyntax() {
         if (getQuery() == null) {
             return createSelectStatementMySqlSyntax() + createWhereStatementsMySqlSyntax();

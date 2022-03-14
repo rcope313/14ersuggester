@@ -1,17 +1,24 @@
-package subcommands;
+package console;
 
+import database.DatabaseConnection;
+import database.query.Query;
+import database.query.SearchQuery;
 import models.CliColumn;
 import models.CliColumnDesign;
 import models.HikeSuggesterDatabase;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.StringJoiner;
 
-public abstract class SubCommand {
+public abstract class CliOutput {
 
-    ArrayList<CliColumn> designateCliColumnFieldsGeneral() {
+    public abstract void buildCliTable(Query query);
+
+    ArrayList<CliColumn> designateCliColumnFields() {
         ArrayList<CliColumn> cliColumnFields = new ArrayList<>();
         cliColumnFields.add(CliColumnDesign.MOUNTAIN_NAME);
         cliColumnFields.add(CliColumnDesign.ROUTE_NAME);
@@ -26,7 +33,6 @@ public abstract class SubCommand {
         ArrayList<String> cliTableHeaders = new ArrayList<>();
         cliColumnFields.forEach((cliColumn) -> cliTableHeaders.add(cliColumn.getHikeSuggesterCliColumn()));
         var cliTableHeadersArray = cliTableHeaders.toArray();
-
         System.out.format(buildCliHeaderFormatter(cliColumnFields), cliTableHeadersArray);
     }
 
@@ -34,13 +40,28 @@ public abstract class SubCommand {
         StringJoiner formatHeaderStringJoiner = new StringJoiner("");
         cliColumnFields.forEach((cliColumn) -> formatHeaderStringJoiner.add(cliColumn.getFormatString() + "s"));
         formatHeaderStringJoiner.add("\n");
-
         return formatHeaderStringJoiner.toString();
+    }
+
+    void inputDataIntoCliTable(String querySyntax, ArrayList<CliColumn> cliColumnFields) {
+        try (Statement stmt = DatabaseConnection.createStatement()) {
+            ResultSet rs = stmt.executeQuery(querySyntax);
+            while (rs.next()) {
+                ArrayList<Object> columnDataList = new ArrayList<>();
+                for (CliColumn cliColumnField : cliColumnFields) {
+                    columnDataList.add(getResultSetValue(rs, cliColumnField));
+                }
+                var columnDataArray = columnDataList.toArray();
+                System.out.format(buildCliDataFormatter(cliColumnFields), columnDataArray);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     static Object getResultSetValue(ResultSet rs, CliColumn cliColumn) throws SQLException {
         if (cliColumn.getDatabaseColumn() == null ||
-            cliColumn.getDatabaseColumn().equals(HikeSuggesterDatabase.ROUTE_UPDATE_DATE)) {
+                cliColumn.getDatabaseColumn().equals(HikeSuggesterDatabase.ROUTE_UPDATE_DATE)) {
             return "";
         }
         if (cliColumn.getFormatRegex().equals("s")) {

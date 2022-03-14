@@ -7,12 +7,10 @@ import models.FourteenerRoute;
 import models.GradeQuality;
 import models.HikeSuggesterDatabase;
 import picocli.CommandLine;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @CommandLine.Command(name = "compare", mixinStandardHelpOptions = true)
 public class CompareSubCommand extends SubCommand implements Runnable {
