@@ -1,6 +1,8 @@
 models/MountainForecast.class
+models/Column$1.class
 models/HikeSuggesterDatabase.class
 models/GradeQuality.class
+models/Column.class
 models/CliColumn.class
 models/CliColumnDesign.class
 models/Trailhead.class

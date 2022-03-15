@@ -5,7 +5,7 @@ public enum Column {
     START_ELEVATION, SUMMIT_ELEVATION, TOTAL_GAIN, ROUTE_LENGTH, EXPOSURE, ROCKFALL_POTENTIAL,
     ROUTE_FINDING, COMMITMENT, MULTIPLE_ROUTES, ROUTE_URL, TRAILHEAD;
 
-    String getDatabaseColumn() {
+    public String getDatabaseColumn() {
         return switch (this) {
             case ROUTE_ID -> HikeSuggesterDatabase.FOURTEENER_ROUTE_ID;
             case ROUTE_NAME -> HikeSuggesterDatabase.ROUTE_NAME;
@@ -28,7 +28,7 @@ public enum Column {
         };
     }
 
-    String getCliColumn() {
+    public String getCliColumn() {
         return switch (this) {
             case ROUTE_ID -> "ID";
             case ROUTE_NAME -> "Route Name";
@@ -51,7 +51,7 @@ public enum Column {
         };
     }
 
-    String getFormatString() {
+    public String getFormatString() {
         return switch (this) {
             case ROUTE_ID -> "%-10";
             case ROUTE_NAME -> "%-35";
@@ -67,7 +67,7 @@ public enum Column {
         };
     }
 
-    String getFormatRegex() {
+    public String getFormatRegex() {
         return switch (this) {
             case ROUTE_ID, ROUTE_NAME, MOUNTAIN_NAME, GRADE_QUALITY, EXPOSURE, ROCKFALL_POTENTIAL, ROUTE_FINDING, COMMITMENT, ROUTE_URL, TRAILHEAD -> "s";
             case SNOW_ROUTE, STANDARD_ROUTE, GRADE, START_ELEVATION, SUMMIT_ELEVATION, TOTAL_GAIN, MULTIPLE_ROUTES -> "d";

@@ -1,12 +1,8 @@
 package console;
 
-import database.DatabaseConnection;
-import database.query.Query;
-import database.query.SearchQuery;
-import models.CliColumn;
-import models.CliColumnDesign;
+import database.dao.DatabaseConnection;
+import models.Column;
 import models.HikeSuggesterDatabase;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -16,74 +12,74 @@ import java.util.StringJoiner;
 
 public abstract class CliOutput {
 
-    public abstract void buildCliTable(Query query);
+//    public abstract void buildCliTable(Query query);
 
-    ArrayList<CliColumn> designateCliColumnFields() {
-        ArrayList<CliColumn> cliColumnFields = new ArrayList<>();
-        cliColumnFields.add(CliColumnDesign.MOUNTAIN_NAME);
-        cliColumnFields.add(CliColumnDesign.ROUTE_NAME);
-        cliColumnFields.add(CliColumnDesign.GRADE);
-        cliColumnFields.add(CliColumnDesign.TOTAL_GAIN);
-        cliColumnFields.add(CliColumnDesign.ROUTE_LENGTH);
-        cliColumnFields.add(CliColumnDesign.ROUTE_URL);
-        return cliColumnFields;
+    ArrayList<Column> designateCliColumnFields() {
+        ArrayList<Column> columnList = new ArrayList<>();
+        columnList.add(Column.MOUNTAIN_NAME);
+        columnList.add(Column.ROUTE_NAME);
+        columnList.add(Column.GRADE);
+        columnList.add(Column.TOTAL_GAIN);
+        columnList.add(Column.ROUTE_LENGTH);
+        columnList.add(Column.ROUTE_URL);
+        return columnList;
     }
 
-    void buildCliTableHeaders(ArrayList<CliColumn> cliColumnFields) {
+    void buildCliTableHeaders(ArrayList<Column> columnList) {
         ArrayList<String> cliTableHeaders = new ArrayList<>();
-        cliColumnFields.forEach((cliColumn) -> cliTableHeaders.add(cliColumn.getHikeSuggesterCliColumn()));
-        var cliTableHeadersArray = cliTableHeaders.toArray();
-        System.out.format(buildCliHeaderFormatter(cliColumnFields), cliTableHeadersArray);
+        columnList.forEach((column) -> cliTableHeaders.add(column.getCliColumn()));
+        Object[] cliTableHeadersArray = cliTableHeaders.toArray();
+        System.out.format(buildCliHeaderFormatter(columnList), cliTableHeadersArray);
     }
 
-    private static String buildCliHeaderFormatter(ArrayList<CliColumn> cliColumnFields) {
+    private static String buildCliHeaderFormatter(ArrayList<Column> columnList) {
         StringJoiner formatHeaderStringJoiner = new StringJoiner("");
-        cliColumnFields.forEach((cliColumn) -> formatHeaderStringJoiner.add(cliColumn.getFormatString() + "s"));
+        columnList.forEach((column) -> formatHeaderStringJoiner.add(column.getFormatString() + "s"));
         formatHeaderStringJoiner.add("\n");
         return formatHeaderStringJoiner.toString();
     }
 
-    void inputDataIntoCliTable(String querySyntax, ArrayList<CliColumn> cliColumnFields) {
+    void inputDataIntoCliTable(String querySyntax, ArrayList<Column> columnList) {
         try (Statement stmt = DatabaseConnection.createStatement()) {
             ResultSet rs = stmt.executeQuery(querySyntax);
             while (rs.next()) {
                 ArrayList<Object> columnDataList = new ArrayList<>();
-                for (CliColumn cliColumnField : cliColumnFields) {
-                    columnDataList.add(getResultSetValue(rs, cliColumnField));
+                for (Column column : columnList) {
+                    columnDataList.add(getResultSetValue(rs, column));
                 }
                 var columnDataArray = columnDataList.toArray();
-                System.out.format(buildCliDataFormatter(cliColumnFields), columnDataArray);
+                System.out.format(buildCliDataFormatter(columnList), columnDataArray);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    static Object getResultSetValue(ResultSet rs, CliColumn cliColumn) throws SQLException {
-        if (cliColumn.getDatabaseColumn() == null ||
-                cliColumn.getDatabaseColumn().equals(HikeSuggesterDatabase.ROUTE_UPDATE_DATE)) {
+    static Object getResultSetValue(ResultSet rs, Column column) throws SQLException {
+        if (column.getDatabaseColumn() == null ||
+            column.getDatabaseColumn().equals(HikeSuggesterDatabase.ROUTE_UPDATE_DATE)) {
             return "";
         }
-        if (cliColumn.getFormatRegex().equals("s")) {
-            return rs.getString(cliColumn.getDatabaseColumn());
+        if (column.getFormatRegex().equals("s")) {
+            return rs.getString(column.getDatabaseColumn());
         }
-        else if (cliColumn.getDatabaseColumn().equals(HikeSuggesterDatabase.IS_SNOW_ROUTE) ||
-                cliColumn.getDatabaseColumn().equals(HikeSuggesterDatabase.IS_STANDARD_ROUTE) ||
-                cliColumn.getDatabaseColumn().equals(HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES)) {
-            return rs.getInt(cliColumn.getDatabaseColumn());
-        } else if (cliColumn.getFormatRegex().equals("d")) {
-            return rs.getInt(cliColumn.getDatabaseColumn());
+        else if (column.getDatabaseColumn().equals(HikeSuggesterDatabase.IS_SNOW_ROUTE) ||
+                 column.getDatabaseColumn().equals(HikeSuggesterDatabase.IS_STANDARD_ROUTE) ||
+                 column.getDatabaseColumn().equals(HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES)) {
+            return rs.getInt(column.getDatabaseColumn());
+        } else if (column.getFormatRegex().equals("d")) {
+            return rs.getInt(column.getDatabaseColumn());
         }
-        else if (cliColumn.getFormatRegex().equals("f")) {
-            return rs.getDouble(cliColumn.getDatabaseColumn());
+        else if (column.getFormatRegex().equals("f")) {
+            return rs.getDouble(column.getDatabaseColumn());
         } else {
             throw new IllegalArgumentException("Unsupported column type.");
         }
     }
 
-    static String buildCliDataFormatter(ArrayList<CliColumn> cliColumnFields) {
+    static String buildCliDataFormatter(ArrayList<Column> columnList) {
         StringJoiner formatDataStringJoiner = new StringJoiner("");
-        cliColumnFields.forEach((cliColumn) -> formatDataStringJoiner.add(cliColumn.getFormatString() + cliColumn.getFormatRegex()));
+        columnList.forEach((column) -> formatDataStringJoiner.add(column.getFormatString() + column.getFormatRegex()));
         formatDataStringJoiner.add("\n");
         return formatDataStringJoiner.toString();
     }

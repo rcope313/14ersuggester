@@ -1,7 +1,7 @@
 package subcommands;
 
-import database.DatabaseConnection;
-import database.query.SearchQuery;
+import database.dao.DatabaseConnection;
+import database.models.AbstractSearchQuery;
 import models.CliColumn;
 import models.CliColumnDesign;
 import picocli.CommandLine;
@@ -10,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @CommandLine.Command(name = "search", mixinStandardHelpOptions = true)
 public class SearchSubCommand extends SubCommand implements Runnable {
@@ -94,37 +93,37 @@ public class SearchSubCommand extends SubCommand implements Runnable {
     public void run() {
 //        spec.commandLine().getOut().println(setSearchQuery().createQuerySyntax());
 //        ** use to create tests
-        SearchQuery searchQuery = setSearchQuery();
+        AbstractSearchQuery searchQuery = setSearchQuery();
         viewCliTableSearchSubCommand(searchQuery);
     }
     
-    private void viewCliTableSearchSubCommand(SearchQuery query)  {
-        ArrayList<CliColumn> cliColumnFields;
-        if (query.isVerbose()) {
-            cliColumnFields = designateCliColumnFieldsVerbose(query);
-        } else {
-            cliColumnFields = designateCliColumnFieldsGeneral();
-        }
-        buildCliTableHeaders(cliColumnFields);
-        inputDataIntoCliTable(query.createQuerySyntax(), cliColumnFields);
+    private void viewCliTableSearchSubCommand(AbstractSearchQuery query)  {
+//        ArrayList<CliColumn> cliColumnFields;
+//        if (query.isVerbose()) {
+//            cliColumnFields = designateCliColumnFieldsVerbose(query);
+//        } else {
+//            cliColumnFields = designateCliColumnFieldsGeneral();
+//        }
+//        buildCliTableHeaders(cliColumnFields);
+//        inputDataIntoCliTable(query.createQuerySyntax(), cliColumnFields);
     }
 
-    private ArrayList<CliColumn> designateCliColumnFieldsVerbose(SearchQuery query) {
+    private ArrayList<CliColumn> designateCliColumnFieldsVerbose(AbstractSearchQuery query) {
         ArrayList<CliColumn> cliColumnFields = new ArrayList<>();
         cliColumnFields.add(CliColumnDesign.MOUNTAIN_NAME);
         cliColumnFields.add(CliColumnDesign.ROUTE_NAME);
 
-        if (query.isSnowRoute()) { cliColumnFields.add(CliColumnDesign.SNOW_ROUTE); }
-        if (query.isStandardRoute()) { cliColumnFields.add(CliColumnDesign.STANDARD_ROUTE); }
-        if (query.getGradeQualities() != null) { cliColumnFields.add(CliColumnDesign.GRADE_QUALITY); }
-        if (query.getStartElevation() != 0) { cliColumnFields.add(CliColumnDesign.START_ELEVATION); }
-        if (query.getSummitElevation() != 0) { cliColumnFields.add(CliColumnDesign.SUMMIT_ELEVATION); }
-        if (query.getExposure() != null) { cliColumnFields.add(CliColumnDesign.EXPOSURE); }
-        if (query.getRockfallPotential() != null) { cliColumnFields.add(CliColumnDesign.ROCKFALL_POTENTIAL); }
-        if (query.getRouteFinding() != null) { cliColumnFields.add(CliColumnDesign.ROUTE_FINDING); }
-        if (query.getCommitment() != null) { cliColumnFields.add(CliColumnDesign.COMMITMENT); }
-        if (query.isHasMultipleRoutes()) { cliColumnFields.add(CliColumnDesign.MULTIPLE_ROUTES); }
-        if (query.getTrailheads() != null) { cliColumnFields.add(CliColumnDesign.TRAILHEAD); }
+//        if (query.isSnowRoute()) { cliColumnFields.add(CliColumnDesign.SNOW_ROUTE); }
+//        if (query.isStandardRoute()) { cliColumnFields.add(CliColumnDesign.STANDARD_ROUTE); }
+//        if (query.getGradeQualities() != null) { cliColumnFields.add(CliColumnDesign.GRADE_QUALITY); }
+//        if (query.getStartElevation() != 0) { cliColumnFields.add(CliColumnDesign.START_ELEVATION); }
+//        if (query.getSummitElevation() != 0) { cliColumnFields.add(CliColumnDesign.SUMMIT_ELEVATION); }
+//        if (query.getExposure() != null) { cliColumnFields.add(CliColumnDesign.EXPOSURE); }
+//        if (query.getRockfallPotential() != null) { cliColumnFields.add(CliColumnDesign.ROCKFALL_POTENTIAL); }
+//        if (query.getRouteFinding() != null) { cliColumnFields.add(CliColumnDesign.ROUTE_FINDING); }
+//        if (query.getCommitment() != null) { cliColumnFields.add(CliColumnDesign.COMMITMENT); }
+//        if (query.isHasMultipleRoutes()) { cliColumnFields.add(CliColumnDesign.MULTIPLE_ROUTES); }
+//        if (query.getTrailheads() != null) { cliColumnFields.add(CliColumnDesign.TRAILHEAD); }
 
         cliColumnFields.add(CliColumnDesign.GRADE);
         cliColumnFields.add(CliColumnDesign.TOTAL_GAIN);
@@ -149,30 +148,33 @@ public class SearchSubCommand extends SubCommand implements Runnable {
         }
     }
     
-    private SearchQuery setSearchQuery() {
-        SearchQuery searchQuery = new SearchQuery();
-        searchQuery.setVerbose(verbose);
-        searchQuery.setQuery(optionQuery);
-        searchQuery.setMountainNames(convertArrayToArrayList(mountainNames));
-        searchQuery.setRouteNames(convertArrayToArrayList(routeNames));
-        searchQuery.setStandardRoute(isStandardRoute);
-        searchQuery.setSnowRoute(isSnowRoute);
-        searchQuery.setGrades(convertArrayToArrayList(grades));
-        searchQuery.setGradeQualities(convertArrayToArrayList(gradeQualities));
-        searchQuery.setTrailheads(convertArrayToArrayList(trailheads));
-        searchQuery.setStartElevation(startElevation);
-        searchQuery.setSummitElevation(summitElevation);
-        searchQuery.setTotalGain(totalGain);
-        searchQuery.setRouteLength(routeLength);
-        searchQuery.setExposure(exposure);
-        searchQuery.setRockfallPotential(rockfallPotential);
-        searchQuery.setRouteFinding(routeFinding);
-        searchQuery.setCommitment(commitment);
-        searchQuery.setHasMultipleRoutes(hasMultipleRoutes);
-        searchQuery.setRouteUrls(convertArrayToArrayList(routeUrls));
-        searchQuery.setTrailheadCoordinates(convertArrayToArrayList(trailheadCoordinates));
-        searchQuery.setRoadDifficulties(convertArrayToArrayList(roadDifficulties));
-        searchQuery.setTrailheadUrls(convertArrayToArrayList(trailheadUrls));
-        return searchQuery;
+    private AbstractSearchQuery setSearchQuery() {
+//        AbstractSearchQuery searchQuery = new AbstractSearchQuery();
+//        searchQuery.setVerbose(verbose);
+//        searchQuery.setQuery(optionQuery);
+//        searchQuery.setMountainNames(convertArrayToArrayList(mountainNames));
+//        searchQuery.setRouteNames(convertArrayToArrayList(routeNames));
+//        searchQuery.setStandardRoute(isStandardRoute);
+//        searchQuery.setSnowRoute(isSnowRoute);
+//        searchQuery.setGrades(convertArrayToArrayList(grades));
+//        searchQuery.setGradeQualities(convertArrayToArrayList(gradeQualities));
+//        searchQuery.setTrailheads(convertArrayToArrayList(trailheads));
+//        searchQuery.setStartElevation(startElevation);
+//        searchQuery.setSummitElevation(summitElevation);
+//        searchQuery.setTotalGain(totalGain);
+//        searchQuery.setRouteLength(routeLength);
+//        searchQuery.setExposure(exposure);
+//        searchQuery.setRockfallPotential(rockfallPotential);
+//        searchQuery.setRouteFinding(routeFinding);
+//        searchQuery.setCommitment(commitment);
+//        searchQuery.setHasMultipleRoutes(hasMultipleRoutes);
+//        searchQuery.setRouteUrls(convertArrayToArrayList(routeUrls));
+//        searchQuery.setTrailheadCoordinates(convertArrayToArrayList(trailheadCoordinates));
+//        searchQuery.setRoadDifficulties(convertArrayToArrayList(roadDifficulties));
+//        searchQuery.setTrailheadUrls(convertArrayToArrayList(trailheadUrls));
+//        return searchQuery;
+        return null;
     }
+
+
 }

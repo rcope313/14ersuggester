@@ -9,7 +9,6 @@
         <module name="hikesuggesterDatabase" />
         <module name="hikesuggesterCli" />
         <module name="hikesuggesterCore" />
-        <module name="hikesuggesterWebScraper" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
