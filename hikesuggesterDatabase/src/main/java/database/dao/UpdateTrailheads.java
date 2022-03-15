@@ -1,5 +1,6 @@
 package database.dao;
 
+import database.models.ImmutableStoredTrailhead;
 import models.HikeSuggesterDatabase;
 import models.Trailhead;
 import webscraper.TrailheadScraper;
@@ -10,13 +11,13 @@ public class UpdateTrailheads {
 
     public static void weeklyUpdate (String strDate, String trailheadUrl) throws Exception {
         if (UpdateUtils.checkDateWeekly(strDate)) {
-            Trailhead updatedTrailhead = TrailheadScraper.scrapeTrailhead(trailheadUrl);
+            ImmutableStoredTrailhead updatedTrailhead = TrailheadScraper.scrapeImmutableStoredTrailhead(trailheadUrl);
             String sql = mySqlSyntaxWeeklyUpdate(updatedTrailhead);
             DatabaseConnection.createStatement().execute(sql);
         }
     }
 
-    static String mySqlSyntaxWeeklyUpdate(Trailhead trailhead) throws ParseException {
+    static String mySqlSyntaxWeeklyUpdate(ImmutableStoredTrailhead trailhead) throws ParseException {
         if (trailhead == null) {
             return "SELECT * FROM " + HikeSuggesterDatabase.TRAILHEADS;
         } else {
@@ -32,7 +33,7 @@ public class UpdateTrailheads {
     }
 
     static void updateAllRowsByUpdateDateCoordinates () throws Exception {
-        ArrayList<Trailhead> trailheads = TrailheadScraper.createListOfTrailheads();
+        ArrayList<ImmutableStoredTrailhead> trailheads = TrailheadScraper.buildAllImmutableStoredTrailheads();
         trailheads.forEach((trailhead) -> {
             try {
                 DatabaseConnection.createStatement().execute(mySqlSyntaxUpdateDateCoordinates(trailhead));
@@ -42,7 +43,7 @@ public class UpdateTrailheads {
         });
     }
 
-    static String mySqlSyntaxUpdateDateCoordinates (Trailhead trailhead) throws ParseException {
+    static String mySqlSyntaxUpdateDateCoordinates (ImmutableStoredTrailhead trailhead) throws ParseException {
         if (trailhead == null) {
             return "SELECT * FROM " + HikeSuggesterDatabase.TRAILHEADS;
         } else {
@@ -55,7 +56,7 @@ public class UpdateTrailheads {
     }
 
     static void updateAllRowsByUrl () throws Exception {
-        ArrayList<Trailhead> trailheads = TrailheadScraper.createListOfTrailheads();
+        ArrayList<ImmutableStoredTrailhead> trailheads = TrailheadScraper.buildAllImmutableStoredTrailheads();
         trailheads.forEach((trailhead) -> {
             try {
                 DatabaseConnection.createStatement().execute(mySqlSyntaxUpdateUrl(trailhead));
@@ -65,7 +66,7 @@ public class UpdateTrailheads {
         });
     }
 
-    static String mySqlSyntaxUpdateUrl (Trailhead trailhead) {
+    static String mySqlSyntaxUpdateUrl (ImmutableStoredTrailhead trailhead) {
 
         if (trailhead == null) {
             return "SELECT * FROM " + HikeSuggesterDatabase.TRAILHEADS;
