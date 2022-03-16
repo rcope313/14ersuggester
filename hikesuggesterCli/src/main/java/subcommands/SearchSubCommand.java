@@ -1,26 +1,19 @@
 package subcommands;
 
-import database.dao.Dao;
+import console.CliOutput;
 import database.models.AbstractSearchQuery;
-import models.CliColumn;
-import models.CliColumnDesign;
+import database.models.ImmutableSearchQuery;
 import picocli.CommandLine;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 @CommandLine.Command(name = "search", mixinStandardHelpOptions = true)
-public class SearchSubCommand extends SubCommand implements Runnable {
+public class SearchSubCommand implements Runnable {
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
     @CommandLine.Option(names = {"-v", "-verbose"},
             description = "Verbose. Result output will yield all table columns, rather than just Mountain Name, Route Name, and URL.")
     public boolean verbose = false;
-    @CommandLine.Option(names = {"-q", "--query"}, interactive = true,
-            description = "Write MySql query. Begin with WHERE statement.")
-    public String optionQuery;
     @CommandLine.Option(names = {"--m", "-mountainnames"}, split = ",",
             description = "Search by name of mountain. If searching by more than one mountain name, split list with ','.")
     public String[] mountainNames;
@@ -79,9 +72,6 @@ public class SearchSubCommand extends SubCommand implements Runnable {
     @CommandLine.Option(names = {"--ru", "-routeurls"}, split = ", ",
             description = "Search by route url. If searching by more than one url, split list with ','.")
     public String[] routeUrls;
-    @CommandLine.Option(names = {"--tc", "-coordinates"},
-            description = "Search by trailhead coordinates. Example syntax: '39.60866, -105.79999'")
-    public String[] trailheadCoordinates;
     @CommandLine.Option(names = {"--rdi", "-roaddifficulties"},
             description = "Search by road difficulty. Road difficulty ranges from 0 through 6.")
     public Integer[] roadDifficulties;
@@ -93,88 +83,31 @@ public class SearchSubCommand extends SubCommand implements Runnable {
     public void run() {
 //        spec.commandLine().getOut().println(setSearchQuery().createQuerySyntax());
 //        ** use to create tests
-        AbstractSearchQuery searchQuery = setSearchQuery();
-        viewCliTableSearchSubCommand(searchQuery);
-    }
-    
-    private void viewCliTableSearchSubCommand(AbstractSearchQuery query)  {
-//        ArrayList<CliColumn> cliColumnFields;
-//        if (query.isVerbose()) {
-//            cliColumnFields = designateCliColumnFieldsVerbose(query);
-//        } else {
-//            cliColumnFields = designateCliColumnFieldsGeneral();
-//        }
-//        buildCliTableHeaders(cliColumnFields);
-//        inputDataIntoCliTable(query.createQuerySyntax(), cliColumnFields);
+        CliOutput.buildCliTable(setSearchQuery());
     }
 
-    private ArrayList<CliColumn> designateCliColumnFieldsVerbose(AbstractSearchQuery query) {
-        ArrayList<CliColumn> cliColumnFields = new ArrayList<>();
-        cliColumnFields.add(CliColumnDesign.MOUNTAIN_NAME);
-        cliColumnFields.add(CliColumnDesign.ROUTE_NAME);
-
-//        if (query.isSnowRoute()) { cliColumnFields.add(CliColumnDesign.SNOW_ROUTE); }
-//        if (query.isStandardRoute()) { cliColumnFields.add(CliColumnDesign.STANDARD_ROUTE); }
-//        if (query.getGradeQualities() != null) { cliColumnFields.add(CliColumnDesign.GRADE_QUALITY); }
-//        if (query.getStartElevation() != 0) { cliColumnFields.add(CliColumnDesign.START_ELEVATION); }
-//        if (query.getSummitElevation() != 0) { cliColumnFields.add(CliColumnDesign.SUMMIT_ELEVATION); }
-//        if (query.getExposure() != null) { cliColumnFields.add(CliColumnDesign.EXPOSURE); }
-//        if (query.getRockfallPotential() != null) { cliColumnFields.add(CliColumnDesign.ROCKFALL_POTENTIAL); }
-//        if (query.getRouteFinding() != null) { cliColumnFields.add(CliColumnDesign.ROUTE_FINDING); }
-//        if (query.getCommitment() != null) { cliColumnFields.add(CliColumnDesign.COMMITMENT); }
-//        if (query.isHasMultipleRoutes()) { cliColumnFields.add(CliColumnDesign.MULTIPLE_ROUTES); }
-//        if (query.getTrailheads() != null) { cliColumnFields.add(CliColumnDesign.TRAILHEAD); }
-
-        cliColumnFields.add(CliColumnDesign.GRADE);
-        cliColumnFields.add(CliColumnDesign.TOTAL_GAIN);
-        cliColumnFields.add(CliColumnDesign.ROUTE_LENGTH);
-        cliColumnFields.add(CliColumnDesign.ROUTE_URL);
-        return cliColumnFields;
+    private ImmutableSearchQuery setSearchQuery() {
+        return ImmutableSearchQuery.builder()
+                .mountainNames(new ArrayList<>(Arrays.asList(mountainNames)))
+                .routeNames(new ArrayList<>(Arrays.asList(routeNames)))
+                .isStandardRoute(isStandardRoute)
+                .isSnowRoute(isSnowRoute)
+                .grades(new ArrayList<>(Arrays.asList(grades)))
+                .gradeQualities(new ArrayList<>(Arrays.asList(gradeQualities)))
+                .trailheads(new ArrayList<>(Arrays.asList(trailheads)))
+                .startElevation(startElevation)
+                .summitElevation(summitElevation)
+                .totalGain(totalGain)
+                .routeLength(routeLength)
+                .exposure(exposure)
+                .rockfallPotential(rockfallPotential)
+                .routeFinding(routeFinding)
+                .commitment(commitment)
+                .hasMultipleRoutes(hasMultipleRoutes)
+                .routeUrls(new ArrayList<>(Arrays.asList(routeUrls)))
+                .roadDifficulties(new ArrayList<>(Arrays.asList(roadDifficulties)))
+                .trailheadUrls(new ArrayList<>(Arrays.asList(trailheadUrls)))
+                .build();
     }
-
-    private void inputDataIntoCliTable(String querySyntax, ArrayList<CliColumn> cliColumnFields) {
-        try (Statement stmt = Dao.createStatement()) {
-            ResultSet rs = stmt.executeQuery(querySyntax);
-            while (rs.next()) {
-                ArrayList<Object> columnDataList = new ArrayList<>();
-                for (CliColumn cliColumnField : cliColumnFields) {
-                    columnDataList.add(getResultSetValue(rs, cliColumnField));
-                }
-                var columnDataArray = columnDataList.toArray();
-                System.out.format(buildCliDataFormatter(cliColumnFields), columnDataArray);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    private AbstractSearchQuery setSearchQuery() {
-//        AbstractSearchQuery searchQuery = new AbstractSearchQuery();
-//        searchQuery.setVerbose(verbose);
-//        searchQuery.setQuery(optionQuery);
-//        searchQuery.setMountainNames(convertArrayToArrayList(mountainNames));
-//        searchQuery.setRouteNames(convertArrayToArrayList(routeNames));
-//        searchQuery.setStandardRoute(isStandardRoute);
-//        searchQuery.setSnowRoute(isSnowRoute);
-//        searchQuery.setGrades(convertArrayToArrayList(grades));
-//        searchQuery.setGradeQualities(convertArrayToArrayList(gradeQualities));
-//        searchQuery.setTrailheads(convertArrayToArrayList(trailheads));
-//        searchQuery.setStartElevation(startElevation);
-//        searchQuery.setSummitElevation(summitElevation);
-//        searchQuery.setTotalGain(totalGain);
-//        searchQuery.setRouteLength(routeLength);
-//        searchQuery.setExposure(exposure);
-//        searchQuery.setRockfallPotential(rockfallPotential);
-//        searchQuery.setRouteFinding(routeFinding);
-//        searchQuery.setCommitment(commitment);
-//        searchQuery.setHasMultipleRoutes(hasMultipleRoutes);
-//        searchQuery.setRouteUrls(convertArrayToArrayList(routeUrls));
-//        searchQuery.setTrailheadCoordinates(convertArrayToArrayList(trailheadCoordinates));
-//        searchQuery.setRoadDifficulties(convertArrayToArrayList(roadDifficulties));
-//        searchQuery.setTrailheadUrls(convertArrayToArrayList(trailheadUrls));
-//        return searchQuery;
-        return null;
-    }
-
 
 }
