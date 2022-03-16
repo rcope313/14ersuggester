@@ -1,6 +1,6 @@
 package webscraper;
 
-import models.MountainForecast;
+import database.models.MountainForecast;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.xerces.dom.DeferredElementImpl;
 import org.assertj.core.util.VisibleForTesting;

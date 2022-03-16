@@ -2,7 +2,7 @@ package database.dao;
 
 import database.models.ImmutableFetchedTrailhead;
 import database.models.ImmutableStoredTrailhead;
-import models.HikeSuggesterDatabase;
+import database.models.HikeSuggesterDatabase;
 import webscraper.TrailheadScraper;
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -4,7 +4,7 @@ import database.models.ImmutableCompareQuery;
 import database.models.ImmutableFetchedRoute;
 import database.models.ImmutableSearchQuery;
 import database.models.ImmutableStoredRoute;
-import models.HikeSuggesterDatabase;
+import database.models.HikeSuggesterDatabase;
 import webscraper.FourteenerRouteScraper;
 import java.sql.ResultSet;
 import java.sql.SQLException;

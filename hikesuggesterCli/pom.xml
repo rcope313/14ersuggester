@@ -12,12 +12,6 @@
     <artifactId>hikesuggesterCli</artifactId>
     <dependencies>
         <dependency>
-            <groupId>org.example</groupId>
-            <artifactId>hikesuggesterCore</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>io.micronaut.picocli</groupId>
             <artifactId>micronaut-picocli</artifactId>
             <version>4.0.0</version>

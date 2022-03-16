@@ -1,4 +1,4 @@
-package models;
+package database.models;
 
 public class HikeSuggesterDatabase {
     public final static String FOURTEENER_ROUTES = "fourteener_routes";

@@ -1,6 +1,6 @@
 package webscraper;
 
-import models.MountainForecast;
+import database.models.MountainForecast;
 import org.junit.Test;
 import org.w3c.dom.Document;
 import java.util.ArrayList;

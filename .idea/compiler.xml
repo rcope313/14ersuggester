@@ -8,7 +8,6 @@
         <outputRelativeToContentRoot value="true" />
         <module name="hikesuggesterDatabase" />
         <module name="hikesuggesterCli" />
-        <module name="hikesuggesterCore" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>

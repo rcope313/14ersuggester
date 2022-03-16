@@ -1,4 +1,4 @@
-package models;
+package database.models;
 
 public class MountainForecast {
     private final String date;
