@@ -1,11 +1,23 @@
 package database.dao;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class UpdateUtils {
+public class Dao {
+    private static final String DB_URL = "jdbc:mysql://localhost/hike_suggester";
+    private static final String USER = "root";
+    private static final String PASS = "root1234";
 
-    public static boolean checkDateWeekly (String strDate) {
+    public static Statement createStatement() throws SQLException {
+        Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        return conn.createStatement();
+    }
+
+    static boolean hasUpdateDateOverWeekAgo(String strDate) {
         if (strDate == null) {
             return false;
         }
@@ -15,7 +27,7 @@ public class UpdateUtils {
         return currentDate.isAfter(updateDatePlusOneWeek) || currentDate.equals(updateDatePlusOneWeek);
     }
 
-    private static LocalDate convertStringToDate (String strDate) {
+    static LocalDate convertStringToDate (String strDate) {
         if (strDate != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
             return LocalDate.parse(strDate, formatter);
@@ -24,3 +36,4 @@ public class UpdateUtils {
         }
     }
 }
+

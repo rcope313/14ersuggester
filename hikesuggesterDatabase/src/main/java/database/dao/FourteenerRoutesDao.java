@@ -1,12 +1,16 @@
 package database.dao;
 
 import database.models.ImmutableCompareQuery;
+import database.models.ImmutableFetchedRoute;
 import database.models.ImmutableSearchQuery;
 import database.models.ImmutableStoredRoute;
 import models.HikeSuggesterDatabase;
+import webscraper.FourteenerRouteScraper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.StringJoiner;
 
@@ -15,7 +19,7 @@ public class FourteenerRoutesDao {
     public void insert(ImmutableStoredRoute route) {
         if (route != null) {
             try {
-                DatabaseConnection.createStatement().execute(insertQuery(route));
+                Dao.createStatement().execute(insertQuery(route));
                 System.out.println("ENTRY CREATED \n");
                 System.out.print("MountainName: " + route.getMountainName() + "\n");
                 System.out.print("Route Name: " + route.getRouteName() + "\n");
@@ -38,41 +42,32 @@ public class FourteenerRoutesDao {
         return getStoredRoutes(compareQuery);
     }
 
-    public void update() {}
-
-    ArrayList<ImmutableStoredRoute> getStoredRoutes(String query) {
-        ArrayList<ImmutableStoredRoute> routes = new ArrayList<>();
-        try (Statement stmt = DatabaseConnection.createStatement()) {
-            ResultSet rs = stmt.executeQuery(query);
+    public ImmutableStoredRoute get(ImmutableFetchedRoute route) {
+        String getQuery = getQuery(route);
+        ImmutableStoredRoute storedRoute = null;
+        try (Statement stmt = Dao.createStatement()) {
+            ResultSet rs = stmt.executeQuery(getQuery);
             while (rs.next()) {
-                routes.add(buildImmutableStoredRoute(rs));
+                storedRoute = buildImmutableStoredRoute(rs);
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return routes;
+        return storedRoute;
     }
 
-    ImmutableStoredRoute buildImmutableStoredRoute(ResultSet rs) throws SQLException {
-        return ImmutableStoredRoute.builder()
-                .mountainName(rs.getString(HikeSuggesterDatabase.MOUNTAIN_NAME))
-                .routeName(rs.getString(HikeSuggesterDatabase.ROUTE_NAME))
-                .isSnowRoute(rs.getInt(HikeSuggesterDatabase.IS_SNOW_ROUTE) == 1)
-                .isStandardRoute(rs.getInt(HikeSuggesterDatabase.IS_STANDARD_ROUTE) == 1)
-                .grade(rs.getInt(HikeSuggesterDatabase.GRADE))
-                .gradeQuality(rs.getString(HikeSuggesterDatabase.GRADE_QUALITY))
-                .trailhead(rs.getString(HikeSuggesterDatabase.TRAILHEAD_NAME))
-                .startElevation(rs.getInt(HikeSuggesterDatabase.START_ELEVATION))
-                .summitElevation(rs.getInt(HikeSuggesterDatabase.SUMMIT_ELEVATION))
-                .totalGain(rs.getInt(HikeSuggesterDatabase.TOTAL_GAIN))
-                .routeLength(rs.getDouble(HikeSuggesterDatabase.ROUTE_LENGTH))
-                .exposure(rs.getString(HikeSuggesterDatabase.EXPOSURE))
-                .rockfallPotential(rs.getString(HikeSuggesterDatabase.ROCKFALL_POTENTIAL))
-                .routeFinding(rs.getString(HikeSuggesterDatabase.ROUTE_FINDING))
-                .commitment(rs.getString(HikeSuggesterDatabase.COMMITMENT))
-                .hasMultipleRoutes(rs.getInt(HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES) == 1)
-                .url(rs.getString(HikeSuggesterDatabase.ROUTE_URL))
-                .build();
+    public void update(ImmutableFetchedRoute route) throws Exception {
+        ImmutableStoredRoute storedRoute = get(route);
+        if (hasUpdateDateOverWeekAgo(storedRoute.getUpdateDate())) {
+            ImmutableFetchedRoute updatedRoute = FourteenerRouteScraper.scrapeImmutableFetchedRoute(storedRoute.getUrl());
+            Dao.createStatement().execute(updateQuery(updatedRoute));
+        }
+    }
+
+    private String getQuery(ImmutableFetchedRoute route) {
+        return "SELECT *" +
+                " FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
+                " WHERE " + HikeSuggesterDatabase.ROUTE_URL + " = " + route.getUrl();
     }
 
     private String compareQuery(ImmutableCompareQuery query) {
@@ -95,6 +90,90 @@ public class FourteenerRoutesDao {
 
     private String searchQuery(ImmutableSearchQuery query) {
         return createSelectStatementMySqlSyntax() + createWhereStatementsMySqlSyntax(query);
+    }
+
+    private static String updateQuery(ImmutableFetchedRoute route)  {
+        if (route == null) {
+            return "SELECT * FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES;
+        } else {
+            return "UPDATE "
+                    + HikeSuggesterDatabase.FOURTEENER_ROUTES + "\n" +
+                    "SET " + HikeSuggesterDatabase.ROUTE_NAME + " = '" + route.getRouteName() + "', \n" +
+                    HikeSuggesterDatabase.MOUNTAIN_NAME + " = '" + route.getMountainName() + "', \n" +
+                    HikeSuggesterDatabase.IS_SNOW_ROUTE + " = " + route.getIsSnowRoute() + ", \n" +
+                    HikeSuggesterDatabase.IS_STANDARD_ROUTE + " = " + route.getIsStandardRoute() + ", \n" +
+                    HikeSuggesterDatabase.GRADE + " = " + route.getGrade() + ", \n" +
+                    HikeSuggesterDatabase.GRADE_QUALITY + " = '" + route.getGradeQuality() + "', \n" +
+                    HikeSuggesterDatabase.START_ELEVATION + " = " + route.getStartElevation() + ", \n" +
+                    HikeSuggesterDatabase.SUMMIT_ELEVATION + " = " + route.getSummitElevation() + ", \n" +
+                    HikeSuggesterDatabase.TOTAL_GAIN + " = " + route.getTotalGain() + ", \n" +
+                    HikeSuggesterDatabase.ROUTE_LENGTH + " = " + route.getRouteLength() + ", \n" +
+                    HikeSuggesterDatabase.ROCKFALL_POTENTIAL + " = '" + route.getRockfallPotential() + "', \n" +
+                    HikeSuggesterDatabase.ROUTE_FINDING + " = '" + route.getRouteFinding() + "', \n" +
+                    HikeSuggesterDatabase.COMMITMENT + " = '" + route.getCommitment() + "', \n" +
+                    HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES + " = " + route.getHasMultipleRoutes() + ", \n" +
+                    HikeSuggesterDatabase.ROUTE_TRAILHEAD + " = '" + route.getTrailhead() + "', \n" +
+                    HikeSuggesterDatabase.ROUTE_UPDATE_DATE + " = '" + java.time.LocalDate.now() + "' \n" +
+                    "WHERE " + HikeSuggesterDatabase.ROUTE_URL + " = '" + route.getUrl() + "';";
+        }
+    }
+
+    ArrayList<ImmutableStoredRoute> getStoredRoutes(String query) {
+        ArrayList<ImmutableStoredRoute> routes = new ArrayList<>();
+        try (Statement stmt = Dao.createStatement()) {
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                routes.add(buildImmutableStoredRoute(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return routes;
+    }
+
+    ImmutableStoredRoute buildImmutableStoredRoute(ResultSet rs) throws SQLException {
+        return ImmutableStoredRoute.builder()
+                .id(rs.getInt(HikeSuggesterDatabase.FOURTEENER_ROUTE_ID))
+                .mountainName(rs.getString(HikeSuggesterDatabase.MOUNTAIN_NAME))
+                .routeName(rs.getString(HikeSuggesterDatabase.ROUTE_NAME))
+                .isSnowRoute(rs.getInt(HikeSuggesterDatabase.IS_SNOW_ROUTE) == 1)
+                .isStandardRoute(rs.getInt(HikeSuggesterDatabase.IS_STANDARD_ROUTE) == 1)
+                .grade(rs.getInt(HikeSuggesterDatabase.GRADE))
+                .gradeQuality(rs.getString(HikeSuggesterDatabase.GRADE_QUALITY))
+                .trailhead(rs.getString(HikeSuggesterDatabase.TRAILHEAD_NAME))
+                .startElevation(rs.getInt(HikeSuggesterDatabase.START_ELEVATION))
+                .summitElevation(rs.getInt(HikeSuggesterDatabase.SUMMIT_ELEVATION))
+                .totalGain(rs.getInt(HikeSuggesterDatabase.TOTAL_GAIN))
+                .routeLength(rs.getDouble(HikeSuggesterDatabase.ROUTE_LENGTH))
+                .exposure(rs.getString(HikeSuggesterDatabase.EXPOSURE))
+                .rockfallPotential(rs.getString(HikeSuggesterDatabase.ROCKFALL_POTENTIAL))
+                .routeFinding(rs.getString(HikeSuggesterDatabase.ROUTE_FINDING))
+                .commitment(rs.getString(HikeSuggesterDatabase.COMMITMENT))
+                .hasMultipleRoutes(rs.getInt(HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES) == 1)
+                .url(rs.getString(HikeSuggesterDatabase.ROUTE_URL))
+                .updateDate(rs.getString(HikeSuggesterDatabase.ROUTE_UPDATE_DATE))
+                .build();
+    }
+
+    private String insertQuery(ImmutableStoredRoute route) {
+        return "INSERT INTO " + HikeSuggesterDatabase.FOURTEENER_ROUTES + " VALUES (" +
+                route.getRouteName() + "', '" +
+                route.getMountainName() + "', " +
+                route.getIsSnowRoute() + ", " +
+                route.getIsStandardRoute() + ", " +
+                route.getGrade() + ", '" +
+                route.getGradeQuality() + "', " +
+                route.getStartElevation() + ", " +
+                route.getSummitElevation() + ", " +
+                route.getTotalGain() + ", " +
+                route.getRouteLength() + ", '" +
+                route.getExposure() + "', " +
+                route.getRockfallPotential() + "', '" +
+                route.getRouteFinding() + "', '" +
+                route.getCommitment() + "', " +
+                route.getHasMultipleRoutes() + ", '" +
+                route.getUrl() + "', '" +
+                route.getTrailhead() + "')";
     }
 
     private String createSelectStatementMySqlSyntax() {
@@ -312,24 +391,22 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private String insertQuery(ImmutableStoredRoute route) {
-        return "INSERT INTO " + HikeSuggesterDatabase.FOURTEENER_ROUTES + " VALUES (" +
-                route.getRouteName() + "', '" +
-                route.getMountainName() + "', " +
-                route.getIsSnowRoute() + ", " +
-                route.getIsStandardRoute() + ", " +
-                route.getGrade() + ", '" +
-                route.getGradeQuality() + "', " +
-                route.getStartElevation() + ", " +
-                route.getSummitElevation() + ", " +
-                route.getTotalGain() + ", " +
-                route.getRouteLength() + ", '" +
-                route.getExposure() + "', " +
-                route.getRockfallPotential() + "', '" +
-                route.getRouteFinding() + "', '" +
-                route.getCommitment() + "', " +
-                route.getHasMultipleRoutes() + ", '" +
-                route.getUrl() + "', '" +
-                route.getTrailhead() + "')";
+    private static boolean hasUpdateDateOverWeekAgo(String strDate) {
+        if (strDate == null) {
+            return false;
+        }
+        LocalDate currentDate = LocalDate.now();
+        LocalDate updateDate = convertStringToDate(strDate);
+        LocalDate updateDatePlusOneWeek = updateDate.plusWeeks(1);
+        return currentDate.isAfter(updateDatePlusOneWeek) || currentDate.equals(updateDatePlusOneWeek);
+    }
+
+    private static LocalDate convertStringToDate (String strDate) {
+        if (strDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+            return LocalDate.parse(strDate, formatter);
+        } else {
+            return null;
+        }
     }
 }

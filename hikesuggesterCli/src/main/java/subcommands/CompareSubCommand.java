@@ -1,6 +1,6 @@
 package subcommands;
 
-import database.dao.DatabaseConnection;
+import database.dao.Dao;
 import database.models.AbstractCompareQuery;
 import models.CliColumn;
 import models.FourteenerRoute;
@@ -57,7 +57,7 @@ public class CompareSubCommand extends SubCommand implements Runnable {
 
     private ArrayList<FourteenerRoute> createFourteenerRoutesFromCliInput(String query) {
         ArrayList<FourteenerRoute> fourteenerRoutes = new ArrayList<>();
-        try (Statement stmt = DatabaseConnection.createStatement()) {
+        try (Statement stmt = Dao.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 FourteenerRoute currentRoute = new FourteenerRoute();
@@ -97,7 +97,7 @@ public class CompareSubCommand extends SubCommand implements Runnable {
     }
 
     private void inputDataIntoCliTable(String querySyntax, ArrayList<CliColumn> cliColumnFields, String differenceString) {
-        try (Statement stmt = DatabaseConnection.createStatement()) {
+        try (Statement stmt = Dao.createStatement()) {
             ResultSet rs = stmt.executeQuery(querySyntax);
 
             while (rs.next()) {

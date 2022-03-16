@@ -3,8 +3,7 @@ package database.models;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public abstract class AbstractStoredRoute {
-    public abstract int getId();
+public abstract class AbstractFetchedRoute {
     public abstract String getMountainName();
     public abstract String getRouteName();
     public abstract boolean getIsSnowRoute();
@@ -22,5 +21,4 @@ public abstract class AbstractStoredRoute {
     public abstract String getCommitment();
     public abstract boolean getHasMultipleRoutes();
     public abstract String getUrl();
-    public abstract String getUpdateDate();
 }

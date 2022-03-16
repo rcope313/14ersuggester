@@ -1,6 +1,6 @@
 package subcommands;
 
-import database.dao.DatabaseConnection;
+import database.dao.Dao;
 import database.models.AbstractSearchQuery;
 import models.CliColumn;
 import models.CliColumnDesign;
@@ -133,7 +133,7 @@ public class SearchSubCommand extends SubCommand implements Runnable {
     }
 
     private void inputDataIntoCliTable(String querySyntax, ArrayList<CliColumn> cliColumnFields) {
-        try (Statement stmt = DatabaseConnection.createStatement()) {
+        try (Statement stmt = Dao.createStatement()) {
             ResultSet rs = stmt.executeQuery(querySyntax);
             while (rs.next()) {
                 ArrayList<Object> columnDataList = new ArrayList<>();

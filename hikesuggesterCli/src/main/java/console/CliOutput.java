@@ -1,6 +1,6 @@
 package console;
 
-import database.dao.DatabaseConnection;
+import database.dao.Dao;
 import models.Column;
 import models.HikeSuggesterDatabase;
 import java.sql.ResultSet;
@@ -40,7 +40,7 @@ public abstract class CliOutput {
     }
 
     void inputDataIntoCliTable(String querySyntax, ArrayList<Column> columnList) {
-        try (Statement stmt = DatabaseConnection.createStatement()) {
+        try (Statement stmt = Dao.createStatement()) {
             ResultSet rs = stmt.executeQuery(querySyntax);
             while (rs.next()) {
                 ArrayList<Object> columnDataList = new ArrayList<>();

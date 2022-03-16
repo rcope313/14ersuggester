@@ -2,7 +2,7 @@ package webscraper;
 
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
-import database.models.ImmutableStoredRoute;
+import database.models.ImmutableFetchedRoute;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
@@ -24,16 +24,16 @@ public class FourteenerRouteScraper {
     final private static String SNOW_IMAGE = "//@src='/images/icon_snowcover_large.png'";
     final private static String STANDARD_ROUTE_ALT_IMAGE = "//@alt='standard'";
 
-    public static ArrayList<ImmutableStoredRoute> buildAllImmutableStoredRoutes() throws Exception {
+    public static ArrayList<ImmutableFetchedRoute> buildAllImmutableFetchedRoutes() throws Exception {
         HashSet<String> urlsSeen = new HashSet<>();
-        ArrayList<ImmutableStoredRoute> fourteenerRouteArrayList = new ArrayList<>();
+        ArrayList<ImmutableFetchedRoute> fourteenerRouteArrayList = new ArrayList<>();
         List<List<String>> allRouteIds = getListOfAllRouteIds();
         for (List<String> routeIdsByMountain : allRouteIds) {
             for (String routeId : routeIdsByMountain) {
                 try {
                     String routeUrl = routeId.substring(1);
                     if (!urlsSeen.contains(routeUrl)) {
-                        fourteenerRouteArrayList.add(scrapeImmutableStoredRoute(routeUrl));
+                        fourteenerRouteArrayList.add(scrapeImmutableFetchedRoute(routeUrl));
                     }
                     urlsSeen.add(routeUrl);
                 } catch (Exception e) {
@@ -46,13 +46,13 @@ public class FourteenerRouteScraper {
         return fourteenerRouteArrayList;
     }
 
-    public static ImmutableStoredRoute scrapeImmutableStoredRoute(String url) throws IOException {
+    public static ImmutableFetchedRoute scrapeImmutableFetchedRoute(String url) throws IOException {
         final String fullUrl = FOURTEENER_URL + url;
         final HtmlPage page = webClient.getPage(fullUrl);
         final HtmlDivision div = (HtmlDivision) page.getByXPath(HEADER_DIV).get(0);
         final HtmlTable table = (HtmlTable) page.getByXPath(ROUTE_STATS_TABLE).get(0);
 
-        return ImmutableStoredRoute.builder()
+        return ImmutableFetchedRoute.builder()
                 .mountainName(scrapeMountainName(div))
                 .routeName(scrapeRouteName(div))
                 .isSnowRoute(scrapeSnowRouteOnly(div))

@@ -4,7 +4,7 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomAttr;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
-import database.models.ImmutableStoredTrailhead;
+import database.models.ImmutableFetchedTrailhead;
 import models.Trailhead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +20,12 @@ public class TrailheadScraper {
     final private static String TRAILHEADS_URL = "https://www.14ers.com/php14ers/trailheadsmain.php";
     final private static String SINGLE_RANGE_DIV = "//div[@class='singlerange']//a/@href";
 
-    public static ArrayList<ImmutableStoredTrailhead> buildAllImmutableStoredTrailheads() throws Exception {
+    public static ArrayList<ImmutableFetchedTrailhead> buildAllImmutableFetchedTrailheads() throws Exception {
         ArrayList<String> trailHeadUrls = getTrailHeadUrlList();
-        ArrayList<ImmutableStoredTrailhead> trailHeads = new ArrayList<>();
+        ArrayList<ImmutableFetchedTrailhead> trailHeads = new ArrayList<>();
         for (String trailheadUrl : trailHeadUrls) {
             try {
-                trailHeads.add(scrapeImmutableStoredTrailhead(FOURTNEERERS_URL + trailheadUrl));
+                trailHeads.add(scrapeImmutableFetchedTrailhead(FOURTNEERERS_URL + trailheadUrl));
             } catch (Exception e) {
                 LOG.warn("Unable to scrape " + trailheadUrl);
             }
@@ -33,12 +33,12 @@ public class TrailheadScraper {
         return trailHeads;
     }
 
-    public static ImmutableStoredTrailhead scrapeImmutableStoredTrailhead(String url) throws Exception {
+    public static ImmutableFetchedTrailhead scrapeImmutableFetchedTrailhead(String url) throws Exception {
         final HtmlPage page = webClient.getPage(url);
         final HtmlDivision pageTitle = (HtmlDivision) page.getByXPath(DIV_PAGE_TILE).get(0);
         final HtmlDivision statsBox = (HtmlDivision) page.getByXPath(DIV_STATS_BOX).get(0);
         final String[] statsBoxAsNormalizedText = statsBox.asNormalizedText().split("\n");
-        return ImmutableStoredTrailhead.builder()
+        return ImmutableFetchedTrailhead.builder()
                 .name(scrapeName(pageTitle))
                 .coordinates(scrapeCoordinates(statsBoxAsNormalizedText))
                 .roadDifficulty(scrapeRoadDifficulty(statsBoxAsNormalizedText))
