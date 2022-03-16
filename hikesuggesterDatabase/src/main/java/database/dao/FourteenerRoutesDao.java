@@ -16,7 +16,7 @@ import java.util.StringJoiner;
 
 public class FourteenerRoutesDao {
 
-    public void insert(ImmutableStoredRoute route) {
+    public static void insert(ImmutableStoredRoute route) {
         if (route != null) {
             try {
                 Dao.createStatement().execute(insertQuery(route));
@@ -32,17 +32,17 @@ public class FourteenerRoutesDao {
         }
     }
 
-    public ArrayList<ImmutableStoredRoute> get(ImmutableSearchQuery query) {
+    public static ArrayList<ImmutableStoredRoute> get(ImmutableSearchQuery query) {
         String searchQuery = searchQuery(query);
         return getStoredRoutes(searchQuery);
     }
 
-    public ArrayList<ImmutableStoredRoute> get(ImmutableCompareQuery query) {
+    public static ArrayList<ImmutableStoredRoute> get(ImmutableCompareQuery query) {
         String compareQuery = compareQuery(query);
         return getStoredRoutes(compareQuery);
     }
 
-    public ImmutableStoredRoute get(ImmutableFetchedRoute route) {
+    public static ImmutableStoredRoute get(ImmutableFetchedRoute route) {
         String getQuery = getQuery(route);
         ImmutableStoredRoute storedRoute = null;
         try (Statement stmt = Dao.createStatement()) {
@@ -56,7 +56,7 @@ public class FourteenerRoutesDao {
         return storedRoute;
     }
 
-    public void update(ImmutableFetchedRoute route) throws Exception {
+    public static void update(ImmutableFetchedRoute route) throws Exception {
         ImmutableStoredRoute storedRoute = get(route);
         if (hasUpdateDateOverWeekAgo(storedRoute.getUpdateDate())) {
             ImmutableFetchedRoute updatedRoute = FourteenerRouteScraper.scrapeImmutableFetchedRoute(storedRoute.getUrl());
@@ -64,13 +64,13 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private String getQuery(ImmutableFetchedRoute route) {
+    private static String getQuery(ImmutableFetchedRoute route) {
         return "SELECT *" +
                 " FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
                 " WHERE " + HikeSuggesterDatabase.ROUTE_URL + " = " + route.getUrl();
     }
 
-    private String compareQuery(ImmutableCompareQuery query) {
+    private static String compareQuery(ImmutableCompareQuery query) {
         if (!query.getRouteUrls().isPresent()) {
             return "SELECT * " +
                     "FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
@@ -88,7 +88,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private String searchQuery(ImmutableSearchQuery query) {
+    private static String searchQuery(ImmutableSearchQuery query) {
         return createSelectStatementMySqlSyntax() + createWhereStatementsMySqlSyntax(query);
     }
 
@@ -118,7 +118,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    ArrayList<ImmutableStoredRoute> getStoredRoutes(String query) {
+    private static ArrayList<ImmutableStoredRoute> getStoredRoutes(String query) {
         ArrayList<ImmutableStoredRoute> routes = new ArrayList<>();
         try (Statement stmt = Dao.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
@@ -131,7 +131,7 @@ public class FourteenerRoutesDao {
         return routes;
     }
 
-    ImmutableStoredRoute buildImmutableStoredRoute(ResultSet rs) throws SQLException {
+    private static ImmutableStoredRoute buildImmutableStoredRoute(ResultSet rs) throws SQLException {
         return ImmutableStoredRoute.builder()
                 .id(rs.getInt(HikeSuggesterDatabase.FOURTEENER_ROUTE_ID))
                 .mountainName(rs.getString(HikeSuggesterDatabase.MOUNTAIN_NAME))
@@ -155,7 +155,7 @@ public class FourteenerRoutesDao {
                 .build();
     }
 
-    private String insertQuery(ImmutableStoredRoute route) {
+    private static String insertQuery(ImmutableStoredRoute route) {
         return "INSERT INTO " + HikeSuggesterDatabase.FOURTEENER_ROUTES + " VALUES (" +
                 route.getRouteName() + "', '" +
                 route.getMountainName() + "', " +
@@ -176,18 +176,18 @@ public class FourteenerRoutesDao {
                 route.getTrailhead() + "')";
     }
 
-    private String createSelectStatementMySqlSyntax() {
+    private static String createSelectStatementMySqlSyntax() {
         return "SELECT *" +
                 " FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES  +
                 " LEFT OUTER JOIN " + HikeSuggesterDatabase.TRAILHEADS  +
                 " ON " + HikeSuggesterDatabase.ROUTE_TRAILHEAD + " = " + HikeSuggesterDatabase.TRAILHEAD_NAME + " ";
     }
 
-    private String createWhereStatementsMySqlSyntax(ImmutableSearchQuery query) {
+    private static String createWhereStatementsMySqlSyntax(ImmutableSearchQuery query) {
         return "WHERE " + HikeSuggesterDatabase.FOURTEENER_ROUTE_ID + " >= 0 " + createBodyStatementsMySqlSyntax(query);
     }
 
-    private String createBodyStatementsMySqlSyntax(ImmutableSearchQuery query) {
+    private static String createBodyStatementsMySqlSyntax(ImmutableSearchQuery query) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         stringJoiner.add(createMountainNamesMySqlSyntax(query));
         stringJoiner.add(createRouteNamesMySqlSyntax(query));
@@ -211,7 +211,7 @@ public class FourteenerRoutesDao {
         return stringJoiner + ";";
     }
 
-    private CharSequence createMountainNamesMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createMountainNamesMySqlSyntax(ImmutableSearchQuery query) {
         String syntax = "AND " + HikeSuggesterDatabase.MOUNTAIN_NAME + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getMountainNames() != null) {
@@ -222,7 +222,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createRouteNamesMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createRouteNamesMySqlSyntax(ImmutableSearchQuery query) {
         String syntax = "AND " + HikeSuggesterDatabase.ROUTE_NAME + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getRouteNames() != null) {
@@ -233,7 +233,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createIsSnowRouteMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createIsSnowRouteMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getIsSnowRoute()) {
             return "AND " + HikeSuggesterDatabase.IS_SNOW_ROUTE + " = true";
         } else {
@@ -241,7 +241,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createIsStandardRouteMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createIsStandardRouteMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getIsStandardRoute()) {
             return "AND " + HikeSuggesterDatabase.IS_STANDARD_ROUTE + " = true";
         } else {
@@ -249,7 +249,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createGradeMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createGradeMySqlSyntax(ImmutableSearchQuery query) {
         String syntax = "AND " + HikeSuggesterDatabase.GRADE + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getGrades() != null) {
@@ -260,7 +260,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createGradeQualityMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createGradeQualityMySqlSyntax(ImmutableSearchQuery query) {
         String syntax = "AND " + HikeSuggesterDatabase.GRADE_QUALITY + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getGradeQualities() != null) {
@@ -271,7 +271,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createTrailheadsMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createTrailheadsMySqlSyntax(ImmutableSearchQuery query) {
         String syntax = "AND " + HikeSuggesterDatabase.TRAILHEAD_NAME + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getTrailheads() != null) {
@@ -282,7 +282,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createStartElevationMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createStartElevationMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getStartElevation() != 0) {
             String startElevationString = String.valueOf(query.getStartElevation());
             return "AND " + HikeSuggesterDatabase.START_ELEVATION + " >= " + startElevationString;
@@ -291,7 +291,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createSummitElevationMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createSummitElevationMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getSummitElevation() != 0) {
             String summitElevationString = String.valueOf(query.getSummitElevation());
             return "AND " + HikeSuggesterDatabase.SUMMIT_ELEVATION + " >= " + summitElevationString;
@@ -300,7 +300,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createTotalGainMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createTotalGainMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getTotalGain() != 0) {
             String totalGainString = String.valueOf(query.getTotalGain());
             return "AND " + HikeSuggesterDatabase.TOTAL_GAIN + " >= " + totalGainString;
@@ -309,7 +309,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createRouteLengthMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createRouteLengthMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getRouteLength() != 0) {
             String routeLengthString = String.valueOf(query.getRouteLength());
             return "AND " + HikeSuggesterDatabase.ROUTE_LENGTH + " >= " + routeLengthString;
@@ -318,7 +318,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createExposureMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createExposureMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getExposure() != null) {
             return "AND " + HikeSuggesterDatabase.EXPOSURE + " = '" + query.getExposure() + "'";
         } else {
@@ -326,7 +326,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createRockfallPotentialMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createRockfallPotentialMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getRockfallPotential() != null) {
             return "AND " + HikeSuggesterDatabase.ROCKFALL_POTENTIAL + " = '" + query.getRockfallPotential() + "'";
         } else {
@@ -334,7 +334,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createRouteFindingMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createRouteFindingMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getRouteFinding() != null) {
             return "AND " + HikeSuggesterDatabase.ROUTE_FINDING + " = '" + query.getRouteFinding() + "'";
         } else {
@@ -342,7 +342,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createCommitmentMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createCommitmentMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getCommitment() != null) {
             return "AND " + HikeSuggesterDatabase.COMMITMENT + " = '" + query.getCommitment() + "'";
         } else {
@@ -350,7 +350,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createHasMultipleRoutesMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createHasMultipleRoutesMySqlSyntax(ImmutableSearchQuery query) {
         if (query.getHasMultipleRoutes()) {
             return "AND " + HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES + " = true";
         } else {
@@ -358,7 +358,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createRouteUrlsMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createRouteUrlsMySqlSyntax(ImmutableSearchQuery query) {
         String syntax = "AND " + HikeSuggesterDatabase.ROUTE_URL + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getRouteUrls() != null) {
@@ -369,7 +369,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createRoadDifficultiesMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createRoadDifficultiesMySqlSyntax(ImmutableSearchQuery query) {
         String syntax = "AND " + HikeSuggesterDatabase.ROAD_DIFFICULTY + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getRoadDifficulties() != null) {
@@ -380,7 +380,7 @@ public class FourteenerRoutesDao {
         }
     }
 
-    private CharSequence createTrailheadUrlsMySqlSyntax(ImmutableSearchQuery query) {
+    private static CharSequence createTrailheadUrlsMySqlSyntax(ImmutableSearchQuery query) {
         String syntax = "AND " + HikeSuggesterDatabase.TRAILHEAD_URL + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getTrailheadUrls() != null) {

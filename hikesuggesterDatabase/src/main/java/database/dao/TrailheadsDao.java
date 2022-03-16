@@ -87,6 +87,4 @@ public class TrailheadsDao {
                 .updateDate(rs.getString(HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE))
                 .build();
     }
-
-
 }
