@@ -1,6 +1,5 @@
 package webscraper;
 
-import models.FourteenerRoute;
 import models.MountainForecast;
 import org.junit.Test;
 import org.w3c.dom.Document;
@@ -9,14 +8,14 @@ import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.*;
 
 public class MountainForecastScraperTest {
-    FourteenerRoute elbe1;
+    ImmutableStoredRoute elbe1;
     MountainForecastScraper mountainForecastElbe1;
     ArrayList<String> dateList, windSpeedList, cloudCoverList, probOfPrecipList, humidityList, windDirectionList,
             tempList, precipAmountList,  windChillList;
 
     void initData() throws Exception {
 
-        elbe1 = new FourteenerRoute();
+        elbe1 = new ImmutableStoredRoute();
         elbe1.setUrl("https://www.14ers.com/route.php?route=elbe1");
 
         mountainForecastElbe1 = new MountainForecastScraper(elbe1);

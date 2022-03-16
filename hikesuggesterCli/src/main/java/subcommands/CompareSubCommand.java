@@ -8,7 +8,6 @@ import java.util.Arrays;
 
 @CommandLine.Command(name = "compare", mixinStandardHelpOptions = true)
 public class CompareSubCommand implements Runnable {
-
     @CommandLine.Parameters(index = "0", description = "First argument, mountain name")
     String mountainName1;
     @CommandLine.Parameters(index = "1", description = "First argument, route name")

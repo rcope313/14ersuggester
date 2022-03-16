@@ -5,8 +5,6 @@ import database.models.ImmutableCompareQuery;
 import database.models.ImmutableSearchQuery;
 import database.models.ImmutableStoredRoute;
 import models.Column;
-import models.FourteenerRoute;
-
 import java.util.ArrayList;
 import java.util.StringJoiner;
 
@@ -16,6 +14,7 @@ public class CliOutput {
         buildCliTableHeaders(designateColumnFields());
         ArrayList<ImmutableStoredRoute> routes = FourteenerRoutesDao.get(query);
         inputImmutableStoredRoutesIntoCliTable(routes, designateColumnFields());
+        createDifferenceString(routes.get(0), routes.get(1));
     }
 
     public static void buildCliTable(ImmutableSearchQuery query) {
@@ -71,7 +70,7 @@ public class CliOutput {
         return formatDataStringJoiner.toString();
     }
 
-    public String createDifferenceString (FourteenerRoute route0, FourteenerRoute route1) {
+    private static void createDifferenceString(ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         StringJoiner differencesStringJoiner = new StringJoiner("\n");
 
         snowRouteDiff(differencesStringJoiner, route0, route1);
@@ -89,101 +88,90 @@ public class CliOutput {
         hasMultipleRoutesDiff(differencesStringJoiner, route0, route1);
         trailheadDiff(differencesStringJoiner, route0, route1);
 
-        return differencesStringJoiner.toString();
+        System.out.print(differencesStringJoiner);
     }
 
-    private void snowRouteDiff (StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
-        if  (route0.isSnowRoute() != route1.isSnowRoute()) {
-            differencesStringJoiner.add("Snow Route: " + route0.isSnowRoute() + ", " + route1.isSnowRoute() + "\n");
+    private static void snowRouteDiff (StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
+        if  (route0.getIsSnowRoute() != route1.getIsSnowRoute()) {
+            differencesStringJoiner.add("Snow Route: " + route0.getIsSnowRoute() + ", " + route1.getIsSnowRoute() + "\n");
         }
     }
 
-    private void standardRouteDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
-        if (route0.isStandardRoute() != route1.isStandardRoute()) {
-            differencesStringJoiner.add("Standard Route: " + route0.isStandardRoute() + ", " + route1.isStandardRoute());
+    private static void standardRouteDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
+        if (route0.getIsStandardRoute() != route1.getIsStandardRoute()) {
+            differencesStringJoiner.add("Standard Route: " + route0.getIsStandardRoute() + ", " + route1.getIsStandardRoute());
         }
     }
 
-    private void gradeDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
-        if (route0.getGradeQuality().getGrade() != route1.getGradeQuality().getGrade()) {
-            differencesStringJoiner.add("Grade: " + route0.getGradeQuality().getGrade() + ", " + route1.getGradeQuality().getGrade());
+    private static void gradeDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
+        if (route0.getGrade() != route1.getGrade()) {
+            differencesStringJoiner.add("Grade: " + route0.getGrade() + ", " + route1.getGrade());
         }
     }
 
-    private void gradeQualityDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
-        if (!route0.getGradeQuality().getQuality().equals(route1.getGradeQuality().getQuality())) {
-            differencesStringJoiner.add("Grade Quality: " + route0.getGradeQuality().getQuality() + ", " + route1.getGradeQuality().getQuality());
+    private static void gradeQualityDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
+        if (!route0.getGradeQuality().equals(route1.getGradeQuality())) {
+            differencesStringJoiner.add("Grade Quality: " + route0.getGradeQuality() + ", " + route1.getGradeQuality());
         }
     }
 
-    private void startElevationDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void startElevationDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (route0.getStartElevation() != route1.getStartElevation()) {
             differencesStringJoiner.add("Start Elevation: " + route0.getStartElevation() + ", " + route1.getStartElevation());
         }
     }
 
-    private void summitElevationDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void summitElevationDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (route0.getSummitElevation() != route1.getSummitElevation()) {
             differencesStringJoiner.add("Summit Elevation: " + route0.getSummitElevation() + ", " + route1.getSummitElevation());
         }
     }
 
-    private void totalGainDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void totalGainDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (route0.getTotalGain() != route1.getTotalGain()) {
             differencesStringJoiner.add("Total Gain: " + route0.getTotalGain() + ", " + route1.getTotalGain());
         }
     }
 
-    private void routeLengthDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void routeLengthDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (route0.getRouteLength() != route1.getRouteLength()) {
             differencesStringJoiner.add("Route Length: " + route0.getRouteLength() + ", " + route1.getRouteLength());
         }
     }
 
-    private void exposureDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void exposureDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (!route0.getExposure().equals(route1.getExposure())) {
             differencesStringJoiner.add("Exposure: " + route0.getExposure() + ", " + route1.getExposure());
         }
     }
 
-    private void rockfallPotentialDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void rockfallPotentialDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (!route0.getRockfallPotential().equals(route1.getRockfallPotential())) {
             differencesStringJoiner.add("Rockfall Potential: " + route0.getRockfallPotential() + ", " + route1.getRockfallPotential());
         }
     }
 
-    private void routeFindingDiff (StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void routeFindingDiff (StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (!route0.getRouteFinding().equals(route1.getRouteFinding())) {
             differencesStringJoiner.add("Route Finding: " + route0.getRouteFinding() + ", " + route1.getRouteFinding());
         }
     }
 
-    private void commitmentDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void commitmentDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (!route0.getCommitment().equals(route1.getCommitment())) {
             differencesStringJoiner.add("Commitment: " + route0.getCommitment() + ", " + route1.getCommitment());
         }
     }
 
-    private void hasMultipleRoutesDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
-        if (route0.hasMultipleRoutes() != route1.hasMultipleRoutes()) {
-            differencesStringJoiner.add("Multiple Routes: " + route0.hasMultipleRoutes() + ", " + route1.hasMultipleRoutes());
+    private static void hasMultipleRoutesDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
+        if (route0.getHasMultipleRoutes() != route1.getHasMultipleRoutes()) {
+            differencesStringJoiner.add("Multiple Routes: " + route0.getHasMultipleRoutes() + ", " + route1.getHasMultipleRoutes());
         }
     }
 
-    private void trailheadDiff(StringJoiner differencesStringJoiner, FourteenerRoute route0, FourteenerRoute route1) {
+    private static void trailheadDiff(StringJoiner differencesStringJoiner, ImmutableStoredRoute route0, ImmutableStoredRoute route1) {
         if (!route0.getTrailhead().equals(route1.getTrailhead())) {
             differencesStringJoiner.add("Trailhead: " + route0.getTrailhead()+ ", \n" + route1.getTrailhead());
-        }
-    }
-
-    private void checkFieldsOfMySqlCompareQuery () {
-        if (getMountainName1() != null &&
-                getRouteName1() != null &&
-                getMountainName2() != null &&
-                getRouteName2() != null &&
-                getRouteUrls() != null) {
-
-            throw new IllegalStateException("Option fields cannot be entered alongside parameter fields");
         }
     }
 }

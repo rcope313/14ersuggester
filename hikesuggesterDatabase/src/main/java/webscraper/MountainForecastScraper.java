@@ -1,6 +1,5 @@
 package webscraper;
 
-import models.FourteenerRoute;
 import models.MountainForecast;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.xerces.dom.DeferredElementImpl;
@@ -20,9 +19,9 @@ import java.util.ArrayList;
 
 public class MountainForecastScraper {
     private final Document xmlDocument;
-    private final FourteenerRoute route;
+    private final ImmutableStoredRoute route;
 
-    public MountainForecastScraper(FourteenerRoute route) throws Exception {
+    public MountainForecastScraper(ImmutableStoredRoute route) throws Exception {
         this.route = route;
         this.xmlDocument = buildXMLDocumentFromFourteenerRoute();
     }
@@ -104,7 +103,7 @@ public class MountainForecastScraper {
         return xmlDocument;
     }
 
-    public FourteenerRoute getRoute() {
+    public ImmutableStoredRoute getRoute() {
         return route;
     }
 }
