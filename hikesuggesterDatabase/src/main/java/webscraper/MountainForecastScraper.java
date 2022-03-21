@@ -19,6 +19,9 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class MountainForecastScraper {
+    private final static String NOAA_HYPERLINK = "a:contains(NOAA Forecast)";
+    private final static String HOURLY_WEATHER_FORECAST_HYPERLINK =  "a[href]:contains(Hourly)";
+    private final static String DWML_HYPERLINK = "a[href*=digitalDWML]";
     private final static String TIME_LAYOUT_EXP  = "//time-layout";
     private final static String WIND_SPEED_EXP = "//wind-speed[@type='sustained']";
     private final static String CLOUD_AMOUNT_EXP = "//cloud-amount";
@@ -62,7 +65,7 @@ public class MountainForecastScraper {
     }
 
     private Document buildXMLDocumentFromFourteenerRoute(ImmutableStoredRoute route) throws Exception {
-        URL url = new URL(getNOAAXmlHourlyWeatherForecast(getNOAAHourlyWeatherForecast(getNOAASevenDayWeatherForecast(route))));
+        URL url = new URL(getNOAADwmlHourlyWeatherForecast(getNOAAHourlyWeatherForecast(getNOAASevenDayWeatherForecast(route))));
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
@@ -74,21 +77,21 @@ public class MountainForecastScraper {
     @VisibleForTesting
     String getNOAASevenDayWeatherForecast(ImmutableStoredRoute route) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(route.getUrl()).get();
-        String unescapedXml = StringEscapeUtils.unescapeXml(doc.select("a:contains(NOAA Forecast)").get(0).attributes().toString());
+        String unescapedXml = StringEscapeUtils.unescapeXml(doc.select(NOAA_HYPERLINK).get(0).attributes().toString());
         return unescapedXml.substring(24,unescapedXml.length()-1);
     }
 
     @VisibleForTesting
     static String getNOAAHourlyWeatherForecast(String url) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
-        String unescapedXml = StringEscapeUtils.unescapeXml(doc.select("a[href]:contains(Hourly)").get(1).attributes().toString());
+        String unescapedXml = StringEscapeUtils.unescapeXml(doc.select(HOURLY_WEATHER_FORECAST_HYPERLINK).get(1).attributes().toString());
         return "https://forecast.weather.gov/" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
     @VisibleForTesting
-    static String getNOAAXmlHourlyWeatherForecast(String url) throws IOException {
+    static String getNOAADwmlHourlyWeatherForecast(String url) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
-        String unescapedXml =StringEscapeUtils.unescapeXml(doc.select("a[href*=digitalDWML]").get(0).attributes().toString());
+        String unescapedXml =StringEscapeUtils.unescapeXml(doc.select(DWML_HYPERLINK).get(0).attributes().toString());
         return "https:" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
