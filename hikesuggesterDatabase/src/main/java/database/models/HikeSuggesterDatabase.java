@@ -1,6 +1,7 @@
 package database.models;
 
 public class HikeSuggesterDatabase {
+    public final static String HIKE_SUGGESTER = "hike_suggester";
     public final static String FOURTEENER_ROUTES = "fourteener_routes";
     public final static String FOURTEENER_ROUTE_ID = "fourteener_routes.fourteenerRouteId";
     public final static String ROUTE_NAME = "fourteener_routes.routeName";
@@ -21,7 +22,6 @@ public class HikeSuggesterDatabase {
     public final static String ROUTE_URL = "fourteener_routes.url";
     public final static String ROUTE_TRAILHEAD = "fourteener_routes.trailhead";
     public final static String ROUTE_UPDATE_DATE = "fourteener_routes.updateDate";
-
     public final static String TRAILHEADS = "trailheads";
     public final static String TRAILHEAD_ID = "trailheads.trailheadId";
     public final static String TRAILHEAD_NAME = "trailheads.name";

@@ -214,12 +214,12 @@ public class FourteenerRouteScraper {
 
     private static int scrapeSummitElevation(HtmlTable table) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(4);
-        return convertElevationStringToInteger(cell.asNormalizedText());
+        return convertElevationIntoInteger(cell.asNormalizedText());
     }
 
     private static int scrapeStartElevation(HtmlTable table) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(3);
-        return convertElevationStringToInteger(cell.asNormalizedText());
+        return convertElevationIntoInteger(cell.asNormalizedText());
     }
 
     private static String scrapeExposure(HtmlTable table) {
@@ -245,40 +245,16 @@ public class FourteenerRouteScraper {
         return commitment.substring(0, commitment.length() - 2);
     }
 
-    private static int convertElevationStringToInteger(String elevation) {
-        String elevationWithoutFeet = elevation.substring(0, elevation.length() - 5);
-        char[] charArray = elevationWithoutFeet.toCharArray();
-
-        if (charArray.length < 5) {
-            return (Character.getNumericValue(charArray[0]) * 100)
-                    + (Character.getNumericValue(charArray[1]) * 10)
-                    + Character.getNumericValue(charArray[2]);
-        }
-
-        else if (charArray.length < 6) {
-            return (Character.getNumericValue(charArray[0]) * 1000)
-                    + (Character.getNumericValue(charArray[2]) * 100)
-                    + (Character.getNumericValue(charArray[3]) * 10)
-                    + Character.getNumericValue(charArray[4]);
-        } else {
-            return (Character.getNumericValue(charArray[0]) * 10000)
-                    + (Character.getNumericValue(charArray[1]) * 1000)
-                    + (Character.getNumericValue(charArray[3]) * 100)
-                    + (Character.getNumericValue(charArray[4]) * 10)
-                    + Character.getNumericValue(charArray[5]);
-        }
-    }
-
     private static int convertTotalGainIntoInteger(String str) {
         if (str.split("\n").length > 1) {
             return 0;
         }
-        String[] stringArray = str.split(" feet");
-        return convertElevationIntoInteger(stringArray[0]);
+        return convertElevationIntoInteger(str);
     }
 
-    private static int convertElevationIntoInteger (String str) {
-        char[] charArray = str.toCharArray();
+    private static int convertElevationIntoInteger(String str) {
+        String[] strArr = str.split(" feet");
+        char[] charArray = strArr[0].toCharArray();
 
         if (charArray.length < 5) {
             return (Character.getNumericValue(charArray[0]) * 100)

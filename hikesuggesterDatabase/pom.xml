@@ -11,6 +11,7 @@
 
     <artifactId>hikesuggesterDatabase</artifactId>
     <dependencies>
+
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
@@ -37,7 +38,12 @@
             <artifactId>jsoup</artifactId>
             <version>1.14.3</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.200</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <properties>

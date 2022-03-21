@@ -1,4 +1,4 @@
-package database.query;
+package dao;
 
 import database.models.AbstractSearchQuery;
 import org.junit.Test;
