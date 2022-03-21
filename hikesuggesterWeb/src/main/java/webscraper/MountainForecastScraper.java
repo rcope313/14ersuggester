@@ -74,29 +74,25 @@ public class MountainForecastScraper {
         return document;
     }
 
-    @VisibleForTesting
-    String getNOAASevenDayWeatherForecast(ImmutableStoredRoute route) throws IOException {
+    private String getNOAASevenDayWeatherForecast(ImmutableStoredRoute route) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(route.getUrl()).get();
         String unescapedXml = StringEscapeUtils.unescapeXml(doc.select(NOAA_HYPERLINK).get(0).attributes().toString());
         return unescapedXml.substring(24,unescapedXml.length()-1);
     }
 
-    @VisibleForTesting
-    static String getNOAAHourlyWeatherForecast(String url) throws IOException {
+    private static String getNOAAHourlyWeatherForecast(String url) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
         String unescapedXml = StringEscapeUtils.unescapeXml(doc.select(HOURLY_WEATHER_FORECAST_HYPERLINK).get(1).attributes().toString());
         return "https://forecast.weather.gov/" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
-    @VisibleForTesting
-    static String getNOAADwmlHourlyWeatherForecast(String url) throws IOException {
+    private static String getNOAADwmlHourlyWeatherForecast(String url) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
         String unescapedXml =StringEscapeUtils.unescapeXml(doc.select(DWML_HYPERLINK).get(0).attributes().toString());
         return "https:" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
-    @VisibleForTesting
-    ArrayList<String> parseElements(String expression, String element, Document doc) throws XPathExpressionException {
+    private ArrayList<String> parseElements(String expression, String element, Document doc) throws XPathExpressionException {
         XPath xPath =  XPathFactory.newInstance().newXPath();
         DeferredElementImpl parentElement = (DeferredElementImpl) xPath.compile(expression).evaluate(doc, XPathConstants.NODE);
         Node aNode = parentElement.getFirstChild();
