@@ -1,19 +1,104 @@
 package console;
 
 import database.models.ImmutableMountainForecast;
+import database.models.ImmutableStoredRoute;
+import models.TimeScore;
 import org.assertj.core.util.VisibleForTesting;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class CliSuggestOutput {
+    private final static int LOW_CONSEQUENCE = 6;
+    private final static int HIGH_CONSEQUENCE = 12;
+
+    public List<TimeScore> getBestThreeTimesOfOneRouteLowConsequence(ImmutableStoredRoute route, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+        ArrayList<Integer> allSixHourBlockTimes = getAllDayTimeSixHourBlocks(sevenDayForecast.get(0).getDate());
+        ArrayList<Integer> lowConsequenceIndexes = getListOfIndexesByLowConsequence(allSixHourBlockTimes, sevenDayForecast);
+        ArrayList<Map.Entry<Integer, Integer>> sortedIndexes = sortLowConsequenceEntriesByWindSpeedAndWindChill(lowConsequenceIndexes, sevenDayForecast);
+        List<TimeScore> listOfBestTimes = transformSortedEntriesToListOfBestTimes(sortedIndexes, route);
+        return listOfBestTimes.subList(0,3);
+    }
+
+    public List<TimeScore> getBestThreeTimesOfOneRouteHighConsequence(ImmutableStoredRoute route, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+        ArrayList<Integer> allSixHourBlockTimes = getAllDayTimeSixHourBlocks(sevenDayForecast.get(0).getDate());
+        ArrayList<Integer> highConsequenceIndexes = getListOfIndexesByHighConsequence(allSixHourBlockTimes, sevenDayForecast);
+        ArrayList<Map.Entry<Integer, Integer>> sortedIndexes = sortHighConsequenceEntriesByWindSpeedAndWindChill(highConsequenceIndexes, sevenDayForecast);
+        List<TimeScore> listOfBestTimes = transformSortedEntriesToListOfBestTimes(sortedIndexes, route);
+        return listOfBestTimes.subList(0,3);
+    }
 
     @VisibleForTesting
-    static ArrayList<Integer> checkPrecipProbabilityByHighConsequence(ArrayList<Integer> dayTimeTwelveHourBlocksByIndex, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+    static List<TimeScore> transformSortedEntriesToListOfBestTimes(ArrayList<Map.Entry<Integer, Integer>> sortedIndexes, ImmutableStoredRoute route) {
+        List<TimeScore> sortedTimeScores = new ArrayList<>();
+        for (Map.Entry<Integer,Integer> entry : sortedIndexes) {
+            TimeScore currentTimeScore = new TimeScore(route, entry.getKey(), entry.getValue());
+            sortedTimeScores.add(currentTimeScore);
+        }
+        return sortedTimeScores;
+    }
+    @VisibleForTesting
+    static ArrayList<Map.Entry<Integer, Integer>> sortLowConsequenceEntriesByWindSpeedAndWindChill(ArrayList<Integer> indexesByLowConsequence, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+        HashMap<Integer,Integer> idxMap = new HashMap<>();
+
+        for (int idx : indexesByLowConsequence) {
+            int maxWindChill = getMaxWindChill(idx, idx + LOW_CONSEQUENCE, sevenDayForecast);
+            int maxWindSpeed = getMaxWindSpeed(idx, idx + LOW_CONSEQUENCE, sevenDayForecast);
+            idxMap.put(idx, maxWindChill - (maxWindSpeed * 2));
+        }
+        ArrayList<Map.Entry<Integer, Integer>> mapList = new ArrayList<>(idxMap.entrySet());
+        mapList.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+        return mapList;
+    }
+    @VisibleForTesting
+    static ArrayList<Map.Entry<Integer, Integer>> sortHighConsequenceEntriesByWindSpeedAndWindChill(ArrayList<Integer> indexesByHighConsequence, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+        HashMap<Integer,Integer> idxMap = new HashMap<>();
+
+        for (int idx : indexesByHighConsequence) {
+            int maxWindChill = getMaxWindChill(idx, idx + HIGH_CONSEQUENCE, sevenDayForecast);
+            int maxWindSpeed = getMaxWindSpeed(idx, idx + HIGH_CONSEQUENCE, sevenDayForecast);
+            idxMap.put(idx, maxWindChill - (maxWindSpeed * 2));
+        }
+        ArrayList<Map.Entry<Integer, Integer>> mapList = new ArrayList<>(idxMap.entrySet());
+        mapList.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
+        return mapList;
+    }
+
+    @VisibleForTesting
+    static int getMaxWindChill(int lowBound, int highBound, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+        int highestWindChill = 0;
+        while (lowBound < highBound) {
+            int currentWindChill= Integer.parseInt(sevenDayForecast.get(lowBound).getWindChill());
+            if (currentWindChill > highestWindChill) {
+                highestWindChill = currentWindChill;
+            }
+            lowBound++;
+        }
+        return highestWindChill;
+    }
+
+    @VisibleForTesting
+    static int getMaxWindSpeed(int lowBound, int highBound, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+        int highestWindSpeed = 0;
+        while (lowBound < highBound) {
+            int currentWindSpeed = Integer.parseInt(sevenDayForecast.get(lowBound).getWindSpeed());
+            if (currentWindSpeed > highestWindSpeed) {
+                highestWindSpeed = currentWindSpeed;
+            }
+            lowBound++;
+        }
+        return highestWindSpeed;
+    }
+
+    @VisibleForTesting
+    static ArrayList<Integer> getListOfIndexesByHighConsequence(ArrayList<Integer> dayTimeTwelveHourBlocksByIndex, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
         ArrayList<Integer> indexes = new ArrayList<>();
         for (int idx : dayTimeTwelveHourBlocksByIndex) {
-            if (idx + 11 < sevenDayForecast.size() && checkPrecipProbabilityByHighConsequence(sevenDayForecast, idx, idx + 11)) {
+            if (idx + HIGH_CONSEQUENCE-1 < sevenDayForecast.size() && checkPrecipProbabilityByHighConsequence(sevenDayForecast, idx, idx + HIGH_CONSEQUENCE-1)) {
                 indexes.add(idx);
            }
        }
@@ -21,10 +106,10 @@ public class CliSuggestOutput {
     }
 
     @VisibleForTesting
-    static ArrayList<Integer> checkPrecipProbabilityByLowConsequence(ArrayList<Integer> dayTimeSixHourBlocksByIndex, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+    static ArrayList<Integer> getListOfIndexesByLowConsequence(ArrayList<Integer> dayTimeSixHourBlocksByIndex, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
         ArrayList<Integer> indexes = new ArrayList<>();
         for (int idx : dayTimeSixHourBlocksByIndex) {
-            if (idx + 5 < sevenDayForecast.size() && checkPrecipProbabilityByLowConsequence(sevenDayForecast, idx, idx + 5)) {
+            if (idx + LOW_CONSEQUENCE-1 < sevenDayForecast.size() && checkPrecipProbabilityByLowConsequence(sevenDayForecast, idx, idx + LOW_CONSEQUENCE-1)) {
                 indexes.add(idx);
             }
         }
