@@ -16,20 +16,28 @@ public class CliSuggestOutput {
     private final static int LOW_CONSEQUENCE = 6;
     private final static int HIGH_CONSEQUENCE = 12;
 
-    public List<TimeScore> getBestThreeTimesOfOneRouteLowConsequence(ImmutableStoredRoute route, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+    public static List<TimeScore> getBestThreeTimesOfOneRouteLowConsequence(ImmutableStoredRoute route, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
         ArrayList<Integer> allSixHourBlockTimes = getAllDayTimeSixHourBlocks(sevenDayForecast.get(0).getDate());
         ArrayList<Integer> lowConsequenceIndexes = getListOfIndexesByLowConsequence(allSixHourBlockTimes, sevenDayForecast);
         ArrayList<Map.Entry<Integer, Integer>> sortedIndexes = sortLowConsequenceEntriesByWindSpeedAndWindChill(lowConsequenceIndexes, sevenDayForecast);
         List<TimeScore> listOfBestTimes = transformSortedEntriesToListOfBestTimes(sortedIndexes, route);
-        return listOfBestTimes.subList(0,3);
+        if (listOfBestTimes.size() < 3) {
+            return listOfBestTimes;
+        } else {
+            return listOfBestTimes.subList(0,3);
+        }
     }
 
-    public List<TimeScore> getBestThreeTimesOfOneRouteHighConsequence(ImmutableStoredRoute route, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
+    public static List<TimeScore> getBestThreeTimesOfOneRouteHighConsequence(ImmutableStoredRoute route, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
         ArrayList<Integer> allSixHourBlockTimes = getAllDayTimeSixHourBlocks(sevenDayForecast.get(0).getDate());
         ArrayList<Integer> highConsequenceIndexes = getListOfIndexesByHighConsequence(allSixHourBlockTimes, sevenDayForecast);
         ArrayList<Map.Entry<Integer, Integer>> sortedIndexes = sortHighConsequenceEntriesByWindSpeedAndWindChill(highConsequenceIndexes, sevenDayForecast);
         List<TimeScore> listOfBestTimes = transformSortedEntriesToListOfBestTimes(sortedIndexes, route);
-        return listOfBestTimes.subList(0,3);
+        if (listOfBestTimes.size() < 3) {
+            return listOfBestTimes;
+        } else {
+            return listOfBestTimes.subList(0,3);
+        }
     }
 
     @VisibleForTesting
@@ -41,6 +49,7 @@ public class CliSuggestOutput {
         }
         return sortedTimeScores;
     }
+
     @VisibleForTesting
     static ArrayList<Map.Entry<Integer, Integer>> sortLowConsequenceEntriesByWindSpeedAndWindChill(ArrayList<Integer> indexesByLowConsequence, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
         HashMap<Integer,Integer> idxMap = new HashMap<>();
@@ -54,6 +63,7 @@ public class CliSuggestOutput {
         mapList.sort(Map.Entry.comparingByValue(Comparator.reverseOrder()));
         return mapList;
     }
+
     @VisibleForTesting
     static ArrayList<Map.Entry<Integer, Integer>> sortHighConsequenceEntriesByWindSpeedAndWindChill(ArrayList<Integer> indexesByHighConsequence, ArrayList<ImmutableMountainForecast> sevenDayForecast) {
         HashMap<Integer,Integer> idxMap = new HashMap<>();

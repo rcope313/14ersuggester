@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CliSuggestOutputTest {
@@ -84,6 +83,23 @@ public class CliSuggestOutputTest {
         oneDayForecast = new ArrayList<>(Arrays.asList(twelveAm, oneAm, twoAm, threeAm, fourAm, fiveAm, sixAm, sevenAm, eightAm,
                                                         nineAm, tenAm, elevenAm, twelvePm, onePm, twoPm, threePm, fourPm, fivePm, sixPm,
                                                         sevenPm, eightPm, ninePm, tenPm, elevenPm));
+    }
+
+    @Test
+    public void itGetsBestThreeTimesOfOneRouteHighConsequence() {
+        assertThat(CliSuggestOutput.getBestThreeTimesOfOneRouteHighConsequence(elb1, oneDayForecast))
+                .usingRecursiveComparison()
+                .isEqualTo(new ArrayList<>());
+    }
+
+    @Test
+    public void itGetsBestThreeTimesOfOneRouteLowConsequence() {
+        TimeScore timeScore5 = new TimeScore(elb1, 5, 40);
+        TimeScore timeScore6 = new TimeScore(elb1, 6, 40);
+        TimeScore timeScore7 = new TimeScore(elb1, 7, 20);
+        assertThat(CliSuggestOutput.getBestThreeTimesOfOneRouteLowConsequence(elb1, oneDayForecast))
+                .usingRecursiveComparison()
+                .isEqualTo(new ArrayList<>(Arrays.asList(timeScore5, timeScore6, timeScore7)));
     }
 
     @Test
