@@ -7,7 +7,7 @@ import java.sql.Statement;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class Dao {
+public class DatabaseConnection {
     private static final String DB_URL = "jdbc:mysql://localhost/hike_suggester";
     private static final String USER = "root";
     private static final String PASS = "root1234";

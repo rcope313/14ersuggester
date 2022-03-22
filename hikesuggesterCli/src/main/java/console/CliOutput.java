@@ -1,6 +1,6 @@
 package console;
 
-import database.dao.RoutesTrailheadsDao;
+import database.dao.RoutesTrailheadsDatabaseConnection;
 import database.models.ImmutableCompareQuery;
 import database.models.ImmutableSearchQuery;
 import database.models.ImmutableStoredRouteAndTrailhead;
@@ -12,14 +12,14 @@ public class CliOutput {
 
     public static void buildCliTable(ImmutableCompareQuery query) {
         buildCliTableHeaders(designateColumnFields());
-        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
+        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDatabaseConnection.get(query);
         inputImmutableStoredRouteAndTrailheadsIntoCliTable(routes, designateColumnFields());
         createDifferenceString(routes.get(0), routes.get(1));
     }
 
     public static void buildCliTable(ImmutableSearchQuery query) {
         buildCliTableHeaders(designateColumnFields());
-        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
+        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDatabaseConnection.get(query);
         inputImmutableStoredRouteAndTrailheadsIntoCliTable(routes, designateColumnFields());
     }
 

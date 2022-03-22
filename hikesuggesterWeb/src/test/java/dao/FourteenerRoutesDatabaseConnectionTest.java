@@ -2,15 +2,14 @@ package dao;
 
 import database.models.HikeSuggesterDatabase;
 import org.junit.Test;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class FourteenerRoutesDaoTest {
+public class FourteenerRoutesDatabaseConnectionTest {
     Connection con = DriverManager.getConnection("jdbc:h2:~/" + HikeSuggesterDatabase.HIKE_SUGGESTER);
 
-    public FourteenerRoutesDaoTest() throws SQLException {
+    public FourteenerRoutesDatabaseConnectionTest() throws SQLException {
     }
 
     @Test

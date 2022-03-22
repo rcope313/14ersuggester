@@ -8,12 +8,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class FourteenerRoutesDao extends Dao {
+public class FourteenerRoutesDatabaseConnection extends DatabaseConnection {
 
     public static void insert(ImmutableStoredRoute route) {
         if (route != null) {
             try {
-                Dao.createStatement().execute(insertQuery(route));
+                DatabaseConnection.createStatement().execute(insertQuery(route));
                 System.out.println("ENTRY CREATED \n");
                 System.out.print("MountainName: " + route.getMountainName() + "\n");
                 System.out.print("Route Name: " + route.getRouteName() + "\n");
@@ -29,7 +29,7 @@ public class FourteenerRoutesDao extends Dao {
     public static ImmutableStoredRoute get(ImmutableFetchedRoute route) {
         String getQuery = getQuery(route);
         ImmutableStoredRoute storedRoute = null;
-        try (Statement stmt = Dao.createStatement()) {
+        try (Statement stmt = DatabaseConnection.createStatement()) {
             ResultSet rs = stmt.executeQuery(getQuery);
             while (rs.next()) {
                 storedRoute = buildImmutableStoredRoute(rs);
@@ -44,7 +44,7 @@ public class FourteenerRoutesDao extends Dao {
         ImmutableStoredRoute storedRoute = get(route);
         if (hasUpdateDateOverWeekAgo(storedRoute.getUpdateDate())) {
             ImmutableFetchedRoute updatedRoute = FourteenerRouteScraper.scrapeImmutableFetchedRoute(storedRoute.getUrl());
-            Dao.createStatement().execute(updateQuery(updatedRoute));
+            DatabaseConnection.createStatement().execute(updateQuery(updatedRoute));
         }
     }
 

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-public class RoutesTrailheadsDao extends Dao {
+public class RoutesTrailheadsDatabaseConnection extends DatabaseConnection {
 
     public static ArrayList<ImmutableStoredRouteAndTrailhead> get(ImmutableSearchQuery query) {
         String searchQuery = searchQuery(query);
@@ -47,7 +47,7 @@ public class RoutesTrailheadsDao extends Dao {
 
     private static ArrayList<ImmutableStoredRouteAndTrailhead> getStoredRoutesAndTrailheads(String query) {
         ArrayList<ImmutableStoredRouteAndTrailhead> routes = new ArrayList<>();
-        try (Statement stmt = Dao.createStatement()) {
+        try (Statement stmt = DatabaseConnection.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 routes.add(buildImmutableStoredRouteAndTrailhead(rs));

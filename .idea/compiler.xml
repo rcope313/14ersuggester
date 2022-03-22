@@ -14,6 +14,7 @@
       <module name="hikesuggester" target="14" />
       <module name="hikesuggesterCli" target="14" />
       <module name="hikesuggesterCore" target="14" />
+      <module name="hikesuggesterDatabase" target="14" />
       <module name="hikesuggesterWeb" target="14" />
       <module name="hikesuggesterWebScraper" target="14" />
     </bytecodeTargetLevel>

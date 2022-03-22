@@ -49,7 +49,7 @@ public class MountainForecastScraper {
 
         for (int idx = 0; idx < tempList.size(); idx ++) {
             ImmutableMountainForecast forecast = ImmutableMountainForecast.builder()
-                    .date(dateList.get(idx))
+                    .date(dateList.get(idx).substring(0,19))
                     .windSpeed(windSpeedList.get(idx))
                     .cloudCover(cloudCoverList.get(idx))
                     .precipProbability(probOfPrecipList.get(idx))

@@ -7,13 +7,13 @@ import webscraper.TrailheadScraper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import static database.dao.Dao.hasUpdateDateOverWeekAgo;
+import static database.dao.DatabaseConnection.hasUpdateDateOverWeekAgo;
 
 public class TrailheadsDao {
 
     public static void insert(ImmutableFetchedTrailhead trailhead) {
         try {
-            Dao.createStatement().execute(insertQuery(trailhead));
+            DatabaseConnection.createStatement().execute(insertQuery(trailhead));
             System.out.println("ENTRY CREATED \n");
             System.out.print("Trailhead Name: " + trailhead.getName() + "\n");
         } catch (Exception e) {
@@ -25,7 +25,7 @@ public class TrailheadsDao {
     public static ImmutableStoredTrailhead get(ImmutableFetchedTrailhead trailhead) {
         String getQuery = getQuery(trailhead);
         ImmutableStoredTrailhead storedTrailhead = null;
-        try (Statement stmt = Dao.createStatement()) {
+        try (Statement stmt = DatabaseConnection.createStatement()) {
             ResultSet rs = stmt.executeQuery(getQuery);
             while (rs.next()) {
                 storedTrailhead = buildImmutableStoredTrailhead(rs);
@@ -40,7 +40,7 @@ public class TrailheadsDao {
         ImmutableStoredTrailhead storedTrailhead = get(trailhead);
         if (hasUpdateDateOverWeekAgo(storedTrailhead.getUpdateDate())) {
             ImmutableFetchedTrailhead updatedTrailhead = TrailheadScraper.scrapeImmutableFetchedTrailhead(trailhead.getUrl());
-            Dao.createStatement().execute(updateQuery(updatedTrailhead));
+            DatabaseConnection.createStatement().execute(updateQuery(updatedTrailhead));
         }
     }
 
