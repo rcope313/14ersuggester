@@ -1,20 +1,14 @@
-package console;
+package models;
 
 import database.models.ImmutableMountainForecast;
 import database.models.ImmutableStoredRouteAndTrailhead;
-import models.RouteForecast;
-import models.TimeScore;
 import org.junit.Before;
 import org.junit.Test;
-import java.time.LocalDateTime;
-import java.time.Month;
+import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import static org.assertj.core.api.Assertions.assertThat;
 
-public class CliSuggestOutputTest {
+public class RouteForecastTest {
     ImmutableStoredRouteAndTrailhead elb, mass;
     ImmutableMountainForecast
             elb12am, elb1Am, elb2Am, elb3Am, elb4Am, elb5Am, elb6Am, elb7Am, elb8Am, elb9Am, elb10Am, elb11Am,
@@ -153,8 +147,8 @@ public class CliSuggestOutputTest {
         mass11Pm = mass12am.withDate("2022-04-21T23:00:00").withWindChill("45").withWindSpeed("0");
 
         elbOneDayForecast = new ArrayList<>(Arrays.asList(elb12am, elb1Am, elb2Am, elb3Am, elb4Am, elb5Am, elb6Am, elb7Am, elb8Am,
-                                                        elb9Am, elb10Am, elb11Am, elb12Pm, elb1Pm, elb2Pm, elb3Pm, elb4Pm, elb5Pm, elb6Pm,
-                                                        elb7Pm, elb8Pm, elb9Pm, elb10Pm, elb11Pm));
+                elb9Am, elb10Am, elb11Am, elb12Pm, elb1Pm, elb2Pm, elb3Pm, elb4Pm, elb5Pm, elb6Pm,
+                elb7Pm, elb8Pm, elb9Pm, elb10Pm, elb11Pm));
 
         massOneDayForecast = new ArrayList<>(Arrays.asList(mass12am, mass1Am, mass2Am, mass3Am, mass4Am, mass5Am, mass6Am, mass7Am, mass8Am,
                 mass9Am, mass10Am, mass11Am, mass12Pm, mass1Pm, mass2Pm, mass3Pm, mass4Pm, mass5Pm, mass6Pm,
@@ -165,109 +159,9 @@ public class CliSuggestOutputTest {
     }
 
     @Test
-    public void itGetsBestTimesOfAllRoutes() {
-        TimeScore timeScoreMass6am = new TimeScore(massForecast, 6, 40);
-        TimeScore timeScoreElb5am = new TimeScore(elbForecast, 5, 40);
-        TimeScore timeScoreElb6am = new TimeScore(elbForecast, 6, 40);
-        TimeScore timeScoreElb7am = new TimeScore(elbForecast, 7, 20);
-        List<RouteForecast> forecasts1 = new ArrayList<>(Arrays.asList(elbForecast, massForecast));
-        assertThat(CliSuggestOutput.getBestTimesOfAllRoutes(forecasts1))
-                .usingRecursiveComparison()
-                .isEqualTo(new ArrayList<>(Arrays.asList(timeScoreElb5am, timeScoreElb6am, timeScoreMass6am, timeScoreElb7am)));
+    public void itInitializesRouteAsHighConsequence() {
+        assertThat(massForecast.isHighConsequence()).isTrue();
+        assertThat(elbForecast.isHighConsequence()).isFalse();
     }
 
-    @Test
-    public void itGetsBestThreeTimesOfOneRouteHighConsequence() {
-        assertThat(CliSuggestOutput.getBestThreeTimesOfOneRouteHighConsequence(mass, massOneDayForecast))
-                .usingRecursiveComparison()
-                .isEqualTo(new ArrayList<>(List.of(new TimeScore(massForecast, 6, 40))));
-    }
-
-    @Test
-    public void itGetsBestThreeTimesOfOneRouteLowConsequence() {
-        TimeScore timeScore5am = new TimeScore(elbForecast, 5, 40);
-        TimeScore timeScore6am = new TimeScore(elbForecast, 6, 40);
-        TimeScore timeScore7am = new TimeScore(elbForecast, 7, 20);
-        assertThat(CliSuggestOutput.getBestThreeTimesOfOneRouteLowConsequence(elb, elbOneDayForecast))
-                .usingRecursiveComparison()
-                .isEqualTo(new ArrayList<>(Arrays.asList(timeScore5am, timeScore6am, timeScore7am)));
-    }
-
-    @Test
-    public void itTransformsSortedIndexesToListOfBestTimes() {
-        ArrayList<Integer> indexesLow = new ArrayList<>(Arrays.asList(5,9,7,6,8));
-        ArrayList<Map.Entry<Integer, Integer>> entries = CliSuggestOutput.sortLowConsequenceEntriesByWindSpeedAndWindChill(indexesLow, elbOneDayForecast);
-        List<TimeScore> bestTimesList = CliSuggestOutput.transformSortedEntriesToListOfBestTimes(entries, elbOneDayForecast, elb);
-        assertThat(bestTimesList.get(0)).usingRecursiveComparison().isEqualTo(new TimeScore(elbForecast,5, 40));
-        assertThat(bestTimesList.get(1)).usingRecursiveComparison().isEqualTo(new TimeScore(elbForecast, 6, 40));
-        assertThat(bestTimesList.get(2)).usingRecursiveComparison().isEqualTo(new TimeScore(elbForecast, 7, 20));
-        assertThat(bestTimesList.get(3)).usingRecursiveComparison().isEqualTo(new TimeScore(elbForecast, 8, 20));
-        assertThat(bestTimesList.get(4)).usingRecursiveComparison().isEqualTo(new TimeScore(elbForecast, 9, 10));
-    }
-
-    @Test
-    public void itGetsMaxWindChill() {
-        assertThat(CliSuggestOutput.getMaxWindChill(5,11, elbOneDayForecast)).isEqualTo(60);
-        assertThat(CliSuggestOutput.getMaxWindChill(0,6, elbOneDayForecast)).isEqualTo(50);
-        assertThat(CliSuggestOutput.getMaxWindChill(1,13, elbOneDayForecast)).isEqualTo(60);
-    }
-
-    @Test
-    public void itGetsMaxWindSpeed() {
-        assertThat(CliSuggestOutput.getMaxWindSpeed(5,11, elbOneDayForecast)).isEqualTo(10);
-        assertThat(CliSuggestOutput.getMaxWindSpeed(1,13, elbOneDayForecast)).isEqualTo(20);
-    }
-
-    @Test
-    public void itGetsListOfIndexesByHighConsequence() {
-        ArrayList<Integer> dayTimeTwelveHourBlocksByIndex = CliSuggestOutput.getAllDayTimeTwelveHourBlocks(elbOneDayForecast.get(0).getDate());
-        assertThat(CliSuggestOutput.getListOfIndexesByHighConsequence(dayTimeTwelveHourBlocksByIndex, elbOneDayForecast))
-                .usingRecursiveComparison()
-                .isEqualTo(new ArrayList<>());
-    }
-
-    @Test
-    public void itGetsListOfIndexesByLowConsequence() {
-        ArrayList<Integer> dayTimeSixHourBlocksByIndex = CliSuggestOutput.getAllDayTimeSixHourBlocks(elbOneDayForecast.get(0).getDate());
-        assertThat(CliSuggestOutput.getListOfIndexesByLowConsequence(dayTimeSixHourBlocksByIndex, elbOneDayForecast))
-                .usingRecursiveComparison()
-                .isEqualTo(new ArrayList<>(Arrays.asList(5,6,7,8,9)));
-    }
-
-    @Test
-    public void itChecksPrecipProbabilityByLowConsequenceHelper() {
-        assertThat(CliSuggestOutput.checkPrecipProbabilityByLowConsequence(elbOneDayForecast, 0, 5)).isTrue();
-        assertThat(CliSuggestOutput.checkPrecipProbabilityByLowConsequence(elbOneDayForecast, 9, 14)).isTrue();
-        assertThat(CliSuggestOutput.checkPrecipProbabilityByLowConsequence(elbOneDayForecast, 10, 15)).isFalse();
-        assertThat(CliSuggestOutput.checkPrecipProbabilityByLowConsequence(elbOneDayForecast, 11, 16)).isFalse();
-        assertThat(CliSuggestOutput.checkPrecipProbabilityByLowConsequence(elbOneDayForecast, 17, 22)).isFalse();
-    }
-
-    @Test
-    public void itChecksPrecipProbabilityByHighConsequenceHelper() {
-        assertThat(CliSuggestOutput.checkPrecipProbabilityByHighConsequence(elbOneDayForecast, 0, 11)).isTrue();
-        assertThat(CliSuggestOutput.checkPrecipProbabilityByHighConsequence(elbOneDayForecast, 5, 16)).isFalse();
-    }
-
-    @Test
-    public void itGetsAllDayTimeSixHourBlocks() {
-        assertThat(CliSuggestOutput.getAllDayTimeSixHourBlocks("2022-04-21T01:00:00"))
-                .isEqualTo(new ArrayList<>(Arrays.asList(4,5,6,7,8,9,28,29,30,31,32,33,52,53,54,55,56,57,76,77,78,79,80,81,100,101,102,103,104,105,124,125,126,127,128,129)));
-        assertThat(CliSuggestOutput.getAllDayTimeSixHourBlocks("2022-04-21T23:00:00"))
-                .isEqualTo(new ArrayList<>(Arrays.asList(6,7,8,9,10,11,30,31,32,33,34,35,54,55,56,57,58,59,78,79,80,81,82,83,102,103,104,105,106,107,126,127,128,129,130,131)));
-    }
-
-    @Test
-    public void itGetsAllDayTimeTwelveHourBlocks() {
-        assertThat(CliSuggestOutput.getAllDayTimeTwelveHourBlocks("2022-04-21T01:00:00"))
-                .isEqualTo(new ArrayList<>(Arrays.asList(3,4,5,27,28,29,51,52,53,75,76,77,99,100,101,123,124,125)));
-        assertThat(CliSuggestOutput.getAllDayTimeTwelveHourBlocks("2022-04-21T18:00:00"))
-                .isEqualTo(new ArrayList<>(Arrays.asList(10,11,12,34,35,36,58,59,60,82,83,84,106,107,108,130,131,132)));
-    }
-
-    @Test
-    public void itParsesStrToLocalDateTime() {
-        LocalDateTime resultDate = LocalDateTime.of(2022, Month.APRIL, 21, 1, 0, 0);
-        assertThat(CliSuggestOutput.parseStrToLocalDateTime("2022-04-21T01:00:00")).isEqualTo(resultDate);
-    }
 }

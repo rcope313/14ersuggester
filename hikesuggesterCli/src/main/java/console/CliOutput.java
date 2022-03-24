@@ -1,10 +1,12 @@
 package console;
 
-import database.dao.RoutesTrailheadsDatabaseConnection;
+import database.dao.RoutesTrailheadsDao;
 import database.models.ImmutableCompareQuery;
 import database.models.ImmutableSearchQuery;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import models.Column;
+import webscraper.FourteenerRouteScraper;
+
 import java.util.ArrayList;
 import java.util.StringJoiner;
 
@@ -12,15 +14,20 @@ public class CliOutput {
 
     public static void buildCliTable(ImmutableCompareQuery query) {
         buildCliTableHeaders(designateColumnFields());
-        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDatabaseConnection.get(query);
+        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
         inputImmutableStoredRouteAndTrailheadsIntoCliTable(routes, designateColumnFields());
         createDifferenceString(routes.get(0), routes.get(1));
     }
 
     public static void buildCliTable(ImmutableSearchQuery query) {
         buildCliTableHeaders(designateColumnFields());
-        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDatabaseConnection.get(query);
+        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
         inputImmutableStoredRouteAndTrailheadsIntoCliTable(routes, designateColumnFields());
+    }
+
+    public static void buildCliTableWeather(ImmutableSearchQuery query) {
+        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
+
     }
 
     private static ArrayList<Column> designateColumnFields() {

@@ -1,20 +1,18 @@
 package models;
 
-import database.models.ImmutableStoredRoute;
-
 public class TimeScore {
-    private final ImmutableStoredRoute route;
+    private final RouteForecast routeForecast;
     private final int timeIndex;
     private final int score;
 
-    public TimeScore(ImmutableStoredRoute route, int timeIndex, int score) {
-        this.route = route;
+    public TimeScore(RouteForecast routeForecast, int timeIndex, int score) {
+        this.routeForecast = routeForecast;
         this.timeIndex = timeIndex;
         this.score = score;
     }
 
-    public ImmutableStoredRoute getRoute() {
-        return route;
+    public RouteForecast getRouteForecast() {
+        return routeForecast;
     }
 
     public int getTimeIndex() {
@@ -24,4 +22,5 @@ public class TimeScore {
     public int getScore() {
         return score;
     }
+
 }

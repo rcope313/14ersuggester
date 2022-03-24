@@ -6,10 +6,10 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class FourteenerRoutesDatabaseConnectionTest {
+public class FourteenerRoutesDaoTest {
     Connection con = DriverManager.getConnection("jdbc:h2:~/" + HikeSuggesterDatabase.HIKE_SUGGESTER);
 
-    public FourteenerRoutesDatabaseConnectionTest() throws SQLException {
+    public FourteenerRoutesDaoTest() throws SQLException {
     }
 
     @Test

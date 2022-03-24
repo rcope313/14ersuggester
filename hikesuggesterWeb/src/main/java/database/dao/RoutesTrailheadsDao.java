@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-public class RoutesTrailheadsDatabaseConnection extends DatabaseConnection {
+public class RoutesTrailheadsDao extends DatabaseConnection {
 
     public static ArrayList<ImmutableStoredRouteAndTrailhead> get(ImmutableSearchQuery query) {
         String searchQuery = searchQuery(query);

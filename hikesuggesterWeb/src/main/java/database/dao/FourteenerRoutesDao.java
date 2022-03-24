@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class FourteenerRoutesDatabaseConnection extends DatabaseConnection {
+public class FourteenerRoutesDao extends DatabaseConnection {
 
     public static void insert(ImmutableStoredRoute route) {
         if (route != null) {
