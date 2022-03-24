@@ -16,11 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CliSuggestOutput {
+public class CliSuggestOutput extends CliOutput {
     private final static int LOW_CONSEQUENCE = 6;
     private final static int HIGH_CONSEQUENCE = 12;
 
-    public static void buildCliTableWeather(ImmutableSearchQuery query) {
+    public static void buildCliTable(ImmutableSearchQuery query) {
         List<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
         List<RouteForecast> forecasts = createListOfRouteForecasts(routes);
         List<TimeScore> bestTimes = getBestTimesOfAllRoutes(forecasts);

@@ -1,6 +1,7 @@
 package subcommands;
 
 import console.CliOutput;
+import console.CliSearchOutput;
 import database.models.AbstractSearchQuery;
 import database.models.ImmutableSearchQuery;
 import picocli.CommandLine;
@@ -83,7 +84,7 @@ public class SearchSubCommand implements Runnable {
     public void run() {
 //        spec.commandLine().getOut().println(setSearchQuery().createQuerySyntax());
 //        ** use to create tests
-        CliOutput.buildCliTable(setSearchQuery());
+        CliSearchOutput.buildCliTable(setSearchQuery());
     }
 
     private ImmutableSearchQuery setSearchQuery() {

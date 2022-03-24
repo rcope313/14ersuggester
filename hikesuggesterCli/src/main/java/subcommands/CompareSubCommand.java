@@ -1,6 +1,6 @@
 package subcommands;
 
-import console.CliOutput;
+import console.CliCompareOutput;
 import database.models.ImmutableCompareQuery;
 import picocli.CommandLine;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class CompareSubCommand implements Runnable {
 
     @Override
     public void run() {
-        CliOutput.buildCliTable(setCompareQuery());
+        CliCompareOutput.buildCliTable(setCompareQuery());
     }
 
     private ImmutableCompareQuery setCompareQuery() {
