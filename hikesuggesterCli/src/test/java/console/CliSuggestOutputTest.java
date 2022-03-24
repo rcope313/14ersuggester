@@ -165,6 +165,13 @@ public class CliSuggestOutputTest {
     }
 
     @Test
+    public void itBuildsCliTableWeatherInputData() {
+        List<RouteForecast> forecasts1 = new ArrayList<>(Arrays.asList(elbForecast, massForecast));
+        List<TimeScore> bestTimes = CliSuggestOutput.getBestTimesOfAllRoutes(forecasts1);
+        CliSuggestOutput.buildCliTableWeatherInputData(bestTimes);
+    }
+
+    @Test
     public void itGetsBestTimesOfAllRoutes() {
         TimeScore timeScoreMass6am = new TimeScore(massForecast, 6, 40);
         TimeScore timeScoreElb5am = new TimeScore(elbForecast, 5, 40);

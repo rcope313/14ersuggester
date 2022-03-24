@@ -24,16 +24,22 @@ public class CliSuggestOutput {
         List<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
         List<RouteForecast> forecasts = createListOfRouteForecasts(routes);
         List<TimeScore> bestTimes = getBestTimesOfAllRoutes(forecasts);
-        buildCliTableWeatherInputData(bestTimes.subList(0,4));
+        if (bestTimes.size() > 4) {
+            buildCliTableWeatherInputData(bestTimes.subList(0, 4));
+        } else {
+            buildCliTableWeatherInputData(bestTimes);
+        }
     }
 
+    @VisibleForTesting
     static void buildCliTableWeatherInputData(List<TimeScore> top5Times) {
         for (int idxRank = 0; idxRank < top5Times.size(); idxRank++) {
             cliTableWeatherDataFormatter(top5Times.get(idxRank), top5Times.get(idxRank).getTimeIndex(), idxRank);
         }
     }
 
-    static void cliTableWeatherDataFormatter(TimeScore timeScore, int idxTime, int idxRank) {
+    private static void cliTableWeatherDataFormatter(TimeScore timeScore, int idxTime, int idxRank) {
+        idxRank++;
         System.out.print("Case " + idxRank + ":" + "\n");
         System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getDate() + "\n");
         System.out.print(timeScore.getRouteForecast().getRoute().getMountainName() + "\n");
@@ -50,121 +56,89 @@ public class CliSuggestOutput {
     }
 
     private static void showHourlyWeatherStatsTemperature(TimeScore timeScore, int idxTime) {
-        if (timeScore.getRouteForecast().isHighConsequence()) {
-            while (idxTime < HIGH_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getTemperature());
-                idxTime++;
-            }
-        } else {
-            while (idxTime < LOW_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getTemperature() + ", ");
-                idxTime++;
-            }
+        System.out.print("Temperature: ");
+        int displayCount = timeScore.getRouteForecast().isHighConsequence() ? HIGH_CONSEQUENCE - 1 : LOW_CONSEQUENCE - 1;
+        while (displayCount > 0) {
+            System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getTemperature() + ", ");
+            idxTime++;
+            displayCount--;
         }
         System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getTemperature() + "\n");
     }
 
     private static void showHourlyWeatherStatsWindChill(TimeScore timeScore, int idxTime) {
-        if (timeScore.getRouteForecast().isHighConsequence()) {
-            while (idxTime < HIGH_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindChill());
-                idxTime++;
-            }
-        } else {
-            while (idxTime < LOW_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindChill() + ", ");
-                idxTime++;
-            }
+        System.out.print("Wind Chill: ");
+        int displayCount = timeScore.getRouteForecast().isHighConsequence() ? HIGH_CONSEQUENCE - 1 : LOW_CONSEQUENCE - 1;
+        while (displayCount > 0) {
+            System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindChill() + ", ");
+            idxTime++;
+            displayCount--;
         }
         System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindChill() + "\n");
     }
 
     private static void showHourlyWeatherStatsWindSpeed(TimeScore timeScore, int idxTime) {
-        if (timeScore.getRouteForecast().isHighConsequence()) {
-            while (idxTime < HIGH_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindSpeed());
-                idxTime++;
-            }
-        } else {
-            while (idxTime < LOW_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindSpeed() + ", ");
-                idxTime++;
-            }
+        System.out.print("Wind Speed: ");
+        int displayCount = timeScore.getRouteForecast().isHighConsequence() ? HIGH_CONSEQUENCE - 1 : LOW_CONSEQUENCE - 1;
+        while (displayCount > 0) {
+            System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindSpeed() + ", ");
+            idxTime++;
+            displayCount--;
         }
         System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindSpeed() + "\n");
     }
 
     private static void showHourlyWeatherStatsWindDirection(TimeScore timeScore, int idxTime) {
-        if (timeScore.getRouteForecast().isHighConsequence()) {
-            while (idxTime < HIGH_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindDirection());
-                idxTime++;
-            }
-        } else {
-            while (idxTime < LOW_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindDirection() + ", ");
-                idxTime++;
-            }
+        System.out.print("Wind Direction: ");
+        int displayCount = timeScore.getRouteForecast().isHighConsequence() ? HIGH_CONSEQUENCE - 1 : LOW_CONSEQUENCE - 1;
+        while (displayCount > 0) {
+            System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindDirection() + ", ");
+            idxTime++;
+            displayCount--;
         }
         System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getWindDirection() + "\n");
     }
 
     private static void showHourlyWeatherStatsHumidity(TimeScore timeScore, int idxTime) {
-        if (timeScore.getRouteForecast().isHighConsequence()) {
-            while (idxTime < HIGH_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getHumidity());
-                idxTime++;
-            }
-        } else {
-            while (idxTime < LOW_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getHumidity() + ", ");
-                idxTime++;
-            }
+        System.out.print("Humidity: ");
+        int displayCount = timeScore.getRouteForecast().isHighConsequence() ? HIGH_CONSEQUENCE - 1 : LOW_CONSEQUENCE - 1;
+        while (displayCount > 0) {
+            System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getHumidity() + "%, ");
+            idxTime++;
+            displayCount--;
         }
-        System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getHumidity() + "\n");
+        System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getHumidity() + "%\n");
     }
 
     private static void showHourlyWeatherStatsCloudCover(TimeScore timeScore, int idxTime) {
-        if (timeScore.getRouteForecast().isHighConsequence()) {
-            while (idxTime < HIGH_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getCloudCover());
-                idxTime++;
-            }
-        } else {
-            while (idxTime < LOW_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getCloudCover() + ", ");
-                idxTime++;
-            }
+        System.out.print("Cloud Cover: ");
+        int displayCount = timeScore.getRouteForecast().isHighConsequence() ? HIGH_CONSEQUENCE - 1 : LOW_CONSEQUENCE - 1;
+        while (displayCount > 0) {
+            System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getCloudCover() + "%, ");
+            idxTime++;
+            displayCount--;
         }
-        System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getCloudCover() + "\n");
+        System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getCloudCover() + "%\n");
     }
 
     private static void showHourlyWeatherStatsPrecipProbability(TimeScore timeScore, int idxTime) {
-        if (timeScore.getRouteForecast().isHighConsequence()) {
-            while (idxTime < HIGH_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipProbability());
-                idxTime++;
-            }
-        } else {
-            while (idxTime < LOW_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipProbability() + ", ");
-                idxTime++;
-            }
+        System.out.print("Precip Probability: ");
+        int displayCount = timeScore.getRouteForecast().isHighConsequence() ? HIGH_CONSEQUENCE - 1 : LOW_CONSEQUENCE - 1;
+        while (displayCount > 0) {
+            System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipProbability() + "%, ");
+            idxTime++;
+            displayCount--;
         }
-        System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipProbability() + "\n");
+        System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipProbability()+ "%\n");
     }
 
     private static void showHourlyWeatherStatsPrecipAmount(TimeScore timeScore, int idxTime) {
-        if (timeScore.getRouteForecast().isHighConsequence()) {
-            while (idxTime < HIGH_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipAmount());
-                idxTime++;
-            }
-        } else {
-            while (idxTime < LOW_CONSEQUENCE + idxTime - 1) {
-                System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipAmount() + ", ");
-                idxTime++;
-            }
+        System.out.print("Precip Amount: ");
+        int displayCount = timeScore.getRouteForecast().isHighConsequence() ? HIGH_CONSEQUENCE - 1 : LOW_CONSEQUENCE - 1;
+        while (displayCount > 0) {
+            System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipAmount() + ", ");
+            idxTime++;
+            displayCount--;
         }
         System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipAmount() + "\n");
     }
