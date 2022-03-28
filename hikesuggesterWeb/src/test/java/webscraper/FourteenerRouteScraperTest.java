@@ -5,6 +5,10 @@ import org.junit.Test;
 public class FourteenerRouteScraperTest {
 
     @Test
+    public void itLogsErrorBuildAllImmutableFetchedRoutes() {
+    }
+
+    @Test
     public void itConvertsTotalGainIntoInteger() {
     }
 

@@ -145,7 +145,6 @@ public class FourteenerRouteScraper {
     private static double scrapeRouteLength(HtmlTable table) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(6);
         return convertRouteLengthIntoInteger(cell.asNormalizedText());
-
     }
 
     private static String scrapeMountainName(HtmlDivision div) {

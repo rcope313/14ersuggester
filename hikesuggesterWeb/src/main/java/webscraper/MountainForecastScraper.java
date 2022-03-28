@@ -1,7 +1,6 @@
 package webscraper;
 
 import database.models.ImmutableMountainForecast;
-import database.models.ImmutableStoredRoute;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.xerces.dom.DeferredElementImpl;

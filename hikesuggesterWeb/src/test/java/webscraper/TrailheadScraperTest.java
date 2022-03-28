@@ -5,6 +5,10 @@ import org.junit.Test;
 public class TrailheadScraperTest {
 
     @Test
+    public void itLogsErrorBuildAllImmutableFetchedTrailheads() {
+    }
+
+    @Test
     public void itConvertsCoordinatesPhraseToCoordinates() {
     }
 

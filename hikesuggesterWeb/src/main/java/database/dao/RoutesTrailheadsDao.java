@@ -14,17 +14,17 @@ import java.util.StringJoiner;
 public class RoutesTrailheadsDao extends DatabaseConnection {
 
     public static ArrayList<ImmutableStoredRouteAndTrailhead> get(ImmutableSearchQuery query) {
-        String searchQuery = searchQuery(query);
+        String searchQuery = buildSearchQuery(query);
         return getStoredRoutesAndTrailheads(searchQuery);
     }
 
     public static ArrayList<ImmutableStoredRouteAndTrailhead> get(ImmutableCompareQuery query) {
-        String compareQuery = compareQuery(query);
+        String compareQuery = buildCompareQuery(query);
         return getStoredRoutesAndTrailheads(compareQuery);
     }
 
-    private static String compareQuery(ImmutableCompareQuery query) {
-        if (!query.getRouteUrls().isPresent()) {
+    private static String buildCompareQuery(ImmutableCompareQuery query) {
+        if (query.getRouteUrls().isEmpty()) {
             return "SELECT * " +
                     "FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
                     " LEFT OUTER JOIN " + HikeSuggesterDatabase.TRAILHEADS +
@@ -41,7 +41,7 @@ public class RoutesTrailheadsDao extends DatabaseConnection {
         }
     }
 
-    private static String searchQuery(ImmutableSearchQuery query) {
+    private static String buildSearchQuery(ImmutableSearchQuery query) {
         return createSelectStatementMySqlSyntax() + createWhereStatementsMySqlSyntax(query);
     }
 

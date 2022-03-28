@@ -1,21 +1,17 @@
 package dao;
 
-import database.models.AbstractSearchQuery;
+import database.models.ImmutableSearchQuery;
+import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+public class RoutesTrailheadsDaoTest {
+    ImmutableSearchQuery q0, q1, q2, q3, q4, q5, q6, q7, q8, q9;
+    String str0, str1, str2, str3, str4, str5, str6, str7, str8, str9;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-public class SearchQueryTest {
-
-    AbstractSearchQuery q0, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10;
-    String str0, str1, str2, str3, str4, str5, str6, str7, str8, str9, str10;
-
+    @Before
     public void initData() {
 
-//        q0 = new AbstractSearchQuery();
+        //        q0 = new AbstractSearchQuery();
 //        q1 = new AbstractSearchQuery();
 //            q1.setMountainNames(new ArrayList<>(Arrays.asList("Mt. Washington", "Mt. Adams", "Mt. Monroe")));
 //        q2 = new AbstractSearchQuery();
@@ -112,25 +108,30 @@ public class SearchQueryTest {
                 " WHERE fourteener_routes.fourteenerRouteId >= 0                " +
                 " AND fourteener_routes.url IN ('https://www.14ers.com/route.php?route=elbe1', 'https://www.14ers.com/route.php?route=elbe2')   " +
                 " AND trailheads.url IN ('https://www.14ers.com/php14ers/trailheadsview.php?thparm=sw01', 'https://www.14ers.com/php14ers/trailheadsview.php?thparm=sw03') ;";
-        str10 = "SELECT *" +
-                " FROM fourteener_routes" +
-                " LEFT OUTER JOIN trailheads ON fourteener_routes.trailhead = trailheads.name" +
-                " WHERE fourteenerRouteId >= 0;";
     }
 
-//    @Test
-//    public void CreateQuerySyntaxTest() {
-//        initData();
-//        assertThat(q0.createQuerySyntax()).isEqualTo(str0);
-//        assertThat(q1.createQuerySyntax()).isEqualTo(str1);
-//        assertThat(q2.createQuerySyntax()).isEqualTo(str2);
-//        assertThat(q3.createQuerySyntax()).isEqualTo(str3);
-//        assertThat(q4.createQuerySyntax()).isEqualTo(str4);
-//        assertThat(q5.createQuerySyntax()).isEqualTo(str5);
-//        assertThat(q6.createQuerySyntax()).isEqualTo(str6);
-//        assertThat(q7.createQuerySyntax()).isEqualTo(str7);
-//        assertThat(q8.createQuerySyntax()).isEqualTo(str8);
-//        assertThat(q9.createQuerySyntax()).isEqualTo(str9);
-//        assertThat(q10.createQuerySyntax()).isEqualTo(str10);
-//    }
+    @Test
+    public void itInsertsRouteIntoDatabase() {
+
+    }
+
+    @Test
+    public void itGetsRouteFromDatabase() {
+
+    }
+
+    @Test
+    public void itUpdatesRouteInDatabase() {
+
+    }
+
+    @Test
+    public void itBuildsCompareQuery() {
+
+    }
+
+    @Test
+    public void itBuildsSearchQuery() {
+
+    }
 }
