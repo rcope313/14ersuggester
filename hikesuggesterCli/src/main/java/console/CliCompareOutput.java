@@ -1,14 +1,14 @@
 package console;
 
 import database.dao.RoutesTrailheadsDao;
-import database.models.ImmutableCompareQuery;
+import database.models.CompareQuery;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import java.util.ArrayList;
 import java.util.StringJoiner;
 
 public class CliCompareOutput extends CliOutput{
 
-    public static void buildCliTable(ImmutableCompareQuery query) {
+    public static void buildCliTable(CompareQuery query) {
         buildCliTableHeaders(designateColumnFields());
         ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
         inputImmutableStoredRouteAndTrailheadsIntoCliTable(routes, designateColumnFields());

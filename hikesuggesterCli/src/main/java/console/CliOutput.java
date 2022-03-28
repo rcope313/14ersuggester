@@ -1,12 +1,7 @@
 package console;
 
-import database.dao.RoutesTrailheadsDao;
-import database.models.ImmutableCompareQuery;
-import database.models.ImmutableSearchQuery;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import models.Column;
-import webscraper.FourteenerRouteScraper;
-
 import java.util.ArrayList;
 import java.util.StringJoiner;
 

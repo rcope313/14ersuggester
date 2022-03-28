@@ -1,7 +1,7 @@
 package subcommands;
 
 import console.CliCompareOutput;
-import database.models.ImmutableCompareQuery;
+import database.models.CompareQuery;
 import picocli.CommandLine;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,13 +25,13 @@ public class CompareSubCommand implements Runnable {
         CliCompareOutput.buildCliTable(setCompareQuery());
     }
 
-    private ImmutableCompareQuery setCompareQuery() {
-        return ImmutableCompareQuery.builder()
-                .mountainName1(mountainName1)
-                .routeName1(routeName1)
-                .mountainName2(mountainName2)
-                .routeName2(routeName2)
-                .routeUrls(new ArrayList<>(Arrays.asList(routeUrls)))
-                .build();
+    private CompareQuery setCompareQuery() {
+        CompareQuery query = new CompareQuery();
+        query.setMountainName1(mountainName1);
+        query.setRouteName1(routeName1);
+        query.setMountainName2(mountainName2);
+        query.setRouteName2(routeName2);
+        query.setRouteUrls(new ArrayList<>(Arrays.asList(routeUrls)));
+        return query;
     }
 }

@@ -2,8 +2,8 @@ package console;
 
 import database.dao.RoutesTrailheadsDao;
 import database.models.ImmutableMountainForecast;
-import database.models.ImmutableSearchQuery;
 import database.models.ImmutableStoredRouteAndTrailhead;
+import database.models.SearchQuery;
 import models.RouteForecast;
 import models.TimeScore;
 import org.assertj.core.util.VisibleForTesting;
@@ -20,7 +20,7 @@ public class CliSuggestOutput extends CliOutput {
     private final static int LOW_CONSEQUENCE = 6;
     private final static int HIGH_CONSEQUENCE = 12;
 
-    public static void buildCliTable(ImmutableSearchQuery query) {
+    public static void buildCliTable(SearchQuery query) {
         List<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
         List<RouteForecast> forecasts = createListOfRouteForecasts(routes);
         List<TimeScore> bestTimes = getBestTimesOfAllRoutes(forecasts);

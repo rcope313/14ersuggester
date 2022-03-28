@@ -1,9 +1,7 @@
 package subcommands;
 
-import console.CliOutput;
 import console.CliSearchOutput;
-import database.models.AbstractSearchQuery;
-import database.models.ImmutableSearchQuery;
+import database.models.SearchQuery;
 import picocli.CommandLine;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -87,28 +85,28 @@ public class SearchSubCommand implements Runnable {
         CliSearchOutput.buildCliTable(setSearchQuery());
     }
 
-    private ImmutableSearchQuery setSearchQuery() {
-        return ImmutableSearchQuery.builder()
-                .mountainNames(new ArrayList<>(Arrays.asList(mountainNames)))
-                .routeNames(new ArrayList<>(Arrays.asList(routeNames)))
-                .isStandardRoute(isStandardRoute)
-                .isSnowRoute(isSnowRoute)
-                .grades(new ArrayList<>(Arrays.asList(grades)))
-                .gradeQualities(new ArrayList<>(Arrays.asList(gradeQualities)))
-                .trailheads(new ArrayList<>(Arrays.asList(trailheads)))
-                .startElevation(startElevation)
-                .summitElevation(summitElevation)
-                .totalGain(totalGain)
-                .routeLength(routeLength)
-                .exposure(exposure)
-                .rockfallPotential(rockfallPotential)
-                .routeFinding(routeFinding)
-                .commitment(commitment)
-                .hasMultipleRoutes(hasMultipleRoutes)
-                .routeUrls(new ArrayList<>(Arrays.asList(routeUrls)))
-                .roadDifficulties(new ArrayList<>(Arrays.asList(roadDifficulties)))
-                .trailheadUrls(new ArrayList<>(Arrays.asList(trailheadUrls)))
-                .build();
+    private SearchQuery setSearchQuery() {
+        SearchQuery query = new SearchQuery();
+        query.setMountainNames(new ArrayList<>(Arrays.asList(mountainNames)));
+        query.setRouteNames(new ArrayList<>(Arrays.asList(routeNames)));
+        query.setStandardRoute(isStandardRoute);
+        query.setSnowRoute(isSnowRoute);
+        query.setGrades(new ArrayList<>(Arrays.asList(grades)));
+        query.setGradeQualities(new ArrayList<>(Arrays.asList(gradeQualities)));
+        query.setTrailheads(new ArrayList<>(Arrays.asList(trailheads)));
+        query.setStartElevation(startElevation);
+        query.setSummitElevation(summitElevation);
+        query.setTotalGain(totalGain);
+        query.setRouteLength(routeLength);
+        query.setExposure(exposure);
+        query.setRockfallPotential(rockfallPotential);
+        query.setRouteFinding(routeFinding);
+        query.setCommitment(commitment);
+        query.setHasMultipleRoutes(hasMultipleRoutes);
+        query.setRouteUrls(new ArrayList<>(Arrays.asList(routeUrls)));
+        query.setRoadDifficulties(new ArrayList<>(Arrays.asList(roadDifficulties)));
+        query.setTrailheadUrls(new ArrayList<>(Arrays.asList(trailheadUrls)));
+        return query;
     }
 
 }
