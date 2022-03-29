@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class FourteenerRouteScraper {
-    final private static WebClient webClient = new WebClient();
+    final private WebClient webClient;
     final private static Logger LOG = LoggerFactory.getLogger(FourteenerRouteScraper.class);
     final private static String FOURTEENER_URL = "https://www.14ers.com";
     final private static String PEAK_TABLE_URL = "https://www.14ers.com/php14ers/14ers.php";
@@ -24,7 +24,11 @@ public class FourteenerRouteScraper {
     final private static String SNOW_IMAGE = "//@src='/images/icon_snowcover_large.png'";
     final private static String STANDARD_ROUTE_ALT_IMAGE = "//@alt='standard'";
 
-    public static ArrayList<ImmutableFetchedRoute> buildAllImmutableFetchedRoutes() throws Exception {
+    public FourteenerRouteScraper(WebClient webClient) {
+        this.webClient = webClient;
+    }
+
+    public ArrayList<ImmutableFetchedRoute> buildAllImmutableFetchedRoutes() throws Exception {
         HashSet<String> urlsSeen = new HashSet<>();
         ArrayList<ImmutableFetchedRoute> fourteenerRouteArrayList = new ArrayList<>();
         List<List<String>> allRouteIds = getListOfAllRouteIds();
@@ -46,7 +50,7 @@ public class FourteenerRouteScraper {
         return fourteenerRouteArrayList;
     }
 
-    public static ImmutableFetchedRoute scrapeImmutableFetchedRoute(String url) throws IOException {
+    public ImmutableFetchedRoute scrapeImmutableFetchedRoute(String url) throws IOException {
         final String fullUrl = FOURTEENER_URL + url;
         final HtmlPage page = webClient.getPage(fullUrl);
         final HtmlDivision div = (HtmlDivision) page.getByXPath(HEADER_DIV).get(0);
@@ -73,7 +77,7 @@ public class FourteenerRouteScraper {
                 .build();
     }
 
-    private static List<List<String>> getListOfAllRouteIds() throws Exception {
+    private List<List<String>> getListOfAllRouteIds() throws Exception {
         List<List<String>> listOfListOfRouteIds = new ArrayList<>();
         getListOfPeakIds().forEach((peakId) -> {
             try {
@@ -85,7 +89,7 @@ public class FourteenerRouteScraper {
         return listOfListOfRouteIds;
     }
 
-    private static List<String> getListOfRouteIDsOfPeakId(String peakId) throws IOException {
+    private List<String> getListOfRouteIDsOfPeakId(String peakId) throws IOException {
         List<String> listOfRouteIds = new ArrayList<>();
         HashSet<String> routesSeen = new HashSet<>();
         String peakIdUrl = ROUTE_LIST_URL + peakId;
@@ -108,7 +112,7 @@ public class FourteenerRouteScraper {
         }
     }
 
-    private static List<String> getListOfPeakIds() throws Exception {
+    private List<String> getListOfPeakIds() throws Exception {
         List<String> listOfPeakIds = new ArrayList<>();
         final HtmlPage page = webClient.getPage(PEAK_TABLE_URL);
         final HtmlTable table = page.getHtmlElementById(PEAK_TABLE);

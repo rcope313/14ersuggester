@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TrailheadScraper {
-    final private static WebClient webClient = new WebClient();
+    final private WebClient webClient;
     final private static Logger LOG = LoggerFactory.getLogger(TrailheadScraper.class);
     final private static String DIV_PAGE_TILE = "//div[@class='pagetitle']";
     final private static String DIV_STATS_BOX = "//div[@class='statsbox']";
@@ -19,7 +19,11 @@ public class TrailheadScraper {
     final private static String TRAILHEADS_URL = "https://www.14ers.com/php14ers/trailheadsmain.php";
     final private static String SINGLE_RANGE_DIV = "//div[@class='singlerange']//a/@href";
 
-    public static ArrayList<ImmutableFetchedTrailhead> buildAllImmutableFetchedTrailheads() throws Exception {
+    public TrailheadScraper(WebClient webClient) {
+        this.webClient = webClient;
+    }
+
+    public ArrayList<ImmutableFetchedTrailhead> buildAllImmutableFetchedTrailheads() throws Exception {
         ArrayList<String> trailHeadUrls = getTrailHeadUrlList();
         ArrayList<ImmutableFetchedTrailhead> trailHeads = new ArrayList<>();
         for (String trailheadUrl : trailHeadUrls) {
@@ -32,7 +36,7 @@ public class TrailheadScraper {
         return trailHeads;
     }
 
-    public static ImmutableFetchedTrailhead scrapeImmutableFetchedTrailhead(String url) throws Exception {
+    public ImmutableFetchedTrailhead scrapeImmutableFetchedTrailhead(String url) throws Exception {
         final HtmlPage page = webClient.getPage(url);
         final HtmlDivision pageTitle = (HtmlDivision) page.getByXPath(DIV_PAGE_TILE).get(0);
         final HtmlDivision statsBox = (HtmlDivision) page.getByXPath(DIV_STATS_BOX).get(0);
@@ -83,7 +87,7 @@ public class TrailheadScraper {
         return statsBoxAsNormalizedText.length == 11;
     }
 
-    private static ArrayList<String> getTrailHeadUrlList() throws Exception {
+    private ArrayList<String> getTrailHeadUrlList() throws Exception {
         ArrayList<String> trailHeadUrls = new ArrayList<>();
         final HtmlPage page = webClient.getPage(TRAILHEADS_URL);
         final List<DomAttr> domList = page.getByXPath(SINGLE_RANGE_DIV);

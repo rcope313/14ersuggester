@@ -1,7 +1,10 @@
 package subcommands;
 
 import console.CliCompareOutput;
+import console.CliSearchOutput;
+import database.dao.RoutesTrailheadsDao;
 import database.models.CompareQuery;
+import database.models.DatabaseConnection;
 import picocli.CommandLine;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +25,8 @@ public class CompareSubCommand implements Runnable {
 
     @Override
     public void run() {
-        CliCompareOutput.buildCliTable(setCompareQuery());
+        CliCompareOutput output = new CliCompareOutput(new RoutesTrailheadsDao(new DatabaseConnection()));
+        output.buildCliTable(setCompareQuery());
     }
 
     private CompareQuery setCompareQuery() {

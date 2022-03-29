@@ -33,7 +33,9 @@ public class MountainForecastScraper {
     private final static String NULL_VALUE_ELEMENT = "[value: null]";
     private final static String START_TIME_VALUE_ELEMENT = "[start-valid-time: null]";
 
-    public static ArrayList<ImmutableMountainForecast> buildMountainForecasts(ImmutableStoredRouteAndTrailhead route) throws Exception {
+    public MountainForecastScraper() {}
+
+    public ArrayList<ImmutableMountainForecast> buildMountainForecasts(ImmutableStoredRouteAndTrailhead route) throws Exception {
         ArrayList<ImmutableMountainForecast> mountainForecasts = new ArrayList<>();
         Document noaaXmlHourlyWeatherForecast = buildXMLDocumentFromFourteenerRoute(route);
         ArrayList<String> dateList = parseElements(TIME_LAYOUT_EXP, START_TIME_VALUE_ELEMENT, noaaXmlHourlyWeatherForecast);
@@ -63,7 +65,7 @@ public class MountainForecastScraper {
         return mountainForecasts;
     }
 
-    private static Document buildXMLDocumentFromFourteenerRoute(ImmutableStoredRouteAndTrailhead route) throws Exception {
+    private Document buildXMLDocumentFromFourteenerRoute(ImmutableStoredRouteAndTrailhead route) throws Exception {
         URL url = new URL(getNOAADwmlHourlyWeatherForecast(getNOAAHourlyWeatherForecast(getNOAASevenDayWeatherForecast(route))));
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -73,25 +75,25 @@ public class MountainForecastScraper {
         return document;
     }
 
-    private static String getNOAASevenDayWeatherForecast(ImmutableStoredRouteAndTrailhead route) throws IOException {
+    private String getNOAASevenDayWeatherForecast(ImmutableStoredRouteAndTrailhead route) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(route.getRouteUrl()).get();
         String unescapedXml = StringEscapeUtils.unescapeXml(doc.select(NOAA_HYPERLINK).get(0).attributes().toString());
         return unescapedXml.substring(24,unescapedXml.length()-1);
     }
 
-    private static String getNOAAHourlyWeatherForecast(String url) throws IOException {
+    private String getNOAAHourlyWeatherForecast(String url) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
         String unescapedXml = StringEscapeUtils.unescapeXml(doc.select(HOURLY_WEATHER_FORECAST_HYPERLINK).get(1).attributes().toString());
         return "https://forecast.weather.gov/" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
-    private static String getNOAADwmlHourlyWeatherForecast(String url) throws IOException {
+    private String getNOAADwmlHourlyWeatherForecast(String url) throws IOException {
         org.jsoup.nodes.Document doc = Jsoup.connect(url).get();
         String unescapedXml =StringEscapeUtils.unescapeXml(doc.select(DWML_HYPERLINK).get(0).attributes().toString());
         return "https:" + unescapedXml.substring(7,unescapedXml.length()-1);
     }
 
-    private static ArrayList<String> parseElements(String expression, String element, Document doc) throws XPathExpressionException {
+    private ArrayList<String> parseElements(String expression, String element, Document doc) throws XPathExpressionException {
         XPath xPath =  XPathFactory.newInstance().newXPath();
         DeferredElementImpl parentElement = (DeferredElementImpl) xPath.compile(expression).evaluate(doc, XPathConstants.NODE);
         Node aNode = parentElement.getFirstChild();

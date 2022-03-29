@@ -17,11 +17,18 @@ import java.util.List;
 import java.util.Map;
 
 public class CliSuggestOutput extends CliOutput {
+    private final RoutesTrailheadsDao dao;
+    private final MountainForecastScraper scraper;
     private final static int LOW_CONSEQUENCE = 6;
     private final static int HIGH_CONSEQUENCE = 12;
 
-    public static void buildCliTable(SearchQuery query) {
-        List<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
+    public CliSuggestOutput(RoutesTrailheadsDao dao, MountainForecastScraper scraper) {
+        this.dao = dao;
+        this.scraper = scraper;
+    }
+
+    public void buildCliTable(SearchQuery query) {
+        List<ImmutableStoredRouteAndTrailhead> routes = dao.get(query);
         List<RouteForecast> forecasts = createListOfRouteForecasts(routes);
         List<TimeScore> bestTimes = getBestTimesOfAllRoutes(forecasts);
         if (bestTimes.size() > 4) {
@@ -143,11 +150,11 @@ public class CliSuggestOutput extends CliOutput {
         System.out.print(timeScore.getRouteForecast().getSevenDayForecast().get(idxTime).getPrecipAmount() + "\n");
     }
 
-    private static List<RouteForecast> createListOfRouteForecasts(List<ImmutableStoredRouteAndTrailhead> routes) {
+    private List<RouteForecast> createListOfRouteForecasts(List<ImmutableStoredRouteAndTrailhead> routes) {
         List<RouteForecast> forecasts = new ArrayList<>();
         routes.forEach((route) -> {
             try {
-                forecasts.add(new RouteForecast(route, MountainForecastScraper.buildMountainForecasts(route)));
+                forecasts.add(new RouteForecast(route, scraper.buildMountainForecasts(route)));
             } catch (Exception e) {
                 e.printStackTrace();
             }

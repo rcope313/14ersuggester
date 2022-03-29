@@ -1,10 +1,10 @@
 package database.dao;
 
 import database.models.CompareQuery;
+import database.models.DatabaseConnection;
 import database.models.HikeSuggesterDatabase;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import database.models.SearchQuery;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,14 +12,18 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.StringJoiner;
 
-public class RoutesTrailheadsDao extends DatabaseConnection {
+public class RoutesTrailheadsDao extends Dao {
 
-    public static ArrayList<ImmutableStoredRouteAndTrailhead> get(SearchQuery query) {
+    public RoutesTrailheadsDao(DatabaseConnection conn) {
+        super(conn);
+    }
+
+    public ArrayList<ImmutableStoredRouteAndTrailhead> get(SearchQuery query) {
         String searchQuery = buildSearchQuery(query);
         return getStoredRoutesAndTrailheads(searchQuery);
     }
 
-    public static ArrayList<ImmutableStoredRouteAndTrailhead> get(CompareQuery query) {
+    public ArrayList<ImmutableStoredRouteAndTrailhead> get(CompareQuery query) {
         String compareQuery = buildCompareQuery(query);
         return getStoredRoutesAndTrailheads(compareQuery);
     }
@@ -46,9 +50,9 @@ public class RoutesTrailheadsDao extends DatabaseConnection {
         return createSelectStatementMySqlSyntax() + createWhereStatementsMySqlSyntax(query);
     }
 
-    private static ArrayList<ImmutableStoredRouteAndTrailhead> getStoredRoutesAndTrailheads(String query) {
+    private ArrayList<ImmutableStoredRouteAndTrailhead> getStoredRoutesAndTrailheads(String query) {
         ArrayList<ImmutableStoredRouteAndTrailhead> routes = new ArrayList<>();
-        try (Statement stmt = DatabaseConnection.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(query);
             while (rs.next()) {
                 routes.add(buildImmutableStoredRouteAndTrailhead(rs));

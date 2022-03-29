@@ -1,11 +1,17 @@
 package console;
 
+import database.dao.RoutesTrailheadsDao;
 import database.models.ImmutableMountainForecast;
 import database.models.ImmutableStoredRouteAndTrailhead;
+import database.models.SearchQuery;
 import models.RouteForecast;
 import models.TimeScore;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+import webscraper.MountainForecastScraper;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
@@ -13,7 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class CliSuggestOutputTest {
     ImmutableStoredRouteAndTrailhead elb, mass;
     ImmutableMountainForecast
@@ -23,6 +31,9 @@ public class CliSuggestOutputTest {
             mass12Pm, mass1Pm, mass2Pm, mass3Pm, mass4Pm, mass5Pm, mass6Pm, mass7Pm, mass8Pm, mass9Pm, mass10Pm, mass11Pm;
     ArrayList<ImmutableMountainForecast> elbOneDayForecast, massOneDayForecast;
     RouteForecast elbForecast, massForecast;
+    SearchQuery query;
+    @Mock private RoutesTrailheadsDao dbMock;
+    @Mock private MountainForecastScraper scraperMock;
 
     @Before
     public void initData() {
@@ -162,11 +173,18 @@ public class CliSuggestOutputTest {
 
         elbForecast = new RouteForecast(elb, elbOneDayForecast);
         massForecast = new RouteForecast(mass, massOneDayForecast);
+
+        query = new SearchQuery();
     }
 
     @Test
-    public void itBuildsCliTable() {
+    public void itBuildsCliTable() throws Exception {
+        when(dbMock.get(query)).thenReturn(new ArrayList<>(Arrays.asList(elb, mass)));
+        when(scraperMock.buildMountainForecasts(elb)).thenReturn(elbOneDayForecast);
+        when(scraperMock.buildMountainForecasts(mass)).thenReturn(massOneDayForecast);
 
+        CliSuggestOutput output = new CliSuggestOutput(dbMock, scraperMock);
+        output.buildCliTable(query);
     }
 
     @Test

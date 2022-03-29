@@ -1,5 +1,7 @@
 package database.dao;
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import database.models.DatabaseConnection;
 import database.models.ImmutableFetchedTrailhead;
 import database.models.ImmutableStoredTrailhead;
 import database.models.HikeSuggesterDatabase;
@@ -7,13 +9,18 @@ import webscraper.TrailheadScraper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import static database.dao.DatabaseConnection.hasUpdateDateOverWeekAgo;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
-public class TrailheadsDao {
+public class TrailheadsDao extends Dao {
 
-    public static void insert(ImmutableFetchedTrailhead trailhead) {
+    public TrailheadsDao(DatabaseConnection conn) {
+        super(conn);
+    }
+
+    public void insert(ImmutableFetchedTrailhead trailhead) {
         try {
-            DatabaseConnection.createStatement().execute(insertQuery(trailhead));
+            conn.createStatement().execute(insertQuery(trailhead));
             System.out.println("ENTRY CREATED \n");
             System.out.print("Trailhead Name: " + trailhead.getName() + "\n");
         } catch (Exception e) {
@@ -22,10 +29,10 @@ public class TrailheadsDao {
         }
     }
 
-    public static ImmutableStoredTrailhead get(ImmutableFetchedTrailhead trailhead) {
+    public ImmutableStoredTrailhead get(ImmutableFetchedTrailhead trailhead) {
         String getQuery = getQuery(trailhead);
         ImmutableStoredTrailhead storedTrailhead = null;
-        try (Statement stmt = DatabaseConnection.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(getQuery);
             while (rs.next()) {
                 storedTrailhead = buildImmutableStoredTrailhead(rs);
@@ -36,10 +43,10 @@ public class TrailheadsDao {
         return storedTrailhead;
     }
 
-    public static void update(ImmutableFetchedTrailhead trailhead) throws Exception {
+    public void update(ImmutableFetchedTrailhead trailhead) throws Exception {
         ImmutableStoredTrailhead storedTrailhead = get(trailhead);
         if (hasUpdateDateOverWeekAgo(storedTrailhead.getUpdateDate())) {
-            ImmutableFetchedTrailhead updatedTrailhead = TrailheadScraper.scrapeImmutableFetchedTrailhead(trailhead.getUrl());
+            ImmutableFetchedTrailhead updatedTrailhead = new TrailheadScraper(new WebClient()).scrapeImmutableFetchedTrailhead(trailhead.getUrl());
             DatabaseConnection.createStatement().execute(updateQuery(updatedTrailhead));
         }
     }

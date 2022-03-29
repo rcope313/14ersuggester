@@ -1,5 +1,7 @@
 package database.dao;
 
+import com.gargoylesoftware.htmlunit.WebClient;
+import database.models.DatabaseConnection;
 import database.models.ImmutableFetchedRoute;
 import database.models.ImmutableStoredRoute;
 import database.models.HikeSuggesterDatabase;
@@ -8,12 +10,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class FourteenerRoutesDao extends DatabaseConnection {
+public class FourteenerRoutesDao extends Dao {
 
-    public static void insert(ImmutableStoredRoute route) {
+    public FourteenerRoutesDao(DatabaseConnection conn) {
+        super(conn);
+    }
+
+    public void insert(ImmutableStoredRoute route) {
         if (route != null) {
             try {
-                DatabaseConnection.createStatement().execute(insertQuery(route));
+                conn.createStatement().execute(insertQuery(route));
                 System.out.println("ENTRY CREATED \n");
                 System.out.print("MountainName: " + route.getMountainName() + "\n");
                 System.out.print("Route Name: " + route.getRouteName() + "\n");
@@ -26,10 +32,10 @@ public class FourteenerRoutesDao extends DatabaseConnection {
         }
     }
 
-    public static ImmutableStoredRoute get(ImmutableFetchedRoute route) {
+    public ImmutableStoredRoute get(ImmutableFetchedRoute route) {
         String getQuery = getQuery(route);
         ImmutableStoredRoute storedRoute = null;
-        try (Statement stmt = DatabaseConnection.createStatement()) {
+        try (Statement stmt = conn.createStatement()) {
             ResultSet rs = stmt.executeQuery(getQuery);
             while (rs.next()) {
                 storedRoute = buildImmutableStoredRoute(rs);
@@ -40,10 +46,10 @@ public class FourteenerRoutesDao extends DatabaseConnection {
         return storedRoute;
     }
 
-    public static void update(ImmutableFetchedRoute route) throws Exception {
+    public void update(ImmutableFetchedRoute route) throws Exception {
         ImmutableStoredRoute storedRoute = get(route);
         if (hasUpdateDateOverWeekAgo(storedRoute.getUpdateDate())) {
-            ImmutableFetchedRoute updatedRoute = FourteenerRouteScraper.scrapeImmutableFetchedRoute(storedRoute.getUrl());
+            ImmutableFetchedRoute updatedRoute = new FourteenerRouteScraper(new WebClient()).scrapeImmutableFetchedRoute(storedRoute.getUrl());
             DatabaseConnection.createStatement().execute(updateQuery(updatedRoute));
         }
     }
@@ -124,5 +130,4 @@ public class FourteenerRoutesDao extends DatabaseConnection {
                 .updateDate(rs.getString(HikeSuggesterDatabase.ROUTE_UPDATE_DATE))
                 .build();
     }
-
 }

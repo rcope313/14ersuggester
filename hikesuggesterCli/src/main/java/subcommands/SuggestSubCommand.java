@@ -1,8 +1,12 @@
 package subcommands;
 
 import console.CliSuggestOutput;
+import database.dao.RoutesTrailheadsDao;
+import database.models.DatabaseConnection;
 import database.models.SearchQuery;
 import picocli.CommandLine;
+import webscraper.MountainForecastScraper;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -82,7 +86,8 @@ public class SuggestSubCommand implements Runnable {
     public void run() {
 //        spec.commandLine().getOut().println(setSearchQuery().createQuerySyntax());
 //        ** use to create tests
-        CliSuggestOutput.buildCliTable(setSearchQuery());
+        CliSuggestOutput output = new CliSuggestOutput(new RoutesTrailheadsDao(new DatabaseConnection()), new MountainForecastScraper());
+        output.buildCliTable(setSearchQuery());
     }
 
     private SearchQuery setSearchQuery() {

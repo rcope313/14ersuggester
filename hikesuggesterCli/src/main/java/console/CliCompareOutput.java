@@ -7,10 +7,15 @@ import java.util.ArrayList;
 import java.util.StringJoiner;
 
 public class CliCompareOutput extends CliOutput{
+    private final RoutesTrailheadsDao dao;
 
-    public static void buildCliTable(CompareQuery query) {
+    public CliCompareOutput(RoutesTrailheadsDao dao) {
+        this.dao = dao;
+    }
+
+    public void buildCliTable(CompareQuery query) {
         buildCliTableHeaders(designateColumnFields());
-        ArrayList<ImmutableStoredRouteAndTrailhead> routes = RoutesTrailheadsDao.get(query);
+        ArrayList<ImmutableStoredRouteAndTrailhead> routes = dao.get(query);
         inputImmutableStoredRouteAndTrailheadsIntoCliTable(routes, designateColumnFields());
         createDifferenceString(routes.get(0), routes.get(1));
     }
