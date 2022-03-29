@@ -9,12 +9,13 @@ public abstract class CliOutput {
 
     static ArrayList<Column> designateColumnFields() {
         ArrayList<Column> columnFields = new ArrayList<>();
-        columnFields.add(Column.MOUNTAIN_NAME);
         columnFields.add(Column.ROUTE_NAME);
+        columnFields.add(Column.MOUNTAIN_NAME);
         columnFields.add(Column.GRADE);
         columnFields.add(Column.TOTAL_GAIN);
         columnFields.add(Column.ROUTE_LENGTH);
         columnFields.add(Column.ROUTE_URL);
+        columnFields.add(Column.TRAILHEAD_URL);
         return columnFields;
     }
 
@@ -37,13 +38,18 @@ public abstract class CliOutput {
     }
 
     static void convertImmutableStoredRouteAndTrailheadIntoCliTable(ImmutableStoredRouteAndTrailhead route, ArrayList<Column> columnList) {
-        ArrayList<String> routeData = new ArrayList<>();
+        ArrayList<Object> routeData = new ArrayList<>();
         routeData.add(route.getRouteName());
         routeData.add(route.getMountainName());
-        routeData.add(String.valueOf(route.getGrade()));
-        routeData.add(String.valueOf(route.getTotalGain()));
-        routeData.add(String.valueOf(route.getRouteLength()));
+        routeData.add(route.getGrade());
+        routeData.add(route.getTotalGain());
+        routeData.add(route.getRouteLength());
         routeData.add(route.getRouteUrl());
+        if (route.getTrailheadUrl().isPresent()) {
+            routeData.add(route.getTrailheadUrl().get());
+        } else {
+            routeData.add("");
+        }
         System.out.format(cliDataFormatter(columnList), routeData.toArray());
     }
 

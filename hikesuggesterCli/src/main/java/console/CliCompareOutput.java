@@ -3,6 +3,7 @@ package console;
 import database.dao.RoutesTrailheadsDao;
 import database.models.CompareQuery;
 import database.models.ImmutableStoredRouteAndTrailhead;
+import org.assertj.core.util.VisibleForTesting;
 import java.util.ArrayList;
 import java.util.StringJoiner;
 
@@ -14,13 +15,17 @@ public class CliCompareOutput extends CliOutput{
     }
 
     public void buildCliTable(CompareQuery query) {
-        buildCliTableHeaders(designateColumnFields());
         ArrayList<ImmutableStoredRouteAndTrailhead> routes = dao.get(query);
+        if (routes.size() != 2) {
+            throw new IllegalStateException("Query did not yield two results. Please use route urls as parameters.");
+        }
+        buildCliTableHeaders(designateColumnFields());
         inputImmutableStoredRouteAndTrailheadsIntoCliTable(routes, designateColumnFields());
-        createDifferenceString(routes.get(0), routes.get(1));
+        System.out.print("\n" + createDifferenceString(routes.get(0), routes.get(1)));
     }
 
-    private static void createDifferenceString(ImmutableStoredRouteAndTrailhead route0, ImmutableStoredRouteAndTrailhead route1) {
+    @VisibleForTesting
+    static String createDifferenceString(ImmutableStoredRouteAndTrailhead route0, ImmutableStoredRouteAndTrailhead route1) {
         StringJoiner differencesStringJoiner = new StringJoiner("\n");
 
         snowRouteDiff(differencesStringJoiner, route0, route1);
@@ -37,8 +42,11 @@ public class CliCompareOutput extends CliOutput{
         commitmentDiff(differencesStringJoiner, route0, route1);
         hasMultipleRoutesDiff(differencesStringJoiner, route0, route1);
         trailheadDiff(differencesStringJoiner, route0, route1);
+        roadDifficultyDiff(differencesStringJoiner, route0, route1);
+        roadDescriptionDiff(differencesStringJoiner, route0, route1);
+        winterAccessDiff(differencesStringJoiner, route0, route1);
 
-        System.out.print(differencesStringJoiner);
+        return differencesStringJoiner.toString();
     }
 
     private static void snowRouteDiff (StringJoiner differencesStringJoiner, ImmutableStoredRouteAndTrailhead route0, ImmutableStoredRouteAndTrailhead route1) {
@@ -122,6 +130,24 @@ public class CliCompareOutput extends CliOutput{
     private static void trailheadDiff(StringJoiner differencesStringJoiner, ImmutableStoredRouteAndTrailhead route0, ImmutableStoredRouteAndTrailhead route1) {
         if (!route0.getTrailhead().equals(route1.getTrailhead())) {
             differencesStringJoiner.add("Trailhead: " + route0.getTrailhead()+ ", \n" + route1.getTrailhead());
+        }
+    }
+
+    private static void roadDifficultyDiff(StringJoiner differencesStringJoiner, ImmutableStoredRouteAndTrailhead route0, ImmutableStoredRouteAndTrailhead route1) {
+        if (!route0.getTrailhead().equals(route1.getTrailhead()) && route0.getRoadDifficulty().isPresent() && route1.getRoadDifficulty().isPresent()) {
+            differencesStringJoiner.add("Road Difficulty: " + route0.getRoadDifficulty().get() + ", " + route1.getRoadDifficulty().get());
+        }
+    }
+
+    private static void roadDescriptionDiff(StringJoiner differencesStringJoiner, ImmutableStoredRouteAndTrailhead route0, ImmutableStoredRouteAndTrailhead route1) {
+        if (route0.getRoadDescription().isPresent() && route1.getRoadDescription().isPresent()) {
+            differencesStringJoiner.add("Road Description: " + route0.getRoadDescription().get() + ", \n" + route1.getRoadDescription().get());
+        }
+    }
+
+    private static void winterAccessDiff(StringJoiner differencesStringJoiner, ImmutableStoredRouteAndTrailhead route0, ImmutableStoredRouteAndTrailhead route1) {
+        if (route0.getWinterAccess().isPresent() && route1.getWinterAccess().isPresent()) {
+            differencesStringJoiner.add("Winter Access: " + route0.getWinterAccess().get() + ", \n" + route1.getWinterAccess().get());
         }
     }
 

@@ -5,7 +5,7 @@ import database.models.HikeSuggesterDatabase;
 public enum Column {
     ROUTE_ID, ROUTE_NAME, MOUNTAIN_NAME, SNOW_ROUTE, STANDARD_ROUTE, GRADE, GRADE_QUALITY,
     START_ELEVATION, SUMMIT_ELEVATION, TOTAL_GAIN, ROUTE_LENGTH, EXPOSURE, ROCKFALL_POTENTIAL,
-    ROUTE_FINDING, COMMITMENT, MULTIPLE_ROUTES, ROUTE_URL, TRAILHEAD;
+    ROUTE_FINDING, COMMITMENT, MULTIPLE_ROUTES, ROUTE_URL, TRAILHEAD, TRAILHEAD_URL;
 
     public String getDatabaseColumn() {
         return switch (this) {
@@ -27,6 +27,7 @@ public enum Column {
             case MULTIPLE_ROUTES -> HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES;
             case ROUTE_URL -> HikeSuggesterDatabase.ROUTE_URL;
             case TRAILHEAD -> HikeSuggesterDatabase.TRAILHEAD_NAME;
+            case TRAILHEAD_URL -> HikeSuggesterDatabase.TRAILHEAD_URL;
         };
     }
 
@@ -50,6 +51,7 @@ public enum Column {
             case MULTIPLE_ROUTES -> "Multiple Routes";
             case ROUTE_URL -> "Route URL";
             case TRAILHEAD -> "Trailhead";
+            case TRAILHEAD_URL -> "Trailhead URL";
         };
     }
 
@@ -64,14 +66,14 @@ public enum Column {
             case START_ELEVATION, SUMMIT_ELEVATION, MULTIPLE_ROUTES -> "%-20";
             case TOTAL_GAIN -> "%-12";
             case EXPOSURE, COMMITMENT -> "%-13";
-            case ROUTE_URL -> "%-50";
+            case ROUTE_URL, TRAILHEAD_URL -> "%-50";
             case TRAILHEAD -> "%-40";
         };
     }
 
     public String getFormatRegex() {
         return switch (this) {
-            case ROUTE_ID, ROUTE_NAME, MOUNTAIN_NAME, GRADE_QUALITY, EXPOSURE, ROCKFALL_POTENTIAL, ROUTE_FINDING, COMMITMENT, ROUTE_URL, TRAILHEAD -> "s";
+            case ROUTE_ID, ROUTE_NAME, MOUNTAIN_NAME, GRADE_QUALITY, EXPOSURE, ROCKFALL_POTENTIAL, ROUTE_FINDING, COMMITMENT, ROUTE_URL, TRAILHEAD, TRAILHEAD_URL -> "s";
             case SNOW_ROUTE, STANDARD_ROUTE, GRADE, START_ELEVATION, SUMMIT_ELEVATION, TOTAL_GAIN, MULTIPLE_ROUTES -> "d";
             case ROUTE_LENGTH -> "f";
         };
