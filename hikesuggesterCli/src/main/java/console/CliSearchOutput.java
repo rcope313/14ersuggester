@@ -3,7 +3,6 @@ package console;
 import database.dao.RoutesTrailheadsDao;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import database.models.SearchQuery;
-
 import java.util.ArrayList;
 
 public class CliSearchOutput extends CliOutput{
