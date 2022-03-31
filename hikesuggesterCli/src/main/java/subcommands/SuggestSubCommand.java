@@ -6,6 +6,8 @@ import database.models.DatabaseConnection;
 import database.models.SearchQuery;
 import picocli.CommandLine;
 import webscraper.MountainForecastScraper;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -80,7 +82,12 @@ public class SuggestSubCommand implements Runnable {
 
     @Override
     public void run() {
-        CliSuggestOutput output = new CliSuggestOutput(new RoutesTrailheadsDao(new DatabaseConnection()), new MountainForecastScraper());
+        CliSuggestOutput output = null;
+        try {
+            output = new CliSuggestOutput(new RoutesTrailheadsDao(DatabaseConnection.getConnection()), new MountainForecastScraper());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         output.buildCliTable(setSearchQuery());
     }
 

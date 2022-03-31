@@ -1,13 +1,13 @@
 package database.dao;
 
-import database.models.DatabaseConnection;
+import java.sql.Connection;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public abstract class Dao {
-    final DatabaseConnection conn;
+    final Connection conn;
 
-    public Dao(DatabaseConnection conn) {
+    public Dao(Connection conn) {
         this.conn = conn;
     }
 

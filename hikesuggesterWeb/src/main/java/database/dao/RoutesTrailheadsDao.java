@@ -1,10 +1,10 @@
 package database.dao;
 
 import database.models.CompareQuery;
-import database.models.DatabaseConnection;
 import database.models.HikeSuggesterDatabase;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import database.models.SearchQuery;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,7 +14,7 @@ import java.util.StringJoiner;
 
 public class RoutesTrailheadsDao extends Dao {
 
-    public RoutesTrailheadsDao(DatabaseConnection conn) {
+    public RoutesTrailheadsDao(Connection conn) {
         super(conn);
     }
 

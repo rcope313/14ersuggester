@@ -1,20 +1,18 @@
 package database.dao;
 
 import com.gargoylesoftware.htmlunit.WebClient;
-import database.models.DatabaseConnection;
 import database.models.ImmutableFetchedTrailhead;
 import database.models.ImmutableStoredTrailhead;
 import database.models.HikeSuggesterDatabase;
 import webscraper.TrailheadScraper;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class TrailheadsDao extends Dao {
 
-    public TrailheadsDao(DatabaseConnection conn) {
+    public TrailheadsDao(Connection conn) {
         super(conn);
     }
 
@@ -47,7 +45,7 @@ public class TrailheadsDao extends Dao {
         ImmutableStoredTrailhead storedTrailhead = get(trailhead);
         if (hasUpdateDateOverWeekAgo(storedTrailhead.getUpdateDate())) {
             ImmutableFetchedTrailhead updatedTrailhead = new TrailheadScraper(new WebClient()).scrapeImmutableFetchedTrailhead(trailhead.getUrl());
-            DatabaseConnection.createStatement().execute(updateQuery(updatedTrailhead));
+            conn.createStatement().execute(updateQuery(updatedTrailhead));
         }
     }
 

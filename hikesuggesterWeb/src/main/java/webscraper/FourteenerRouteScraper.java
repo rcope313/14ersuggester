@@ -290,7 +290,6 @@ public class FourteenerRouteScraper {
         }
     }
 
-    @VisibleForTesting
     static String updateWithCorrectSqlSyntax(String str) {
         if (str.contains("'")) {
             return insertApostrophe(str);

@@ -52,7 +52,7 @@ public class TrailheadScraper {
     }
 
     private static String scrapeName(HtmlDivision pageTitle) {
-        return updateWithCorrectSqlSyntax(pageTitle.asNormalizedText());
+        return FourteenerRouteScraper.updateWithCorrectSqlSyntax(pageTitle.asNormalizedText());
     }
 
     private static String scrapeCoordinates(String[] statsBoxAsNormalizedText) {
@@ -72,14 +72,14 @@ public class TrailheadScraper {
     }
 
     private static String scrapeRoadDescription(String[] statsBoxAsNormalizedText) {
-        return updateWithCorrectSqlSyntax(statsBoxAsNormalizedText[6]);
+        return FourteenerRouteScraper.updateWithCorrectSqlSyntax(statsBoxAsNormalizedText[6]);
     }
 
     private static String scrapeWinterAccess(String[] statsBoxAsNormalizedText) {
         if (statsBoxContainsAllFields(statsBoxAsNormalizedText)) {
-            return updateWithCorrectSqlSyntax(statsBoxAsNormalizedText[10]);
+            return FourteenerRouteScraper.updateWithCorrectSqlSyntax(statsBoxAsNormalizedText[10]);
         } else {
-            return updateWithCorrectSqlSyntax(statsBoxAsNormalizedText[18]);
+            return FourteenerRouteScraper.updateWithCorrectSqlSyntax(statsBoxAsNormalizedText[18]);
         }
     }
 
@@ -107,25 +107,5 @@ public class TrailheadScraper {
 
     private static int convertRoadDifficultyPhraseToInt(String roadDifficultyPhrase) {
         return Integer.parseInt(roadDifficultyPhrase.split(" ")[1]);
-    }
-
-    private static String updateWithCorrectSqlSyntax(String str) {
-        if (str.contains("'")) {
-            return insertApostrophe(insertApostrophe(str));
-        } else {
-            return str;
-        }
-    }
-
-    private static String insertApostrophe (String str) {
-        String resultString = "";
-        for (Character c : str.toCharArray()) {
-            if (c.charValue() == 39) {
-                resultString = resultString + "''";
-            } else {
-                resultString = resultString + c;
-            }
-        }
-        return resultString;
     }
 }

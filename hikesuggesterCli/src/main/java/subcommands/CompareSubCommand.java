@@ -6,6 +6,8 @@ import database.dao.RoutesTrailheadsDao;
 import database.models.CompareQuery;
 import database.models.DatabaseConnection;
 import picocli.CommandLine;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -26,7 +28,12 @@ public class CompareSubCommand implements Runnable {
 
     @Override
     public void run() {
-        CliCompareOutput output = new CliCompareOutput(new RoutesTrailheadsDao(new DatabaseConnection()));
+        CliCompareOutput output = null;
+        try {
+            output = new CliCompareOutput(new RoutesTrailheadsDao(DatabaseConnection.getConnection()));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         output.buildCliTable(setCompareQuery());
     }
 

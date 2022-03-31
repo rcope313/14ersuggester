@@ -1,18 +1,18 @@
 package database.dao;
 
 import com.gargoylesoftware.htmlunit.WebClient;
-import database.models.DatabaseConnection;
 import database.models.ImmutableFetchedRoute;
 import database.models.ImmutableStoredRoute;
 import database.models.HikeSuggesterDatabase;
 import webscraper.FourteenerRouteScraper;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class FourteenerRoutesDao extends Dao {
 
-    public FourteenerRoutesDao(DatabaseConnection conn) {
+    public FourteenerRoutesDao(Connection conn) {
         super(conn);
     }
 
@@ -50,7 +50,7 @@ public class FourteenerRoutesDao extends Dao {
         ImmutableStoredRoute storedRoute = get(route);
         if (hasUpdateDateOverWeekAgo(storedRoute.getUpdateDate())) {
             ImmutableFetchedRoute updatedRoute = new FourteenerRouteScraper(new WebClient()).scrapeImmutableFetchedRoute(storedRoute.getUrl());
-            DatabaseConnection.createStatement().execute(updateQuery(updatedRoute));
+            conn.createStatement().execute(updateQuery(updatedRoute));
         }
     }
 

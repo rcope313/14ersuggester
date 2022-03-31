@@ -8,15 +8,4 @@ public class TrailheadScraperTest {
     public void itLogsErrorBuildAllImmutableFetchedTrailheads() {
     }
 
-    @Test
-    public void itConvertsCoordinatesPhraseToCoordinates() {
-    }
-
-    @Test
-    public void itConvertsRoadDifficultyPhraseToInt() {
-    }
-
-    @Test
-    public void itUpdatesStringWithCorrectSqlSyntax() {
-    }
 }

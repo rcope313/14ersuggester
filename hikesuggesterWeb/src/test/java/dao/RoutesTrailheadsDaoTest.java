@@ -1,18 +1,29 @@
 package dao;
 
+import database.dao.RoutesTrailheadsDao;
 import database.models.SearchQuery;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 public class RoutesTrailheadsDaoTest {
     SearchQuery q0, q1, q2, q3, q4, q5, q6, q7, q8, q9;
     String str0, str1, str2, str3, str4, str5, str6, str7, str8, str9;
+    Connection conn;
+
+
+    @Before
+    public void getConnection() throws SQLException {
+        conn = DriverManager.getConnection("jdbc:h2:mem:myDb", "sa", "sa");
+    }
 
     @Before
     public void initData() {
-
         q0 = new SearchQuery();
         q1 = new SearchQuery();
             q1.setMountainNames(new ArrayList<>(Arrays.asList("Mt. Washington", "Mt. Adams", "Mt. Monroe")));
@@ -111,6 +122,7 @@ public class RoutesTrailheadsDaoTest {
 
     @Test
     public void itInsertsRouteIntoDatabase() {
+        RoutesTrailheadsDao dao = new RoutesTrailheadsDao(conn);
 
     }
 
