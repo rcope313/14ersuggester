@@ -3,6 +3,7 @@ package webscraper;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.*;
 import database.models.ImmutableFetchedRoute;
+import org.assertj.core.util.VisibleForTesting;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.IOException;
@@ -136,19 +137,19 @@ public class FourteenerRouteScraper {
     private static boolean scrapeHasMultipleRoutes(HtmlTable table) {
         final HtmlTableDataCell cellTotalGain = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(5);
         final HtmlTableDataCell cellRouteLength = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(6);
-        int totalGain = convertTotalGainIntoInteger(cellTotalGain.asNormalizedText());
-        double routeLength = convertRouteLengthIntoInteger(cellRouteLength.asNormalizedText());
+        int totalGain = convertElevationIntoInteger(cellTotalGain.asNormalizedText());
+        double routeLength = convertRouteLengthIntoDouble(cellRouteLength.asNormalizedText());
         return totalGain == 0 || routeLength == 0;
     }
 
     private static int scrapeTotalGain(HtmlTable table) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(5);
-        return convertTotalGainIntoInteger(cell.asNormalizedText());
+        return convertElevationIntoInteger(cell.asNormalizedText());
     }
 
     private static double scrapeRouteLength(HtmlTable table) {
         final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(6);
-        return convertRouteLengthIntoInteger(cell.asNormalizedText());
+        return convertRouteLengthIntoDouble(cell.asNormalizedText());
     }
 
     private static String scrapeMountainName(HtmlDivision div) {
@@ -248,68 +249,65 @@ public class FourteenerRouteScraper {
         return commitment.substring(0, commitment.length() - 2);
     }
 
-    private static int convertTotalGainIntoInteger(String str) {
+    @VisibleForTesting
+    static int convertElevationIntoInteger(String str) {
         if (str.split("\n").length > 1) {
             return 0;
         }
-        return convertElevationIntoInteger(str);
-    }
-
-    private static int convertElevationIntoInteger(String str) {
-        String[] strArr = str.split(" feet");
-        char[] charArray = strArr[0].toCharArray();
-
-        if (charArray.length < 5) {
-            return (Character.getNumericValue(charArray[0]) * 100)
-                    + (Character.getNumericValue(charArray[1]) * 10)
-                    + Character.getNumericValue(charArray[2]);
-        }
-
-        else if (charArray.length < 6) {
-            return (Character.getNumericValue(charArray[0]) * 1000)
-                    + (Character.getNumericValue(charArray[2]) * 100)
-                    + (Character.getNumericValue(charArray[3]) * 10)
-                    + Character.getNumericValue(charArray[4]);
+        if (str.contains("feet")) {
+            return convertElevationIntoInteger(str.split(" feet"));
+        } else if (str.contains("ft")){
+            return convertElevationIntoInteger(str.split(" ft"));
         } else {
-            return (Character.getNumericValue(charArray[0]) * 10000)
-                    + (Character.getNumericValue(charArray[1]) * 1000)
-                    + (Character.getNumericValue(charArray[3]) * 100)
-                    + (Character.getNumericValue(charArray[4]) * 10)
-                    + Character.getNumericValue(charArray[5]);
+            return 0;
         }
     }
 
-    private static double convertRouteLengthIntoInteger(String str) {
+    private static int convertElevationIntoInteger(String[] strArray) {
+        char[] charArray = strArray[0].toCharArray();
+        int decimalPlace = 1, elevation = 0;
+
+        for (int idx = charArray.length-1; idx >= 0; idx--) {
+            if (charArray[idx] >= 48 && charArray[idx] <= 57) {
+                elevation += decimalPlace * Character.getNumericValue(charArray[idx]);
+                decimalPlace = decimalPlace * 10;
+            }
+        }
+        return elevation;
+    }
+
+    @VisibleForTesting
+    static double convertRouteLengthIntoDouble(String str) {
         if (str.split("\n").length > 1) {
             return 0;
         }
-        String[] stringArrayMiles = str.split(" miles");
-        String[] stringArrayMi = str.split(" mi");
-
-        if (stringArrayMiles.length == 1) {
-            return Double.parseDouble(stringArrayMi[0]);
+         if (str.contains("miles")) {
+            return Double.parseDouble(str.split(" miles")[0]);
+        } else if (str.contains("mi")){
+            return Double.parseDouble(str.split(" mi")[0]);
         } else {
-            return Double.parseDouble(stringArrayMiles[0]);
+            return 0;
         }
     }
 
-    private static String updateWithCorrectSqlSyntax(String str) {
+    @VisibleForTesting
+    static String updateWithCorrectSqlSyntax(String str) {
         if (str.contains("'")) {
-            return insertApostrophe(insertApostrophe(str));
+            return insertApostrophe(str);
         } else {
             return str;
         }
     }
 
-    private static String insertApostrophe (String str) {
-        String resultString = "";
+    private static String insertApostrophe(String str) {
+        StringBuilder resultString = new StringBuilder();
         for (Character c : str.toCharArray()) {
-            if (c.charValue() == 39) {
-                resultString = resultString + "''";
+            if (39 == c) {
+                resultString.append("''");
             } else {
-                resultString = resultString + c;
+                resultString.append(c);
             }
         }
-        return resultString;
+        return resultString.toString();
     }
 }
