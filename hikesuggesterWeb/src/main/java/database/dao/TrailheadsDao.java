@@ -1,16 +1,12 @@
 package database.dao;
 
-import com.gargoylesoftware.htmlunit.WebClient;
 import database.models.ImmutableFetchedTrailhead;
 import database.models.ImmutableStoredTrailhead;
 import database.models.HikeSuggesterDatabase;
-import webscraper.TrailheadScraper;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 public class TrailheadsDao extends Dao {
 
@@ -44,29 +40,6 @@ public class TrailheadsDao extends Dao {
             throw new IllegalStateException("Trailhead not in database.");
         }
         return storedTrailhead;
-    }
-
-    public void update(ImmutableFetchedTrailhead trailhead) throws Exception {
-        ImmutableStoredTrailhead storedTrailhead = get(trailhead);
-        if (hasUpdateDateOverWeekAgo(storedTrailhead.getUpdateDate())) {
-            ImmutableFetchedTrailhead updatedTrailhead = new TrailheadScraper(new WebClient()).scrapeImmutableFetchedTrailhead(trailhead.getUrl());
-            conn.createStatement().execute(updateQuery(updatedTrailhead));
-        }
-    }
-
-    private static String updateQuery(ImmutableFetchedTrailhead trailhead)  {
-        if (trailhead == null) {
-            return "SELECT * FROM " + HikeSuggesterDatabase.TRAILHEADS;
-        } else {
-            return "UPDATE " + HikeSuggesterDatabase.TRAILHEADS + "\n" +
-                    "SET " + HikeSuggesterDatabase.TRAILHEAD_NAME + " = '" + trailhead.getName() + "', \n" +
-                    HikeSuggesterDatabase.COORDINATES + " = '" + trailhead.getCoordinates() + "', \n" +
-                    HikeSuggesterDatabase.ROAD_DIFFICULTY + " = " + trailhead.getRoadDifficulty() + ", \n" +
-                    HikeSuggesterDatabase.ROAD_DESCRIPTION + " = '" + trailhead.getRoadDescription() + "', \n" +
-                    HikeSuggesterDatabase.WINTER_ACCESS + " = '" + trailhead.getWinterAccess() + "', \n" +
-                    HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE + " = '" + java.time.LocalDate.now() + "' \n" +
-                    "WHERE " + HikeSuggesterDatabase.TRAILHEAD_URL + " = '" + trailhead.getUrl() + "';";
-        }
     }
 
     private static String insertQuery(ImmutableFetchedTrailhead trailhead) {

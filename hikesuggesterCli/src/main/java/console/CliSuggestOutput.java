@@ -29,6 +29,13 @@ public class CliSuggestOutput extends CliOutput {
 
     public void buildCliTable(SearchQuery query) {
         List<ImmutableStoredRouteAndTrailhead> routes = dao.get(query);
+        routes.forEach((route) -> {
+            try {
+                dao.update(route);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         List<RouteForecast> forecasts = createListOfRouteForecasts(routes);
         List<TimeScore> bestTimes = getBestTimesOfAllRoutes(forecasts);
         if (bestTimes.size() > 4) {

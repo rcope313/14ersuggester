@@ -1,13 +1,21 @@
 package database.dao;
 
+import com.gargoylesoftware.htmlunit.WebClient;
 import database.models.CompareQuery;
 import database.models.HikeSuggesterDatabase;
+import database.models.ImmutableFetchedRoute;
+import database.models.ImmutableFetchedTrailhead;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import database.models.SearchQuery;
+import webscraper.FourteenerRouteScraper;
+import webscraper.TrailheadScraper;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -26,6 +34,58 @@ public class RoutesTrailheadsDao extends Dao {
     public ArrayList<ImmutableStoredRouteAndTrailhead> get(CompareQuery query) {
         String compareQuery = buildCompareQuery(query);
         return getStoredRoutesAndTrailheads(compareQuery);
+    }
+
+    public void update(ImmutableStoredRouteAndTrailhead routeAndTrailhead) throws Exception {
+        if (hasUpdateDateOverWeekAgo(routeAndTrailhead.getRouteUpdateDate())) {
+            ImmutableFetchedRoute updatedRoute = new FourteenerRouteScraper(new WebClient()).scrapeImmutableFetchedRoute(routeAndTrailhead.getRouteUrl());
+            conn.createStatement().execute(updateRouteQuery(updatedRoute));
+        }
+        if (hasUpdateDateOverWeekAgo(routeAndTrailhead.getTrailheadUpdateDate().get())) {
+            ImmutableFetchedTrailhead updatedTrailhead = new TrailheadScraper(new WebClient()).scrapeImmutableFetchedTrailhead(routeAndTrailhead.getTrailheadUrl().get());
+            conn.createStatement().execute(updateTrailheadQuery(updatedTrailhead));
+        }
+    }
+
+    private static String updateTrailheadQuery(ImmutableFetchedTrailhead trailhead)  {
+        if (trailhead == null) {
+            return "SELECT * FROM " + HikeSuggesterDatabase.TRAILHEADS;
+        } else {
+            return "UPDATE " + HikeSuggesterDatabase.TRAILHEADS + "\n" +
+                    "SET " + HikeSuggesterDatabase.TRAILHEAD_NAME + " = '" + trailhead.getName() + "', \n" +
+                    HikeSuggesterDatabase.COORDINATES + " = '" + trailhead.getCoordinates() + "', \n" +
+                    HikeSuggesterDatabase.ROAD_DIFFICULTY + " = " + trailhead.getRoadDifficulty() + ", \n" +
+                    HikeSuggesterDatabase.ROAD_DESCRIPTION + " = '" + trailhead.getRoadDescription() + "', \n" +
+                    HikeSuggesterDatabase.WINTER_ACCESS + " = '" + trailhead.getWinterAccess() + "', \n" +
+                    HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE + " = '" + java.time.LocalDate.now() + "' \n" +
+                    "WHERE " + HikeSuggesterDatabase.TRAILHEAD_URL + " = '" + trailhead.getUrl() + "';";
+        }
+    }
+
+    private static String updateRouteQuery(ImmutableFetchedRoute route)  {
+        if (route == null) {
+            return "SELECT * FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES;
+        } else {
+            return "UPDATE "
+                    + HikeSuggesterDatabase.FOURTEENER_ROUTES + "\n" +
+                    "SET " + HikeSuggesterDatabase.ROUTE_NAME + " = '" + route.getRouteName() + "', \n" +
+                    HikeSuggesterDatabase.MOUNTAIN_NAME + " = '" + route.getMountainName() + "', \n" +
+                    HikeSuggesterDatabase.IS_SNOW_ROUTE + " = " + route.getIsSnowRoute() + ", \n" +
+                    HikeSuggesterDatabase.IS_STANDARD_ROUTE + " = " + route.getIsStandardRoute() + ", \n" +
+                    HikeSuggesterDatabase.GRADE + " = " + route.getGrade() + ", \n" +
+                    HikeSuggesterDatabase.GRADE_QUALITY + " = '" + route.getGradeQuality() + "', \n" +
+                    HikeSuggesterDatabase.START_ELEVATION + " = " + route.getStartElevation() + ", \n" +
+                    HikeSuggesterDatabase.SUMMIT_ELEVATION + " = " + route.getSummitElevation() + ", \n" +
+                    HikeSuggesterDatabase.TOTAL_GAIN + " = " + route.getTotalGain() + ", \n" +
+                    HikeSuggesterDatabase.ROUTE_LENGTH + " = " + route.getRouteLength() + ", \n" +
+                    HikeSuggesterDatabase.ROCKFALL_POTENTIAL + " = '" + route.getRockfallPotential() + "', \n" +
+                    HikeSuggesterDatabase.ROUTE_FINDING + " = '" + route.getRouteFinding() + "', \n" +
+                    HikeSuggesterDatabase.COMMITMENT + " = '" + route.getCommitment() + "', \n" +
+                    HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES + " = " + route.getHasMultipleRoutes() + ", \n" +
+                    HikeSuggesterDatabase.ROUTE_TRAILHEAD + " = '" + route.getTrailhead() + "', \n" +
+                    HikeSuggesterDatabase.ROUTE_UPDATE_DATE + " = '" + java.time.LocalDate.now() + "' \n" +
+                    "WHERE " + HikeSuggesterDatabase.ROUTE_URL + " = '" + route.getUrl() + "';";
+        }
     }
 
     static String buildCompareQuery(CompareQuery query) {
@@ -312,6 +372,25 @@ public class RoutesTrailheadsDao extends Dao {
             return syntax + stringJoiner.toString() + ") ";
         } else {
             return "";
+        }
+    }
+
+    static boolean hasUpdateDateOverWeekAgo(String strDate) {
+        if (strDate == null) {
+            return false;
+        }
+        LocalDate currentDate = LocalDate.now();
+        LocalDate updateDate = convertStringToDate(strDate);
+        LocalDate updateDatePlusOneWeek = updateDate.plusWeeks(1);
+        return currentDate.isAfter(updateDatePlusOneWeek) || currentDate.equals(updateDatePlusOneWeek);
+    }
+
+    private static LocalDate convertStringToDate (String strDate) {
+        if (strDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
+            return LocalDate.parse(strDate, formatter);
+        } else {
+            return null;
         }
     }
 }

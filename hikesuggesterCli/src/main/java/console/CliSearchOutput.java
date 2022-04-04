@@ -15,6 +15,13 @@ public class CliSearchOutput extends CliOutput{
     public void buildCliTable(SearchQuery query) {
         buildCliTableHeaders(designateColumnFields());
         ArrayList<ImmutableStoredRouteAndTrailhead> routes = dao.get(query);
+        routes.forEach((route) -> {
+            try {
+                dao.update(route);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         inputImmutableStoredRouteAndTrailheadsIntoCliTable(routes, designateColumnFields());
     }
 }

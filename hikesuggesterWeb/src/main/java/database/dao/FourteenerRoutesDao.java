@@ -1,12 +1,8 @@
 package database.dao;
 
-import com.gargoylesoftware.htmlunit.WebClient;
 import database.models.ImmutableFetchedRoute;
 import database.models.ImmutableStoredRoute;
 import database.models.HikeSuggesterDatabase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import webscraper.FourteenerRouteScraper;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,44 +46,10 @@ public class FourteenerRoutesDao extends Dao {
         return storedRoute;
     }
 
-    public void update(ImmutableFetchedRoute route) throws Exception {
-        ImmutableStoredRoute storedRoute = get(route);
-        if (hasUpdateDateOverWeekAgo(storedRoute.getUpdateDate())) {
-            ImmutableFetchedRoute updatedRoute = new FourteenerRouteScraper(new WebClient()).scrapeImmutableFetchedRoute(storedRoute.getUrl());
-            conn.createStatement().execute(updateQuery(updatedRoute));
-        }
-    }
-
     private static String getQuery(ImmutableFetchedRoute route) {
         return "SELECT *" +
                 " FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
                 " WHERE " + HikeSuggesterDatabase.ROUTE_URL + " = '" + route.getUrl() +"' ";
-    }
-
-    private static String updateQuery(ImmutableFetchedRoute route)  {
-        if (route == null) {
-            return "SELECT * FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES;
-        } else {
-            return "UPDATE "
-                    + HikeSuggesterDatabase.FOURTEENER_ROUTES + "\n" +
-                    "SET " + HikeSuggesterDatabase.ROUTE_NAME + " = '" + route.getRouteName() + "', \n" +
-                    HikeSuggesterDatabase.MOUNTAIN_NAME + " = '" + route.getMountainName() + "', \n" +
-                    HikeSuggesterDatabase.IS_SNOW_ROUTE + " = " + route.getIsSnowRoute() + ", \n" +
-                    HikeSuggesterDatabase.IS_STANDARD_ROUTE + " = " + route.getIsStandardRoute() + ", \n" +
-                    HikeSuggesterDatabase.GRADE + " = " + route.getGrade() + ", \n" +
-                    HikeSuggesterDatabase.GRADE_QUALITY + " = '" + route.getGradeQuality() + "', \n" +
-                    HikeSuggesterDatabase.START_ELEVATION + " = " + route.getStartElevation() + ", \n" +
-                    HikeSuggesterDatabase.SUMMIT_ELEVATION + " = " + route.getSummitElevation() + ", \n" +
-                    HikeSuggesterDatabase.TOTAL_GAIN + " = " + route.getTotalGain() + ", \n" +
-                    HikeSuggesterDatabase.ROUTE_LENGTH + " = " + route.getRouteLength() + ", \n" +
-                    HikeSuggesterDatabase.ROCKFALL_POTENTIAL + " = '" + route.getRockfallPotential() + "', \n" +
-                    HikeSuggesterDatabase.ROUTE_FINDING + " = '" + route.getRouteFinding() + "', \n" +
-                    HikeSuggesterDatabase.COMMITMENT + " = '" + route.getCommitment() + "', \n" +
-                    HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES + " = " + route.getHasMultipleRoutes() + ", \n" +
-                    HikeSuggesterDatabase.ROUTE_TRAILHEAD + " = '" + route.getTrailhead() + "', \n" +
-                    HikeSuggesterDatabase.ROUTE_UPDATE_DATE + " = '" + java.time.LocalDate.now() + "' \n" +
-                    "WHERE " + HikeSuggesterDatabase.ROUTE_URL + " = '" + route.getUrl() + "';";
-        }
     }
 
     private static String insertQuery(ImmutableFetchedRoute route) {

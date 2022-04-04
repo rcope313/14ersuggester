@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -402,9 +401,9 @@ public class DaoTest {
         dao.insert(graysFetched);
         ImmutableStoredRoute storedElbRoute = dao.get(elbFetched1);
         ImmutableStoredRoute storedGraysRoute = dao.get(graysFetched);
-        assertThat(FourteenerRoutesDao.hasUpdateDateOverWeekAgo(storedElbRoute.getUpdateDate())).isFalse();
-        assertThat(FourteenerRoutesDao.hasUpdateDateOverWeekAgo(storedGraysRoute.getUpdateDate())).isFalse();
-        assertThat(FourteenerRoutesDao.hasUpdateDateOverWeekAgo(graysStored.getUpdateDate())).isTrue();
+        assertThat(RoutesTrailheadsDao.hasUpdateDateOverWeekAgo(storedElbRoute.getUpdateDate())).isFalse();
+        assertThat(RoutesTrailheadsDao.hasUpdateDateOverWeekAgo(storedGraysRoute.getUpdateDate())).isFalse();
+        assertThat(RoutesTrailheadsDao.hasUpdateDateOverWeekAgo(graysStored.getUpdateDate())).isTrue();
     }
 
     @Test
@@ -428,8 +427,8 @@ public class DaoTest {
         dao.insert(argentineFetched);
         ImmutableStoredTrailhead storedNorthElbTrailhead = dao.get(elbNorthFetched);
         ImmutableStoredTrailhead storedArgentineTrailhead = dao.get(argentineFetched);
-        assertThat(FourteenerRoutesDao.hasUpdateDateOverWeekAgo(storedNorthElbTrailhead.getUpdateDate())).isFalse();
-        assertThat(FourteenerRoutesDao.hasUpdateDateOverWeekAgo(storedArgentineTrailhead.getUpdateDate())).isFalse();
-        assertThat(FourteenerRoutesDao.hasUpdateDateOverWeekAgo(argentineStored.getUpdateDate())).isTrue();
+        assertThat(RoutesTrailheadsDao.hasUpdateDateOverWeekAgo(storedNorthElbTrailhead.getUpdateDate())).isFalse();
+        assertThat(RoutesTrailheadsDao.hasUpdateDateOverWeekAgo(storedArgentineTrailhead.getUpdateDate())).isFalse();
+        assertThat(RoutesTrailheadsDao.hasUpdateDateOverWeekAgo(argentineStored.getUpdateDate())).isTrue();
     }
 }

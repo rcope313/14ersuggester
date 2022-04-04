@@ -16,6 +16,13 @@ public class CliCompareOutput extends CliOutput{
 
     public void buildCliTable(CompareQuery query) {
         ArrayList<ImmutableStoredRouteAndTrailhead> routes = dao.get(query);
+        routes.forEach((route) -> {
+            try {
+                dao.update(route);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
         if (routes.size() != 2) {
             throw new IllegalStateException("Query did not yield two results. Please use route urls as parameters.");
         }
