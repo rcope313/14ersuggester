@@ -4,6 +4,8 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import database.models.ImmutableFetchedRoute;
 import database.models.ImmutableStoredRoute;
 import database.models.HikeSuggesterDatabase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webscraper.FourteenerRouteScraper;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -16,18 +18,17 @@ public class FourteenerRoutesDao extends Dao {
         super(conn);
     }
 
-    public void insert(ImmutableStoredRoute route) {
+    public void insert(ImmutableFetchedRoute route) {
         if (route != null) {
             try {
                 conn.createStatement().execute(insertQuery(route));
+                System.out.print("MountainName: " + route.getMountainName() + "\n");
+                System.out.print("Route Name: " + route.getRouteName() + "\n");
                 System.out.println("ENTRY CREATED \n");
-                System.out.print("MountainName: " + route.getMountainName() + "\n");
-                System.out.print("Route Name: " + route.getRouteName() + "\n");
-
             } catch (Exception e) {
-                System.out.print("DUPLICATE ENTRY IGNORED \n");
                 System.out.print("MountainName: " + route.getMountainName() + "\n");
                 System.out.print("Route Name: " + route.getRouteName() + "\n");
+                System.out.print("ENTRY IGNORED \n");
             }
         }
     }
@@ -43,6 +44,9 @@ public class FourteenerRoutesDao extends Dao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        if (storedRoute == null) {
+            throw new IllegalStateException("Route not in database.");
+        }
         return storedRoute;
     }
 
@@ -57,7 +61,7 @@ public class FourteenerRoutesDao extends Dao {
     private static String getQuery(ImmutableFetchedRoute route) {
         return "SELECT *" +
                 " FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
-                " WHERE " + HikeSuggesterDatabase.ROUTE_URL + " = " + route.getUrl();
+                " WHERE " + HikeSuggesterDatabase.ROUTE_URL + " = '" + route.getUrl() +"' ";
     }
 
     private static String updateQuery(ImmutableFetchedRoute route)  {
@@ -86,8 +90,10 @@ public class FourteenerRoutesDao extends Dao {
         }
     }
 
-    private static String insertQuery(ImmutableStoredRoute route) {
-        return "INSERT INTO " + HikeSuggesterDatabase.FOURTEENER_ROUTES + " VALUES (" +
+    private static String insertQuery(ImmutableFetchedRoute route) {
+        return "INSERT INTO " +
+                HikeSuggesterDatabase.getColumnNamesFourteenerRoutesTable() +
+                " VALUES ('" +
                 route.getRouteName() + "', '" +
                 route.getMountainName() + "', " +
                 route.getIsSnowRoute() + ", " +
@@ -98,13 +104,14 @@ public class FourteenerRoutesDao extends Dao {
                 route.getSummitElevation() + ", " +
                 route.getTotalGain() + ", " +
                 route.getRouteLength() + ", '" +
-                route.getExposure() + "', " +
+                route.getExposure() + "', '" +
                 route.getRockfallPotential() + "', '" +
                 route.getRouteFinding() + "', '" +
                 route.getCommitment() + "', " +
                 route.getHasMultipleRoutes() + ", '" +
                 route.getUrl() + "', '" +
-                route.getTrailhead() + "')";
+                route.getTrailhead() + "', '" +
+                java.time.LocalDate.now() + "')";
     }
 
     private static ImmutableStoredRoute buildImmutableStoredRoute(ResultSet rs) throws SQLException {
@@ -116,7 +123,7 @@ public class FourteenerRoutesDao extends Dao {
                 .isStandardRoute(rs.getInt(HikeSuggesterDatabase.IS_STANDARD_ROUTE) == 1)
                 .grade(rs.getInt(HikeSuggesterDatabase.GRADE))
                 .gradeQuality(rs.getString(HikeSuggesterDatabase.GRADE_QUALITY))
-                .trailhead(rs.getString(HikeSuggesterDatabase.TRAILHEAD_NAME))
+                .trailhead(rs.getString(HikeSuggesterDatabase.ROUTE_TRAILHEAD))
                 .startElevation(rs.getInt(HikeSuggesterDatabase.START_ELEVATION))
                 .summitElevation(rs.getInt(HikeSuggesterDatabase.SUMMIT_ELEVATION))
                 .totalGain(rs.getInt(HikeSuggesterDatabase.TOTAL_GAIN))

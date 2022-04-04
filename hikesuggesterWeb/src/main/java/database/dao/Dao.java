@@ -21,7 +21,7 @@ public abstract class Dao {
         return currentDate.isAfter(updateDatePlusOneWeek) || currentDate.equals(updateDatePlusOneWeek);
     }
 
-    static LocalDate convertStringToDate (String strDate) {
+    private static LocalDate convertStringToDate (String strDate) {
         if (strDate != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE;
             return LocalDate.parse(strDate, formatter);
@@ -29,4 +29,5 @@ public abstract class Dao {
             return null;
         }
     }
+
 }

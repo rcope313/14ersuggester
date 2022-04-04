@@ -31,4 +31,40 @@ public class HikeSuggesterDatabase {
     public final static String WINTER_ACCESS = "trailheads.winterAccess";
     public final static String TRAILHEAD_URL = "trailheads.url";
     public final static String TRAILHEAD_UPDATE_DATE = "trailheads.updateDate";
+
+    public static String getColumnNamesFourteenerRoutesTable() {
+        return FOURTEENER_ROUTES +
+                " ("
+                + ROUTE_NAME.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + MOUNTAIN_NAME.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + IS_SNOW_ROUTE.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + IS_STANDARD_ROUTE.substring(FOURTEENER_ROUTES.length() + 1)+ ", "
+                + GRADE.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + GRADE_QUALITY.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + START_ELEVATION.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + SUMMIT_ELEVATION.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + TOTAL_GAIN.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + ROUTE_LENGTH.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + EXPOSURE.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + ROCKFALL_POTENTIAL.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + ROUTE_FINDING.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + COMMITMENT.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + HAS_MULTIPLE_ROUTES.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + ROUTE_URL.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + ROUTE_TRAILHEAD.substring(FOURTEENER_ROUTES.length() + 1) + ", "
+                + ROUTE_UPDATE_DATE.substring(FOURTEENER_ROUTES.length() + 1) + ")";
+    }
+
+    public static String getColumnNamesTrailheadsTable() {
+        return TRAILHEADS +
+                " ("
+                + TRAILHEAD_NAME.substring(TRAILHEADS.length() + 1) + ", "
+                + COORDINATES.substring(TRAILHEADS.length() + 1) + ", "
+                + ROAD_DIFFICULTY.substring(TRAILHEADS.length() + 1) + ", "
+                + ROAD_DESCRIPTION.substring(TRAILHEADS.length() + 1) + ", "
+                + WINTER_ACCESS.substring(TRAILHEADS.length() + 1) + ", "
+                + TRAILHEAD_URL.substring(TRAILHEADS.length() + 1) + ", "
+                + TRAILHEAD_UPDATE_DATE.substring(TRAILHEADS.length() + 1) + ")";
+    }
+
 }

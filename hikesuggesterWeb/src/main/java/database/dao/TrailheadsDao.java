@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class TrailheadsDao extends Dao {
 
@@ -38,6 +40,9 @@ public class TrailheadsDao extends Dao {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        if (storedTrailhead == null) {
+            throw new IllegalStateException("Trailhead not in database.");
+        }
         return storedTrailhead;
     }
 
@@ -65,19 +70,22 @@ public class TrailheadsDao extends Dao {
     }
 
     private static String insertQuery(ImmutableFetchedTrailhead trailhead) {
-        return "INSERT INTO " + HikeSuggesterDatabase.TRAILHEADS + " VALUES ('" +
+        return "INSERT INTO " +
+                HikeSuggesterDatabase.getColumnNamesTrailheadsTable()  +
+                " VALUES ('" +
                 trailhead.getName() + "', '" +
                 trailhead.getCoordinates() + "', " +
                 trailhead.getRoadDifficulty() + ", '" +
                 trailhead.getRoadDescription() + "', '" +
                 trailhead.getWinterAccess() + "', '" +
-                trailhead.getUrl() + "')";
+                trailhead.getUrl() + "', '" +
+                java.time.LocalDate.now() + "')";
     }
 
     private static String getQuery(ImmutableFetchedTrailhead trailhead) {
         return "SELECT *" +
                 " FROM " + HikeSuggesterDatabase.TRAILHEADS +
-                " WHERE " + HikeSuggesterDatabase.TRAILHEAD_URL + " = " + trailhead.getUrl();
+                " WHERE " + HikeSuggesterDatabase.TRAILHEAD_URL + " = '" + trailhead.getUrl() + "' ";
     }
 
     private static ImmutableStoredTrailhead buildImmutableStoredTrailhead(ResultSet rs) throws SQLException {

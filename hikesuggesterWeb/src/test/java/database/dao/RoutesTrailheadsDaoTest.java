@@ -1,4 +1,4 @@
-package dao;
+package database.dao;
 
 import database.dao.RoutesTrailheadsDao;
 import database.models.SearchQuery;
@@ -15,7 +15,6 @@ public class RoutesTrailheadsDaoTest {
     SearchQuery q0, q1, q2, q3, q4, q5, q6, q7, q8, q9;
     String str0, str1, str2, str3, str4, str5, str6, str7, str8, str9;
     Connection conn;
-
 
     @Before
     public void getConnection() throws SQLException {

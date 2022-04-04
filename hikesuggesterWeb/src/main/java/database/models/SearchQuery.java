@@ -20,7 +20,7 @@ public class SearchQuery {
     private String commitment;
     private boolean hasMultipleRoutes;
     private ArrayList<String> routeUrls;
-    private ArrayList<String> trrailheadCoordinates;
+    private ArrayList<String> trailheadCoordinates;
     private ArrayList<Integer> roadDifficulties;
     private ArrayList<String> trailheadUrls;
 
@@ -160,12 +160,12 @@ public class SearchQuery {
         this.routeUrls = routeUrls;
     }
 
-    public ArrayList<String> getTrrailheadCoordinates() {
-        return trrailheadCoordinates;
+    public ArrayList<String> getTrailheadCoordinates() {
+        return trailheadCoordinates;
     }
 
-    public void setTrrailheadCoordinates(ArrayList<String> trrailheadCoordinates) {
-        this.trrailheadCoordinates = trrailheadCoordinates;
+    public void setTrailheadCoordinates(ArrayList<String> trailheadCoordinates) {
+        this.trailheadCoordinates = trailheadCoordinates;
     }
 
     public ArrayList<Integer> getRoadDifficulties() {

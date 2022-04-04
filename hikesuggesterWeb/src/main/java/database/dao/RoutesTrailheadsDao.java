@@ -28,21 +28,23 @@ public class RoutesTrailheadsDao extends Dao {
         return getStoredRoutesAndTrailheads(compareQuery);
     }
 
-    private static String buildCompareQuery(CompareQuery query) {
-        if (query.getRouteUrls().isEmpty()) {
-            return "SELECT * " +
-                    "FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
-                    " LEFT OUTER JOIN " + HikeSuggesterDatabase.TRAILHEADS +
-                    " ON " + HikeSuggesterDatabase.ROUTE_TRAILHEAD + " = " + HikeSuggesterDatabase.TRAILHEAD_NAME  +
-                    " WHERE " + HikeSuggesterDatabase.MOUNTAIN_NAME + " IN ('" + query.getMountainName1() + "', '" + query.getMountainName2() + "')" +
-                    " AND " + HikeSuggesterDatabase.ROUTE_NAME + " IN ('" + query.getRouteName1() + "', '" + query.getRouteName2() + "');";
-
-        } else {
+    static String buildCompareQuery(CompareQuery query) {
+        if (query.getRouteUrls() != null && query.getRouteUrls().size() == 2) {
             return "SELECT * " +
                     "FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
                     " LEFT OUTER JOIN " + HikeSuggesterDatabase.TRAILHEADS +
                     " ON " + HikeSuggesterDatabase.ROUTE_TRAILHEAD + " = " + HikeSuggesterDatabase.TRAILHEAD_NAME +
                     " WHERE " + HikeSuggesterDatabase.ROUTE_URL + " IN ('" + query.getRouteUrls().get(0) + "', '" + query.getRouteUrls().get(1) + "');";
+        }
+        else if (query.getMountainName1() == null || query.getMountainName2() == null || query.getRouteName1() == null || query.getRouteName2() == null) {
+            throw new IllegalStateException("Incomplete query. Please enter both route names and mountain names, or route urls only.");
+        } else {
+            return "SELECT * " +
+                    "FROM " + HikeSuggesterDatabase.FOURTEENER_ROUTES +
+                    " LEFT OUTER JOIN " + HikeSuggesterDatabase.TRAILHEADS +
+                    " ON " + HikeSuggesterDatabase.ROUTE_TRAILHEAD + " = " + HikeSuggesterDatabase.TRAILHEAD_NAME +
+                    " WHERE " + HikeSuggesterDatabase.MOUNTAIN_NAME + " IN ('" + query.getMountainName1() + "', '" + query.getMountainName2() + "')" +
+                    " AND " + HikeSuggesterDatabase.ROUTE_NAME + " IN ('" + query.getRouteName1() + "', '" + query.getRouteName2() + "');";
         }
     }
 
@@ -64,6 +66,10 @@ public class RoutesTrailheadsDao extends Dao {
     }
 
     private static ImmutableStoredRouteAndTrailhead buildImmutableStoredRouteAndTrailhead(ResultSet rs) throws SQLException {
+        Optional<Integer> trailheadId, roadDifficulty;
+        trailheadId = rs.getInt(HikeSuggesterDatabase.TRAILHEAD_ID) == 0 ? Optional.empty() : Optional.of(rs.getInt(HikeSuggesterDatabase.TRAILHEAD_ID));
+        roadDifficulty = rs.getInt(HikeSuggesterDatabase.ROAD_DIFFICULTY) == 0 ? Optional.empty() : Optional.of(rs.getInt(HikeSuggesterDatabase.ROAD_DIFFICULTY));
+
         return ImmutableStoredRouteAndTrailhead.builder()
                 .routeId(rs.getInt(HikeSuggesterDatabase.FOURTEENER_ROUTE_ID))
                 .mountainName(rs.getString(HikeSuggesterDatabase.MOUNTAIN_NAME))
@@ -83,13 +89,14 @@ public class RoutesTrailheadsDao extends Dao {
                 .hasMultipleRoutes(rs.getInt(HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES) == 1)
                 .routeUrl(rs.getString(HikeSuggesterDatabase.ROUTE_URL))
                 .routeUpdateDate(rs.getString(HikeSuggesterDatabase.ROUTE_UPDATE_DATE))
-                .trailhead(rs.getString(HikeSuggesterDatabase.TRAILHEAD_NAME))
-                .trailheadId(Optional.of(rs.getInt(HikeSuggesterDatabase.TRAILHEAD_NAME)))
-                .roadDescription(Optional.of(rs.getString(HikeSuggesterDatabase.ROAD_DESCRIPTION)))
-                .roadDifficulty(Optional.of(rs.getInt(HikeSuggesterDatabase.ROAD_DIFFICULTY)))
-                .trailheadCoordinates(Optional.of(rs.getString(HikeSuggesterDatabase.COORDINATES)))
-                .trailheadUpdateDate(Optional.of(rs.getString(HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE)))
-                .trailheadUrl(Optional.of(rs.getString(HikeSuggesterDatabase.TRAILHEAD_URL)))
+                .trailhead(rs.getString(HikeSuggesterDatabase.ROUTE_TRAILHEAD))
+                .trailheadId(trailheadId)
+                .roadDescription(Optional.ofNullable(rs.getString(HikeSuggesterDatabase.ROAD_DESCRIPTION)))
+                .roadDifficulty(roadDifficulty)
+                .winterAccess(Optional.ofNullable(rs.getString(HikeSuggesterDatabase.WINTER_ACCESS)))
+                .trailheadCoordinates(Optional.ofNullable(rs.getString(HikeSuggesterDatabase.COORDINATES)))
+                .trailheadUpdateDate(Optional.ofNullable(rs.getString(HikeSuggesterDatabase.TRAILHEAD_UPDATE_DATE)))
+                .trailheadUrl(Optional.ofNullable(rs.getString(HikeSuggesterDatabase.TRAILHEAD_URL)))
                 .build();
     }
 
@@ -152,7 +159,7 @@ public class RoutesTrailheadsDao extends Dao {
 
     private static CharSequence createIsSnowRouteMySqlSyntax(SearchQuery query) {
         if (query.isSnowRoute()) {
-            return "AND " + HikeSuggesterDatabase.IS_SNOW_ROUTE + " = true";
+            return "AND " + HikeSuggesterDatabase.IS_SNOW_ROUTE + " = 1";
         } else {
             return "";
         }
@@ -160,7 +167,7 @@ public class RoutesTrailheadsDao extends Dao {
 
     private static CharSequence createIsStandardRouteMySqlSyntax(SearchQuery query) {
         if (query.isStandardRoute()) {
-            return "AND " + HikeSuggesterDatabase.IS_STANDARD_ROUTE + " = true";
+            return "AND " + HikeSuggesterDatabase.IS_STANDARD_ROUTE + " = 1";
         } else {
             return "";
         }
@@ -189,7 +196,7 @@ public class RoutesTrailheadsDao extends Dao {
     }
 
     private static CharSequence createTrailheadsMySqlSyntax(SearchQuery query) {
-        String syntax = "AND " + HikeSuggesterDatabase.TRAILHEAD_NAME + " IN (";
+        String syntax = "AND " + HikeSuggesterDatabase.ROUTE_TRAILHEAD + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getTrailheads() != null) {
             query.getTrailheads().forEach((trailhead) -> stringJoiner.add("'" + trailhead + "'"));
@@ -269,7 +276,7 @@ public class RoutesTrailheadsDao extends Dao {
 
     private static CharSequence createHasMultipleRoutesMySqlSyntax(SearchQuery query) {
         if (query.isHasMultipleRoutes()) {
-            return "AND " + HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES + " = true";
+            return "AND " + HikeSuggesterDatabase.HAS_MULTIPLE_ROUTES + " = 1";
         } else {
             return "";
         }
