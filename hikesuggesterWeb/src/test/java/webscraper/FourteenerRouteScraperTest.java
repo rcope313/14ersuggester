@@ -6,10 +6,6 @@ import org.junit.Test;
 public class FourteenerRouteScraperTest {
 
     @Test
-    public void itLogsErrorBuildAllImmutableFetchedRoutes() {
-    }
-
-    @Test
     public void itConvertsElevationIntoInteger() {
         String str1 = "1200 feet";
         String str2 = "1200 ft";

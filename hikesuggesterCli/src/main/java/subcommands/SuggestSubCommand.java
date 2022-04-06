@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @CommandLine.Command(name = "suggest", mixinStandardHelpOptions = true)
 public class SuggestSubCommand implements Runnable {

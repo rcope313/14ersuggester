@@ -9,7 +9,6 @@ import database.models.ImmutableStoredRouteAndTrailhead;
 import database.models.SearchQuery;
 import webscraper.FourteenerRouteScraper;
 import webscraper.TrailheadScraper;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.logging.Level;
 
 public class RoutesTrailheadsDao extends Dao {
 
@@ -38,8 +38,10 @@ public class RoutesTrailheadsDao extends Dao {
 
     public void update(ImmutableStoredRouteAndTrailhead routeAndTrailhead) throws Exception {
         if (hasUpdateDateOverWeekAgo(routeAndTrailhead.getRouteUpdateDate())) {
-            ImmutableFetchedRoute updatedRoute = new FourteenerRouteScraper(new WebClient()).scrapeImmutableFetchedRoute(routeAndTrailhead.getRouteUrl());
-            conn.createStatement().execute(updateRouteQuery(updatedRoute));
+            Optional<ImmutableFetchedRoute> updatedRoute = new FourteenerRouteScraper(new WebClient()).scrapeImmutableFetchedRoute(routeAndTrailhead.getRouteUrl());
+            if (updatedRoute.isPresent()) {
+                conn.createStatement().execute(updateRouteQuery(updatedRoute.get()));
+            }
         }
         if (hasUpdateDateOverWeekAgo(routeAndTrailhead.getTrailheadUpdateDate().get())) {
             ImmutableFetchedTrailhead updatedTrailhead = new TrailheadScraper(new WebClient()).scrapeImmutableFetchedTrailhead(routeAndTrailhead.getTrailheadUrl().get());

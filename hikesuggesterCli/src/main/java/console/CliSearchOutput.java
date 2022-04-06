@@ -4,6 +4,7 @@ import database.dao.RoutesTrailheadsDao;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import database.models.SearchQuery;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 public class CliSearchOutput extends CliOutput{
     private final RoutesTrailheadsDao dao;

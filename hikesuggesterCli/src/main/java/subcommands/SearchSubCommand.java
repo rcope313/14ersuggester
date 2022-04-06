@@ -6,11 +6,11 @@ import database.models.DatabaseConnection;
 import database.models.SearchQuery;
 import org.assertj.core.util.VisibleForTesting;
 import picocli.CommandLine;
-
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @CommandLine.Command(name = "search", mixinStandardHelpOptions = true)
 public class SearchSubCommand implements Runnable {

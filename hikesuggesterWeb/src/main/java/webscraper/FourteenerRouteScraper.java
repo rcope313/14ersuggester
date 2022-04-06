@@ -10,28 +10,43 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 public class FourteenerRouteScraper {
     final private WebClient webClient;
     final private static Logger LOG = LoggerFactory.getLogger(FourteenerRouteScraper.class);
-    final private static String FOURTEENER_URL = "https://www.14ers.com";
     final private static String PEAK_TABLE_URL = "https://www.14ers.com/php14ers/14ers.php";
     final private static String ROUTE_LIST_URL = "https://www.14ers.com/routelist.php";
     final private static String ROUTE_RESULTS = "routeResults";
     final private static String PEAK_TABLE = "peakTable";
     final private static String HEADER_DIV = "//div[@class='BldHdr2 bold1']";
-    final private static String ROUTE_STATS_TABLE = "//table[@class='routestatsbox'";
-    final private static String ROUTE_STATS_CELL = "//td[@class='data_box_cell2']";
     final private static String SNOW_IMAGE = "//@src='/images/icon_snowcover_large.png'";
     final private static String STANDARD_ROUTE_ALT_IMAGE = "//@alt='standard'";
+    final private static String MOUNTAIN_NAME_XPATH = "//*[@id='wrap']/div[6]/span/text()";
+    final private static String ROUTE_NAME_XPATH = "//*[@id='wrap']/div[6]/text()";
+    final private static String TOTAL_GAIN_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[6]/td[2]";
+    final private static String ROUTE_LENGTH_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[7]/td[2]";
+    final private static String START_ELEVATION_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[4]/td[2]";
+    final private static String SUMMIT_ELEVATION_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[5]/td[2]";
+    final private static String GRADE_XPATH= "//*[@id='statsColumn1']/table/tbody/tr[1]/td[2]/div/span";
+    final private static String TRAILHEAD_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[3]/td[2]/a";
+    final private static String EXPOSURE_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[2]/td[2]/span[1]";
+    final private static String ROCKFALL_POTENTIAL_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[2]/td[2]/span[2]";
+    final private static String ROUTE_FINDING_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[2]/td[2]/span[3]";
+    final private static String COMMITMENT_XPATH = "//*[@id='statsColumn1']/table/tbody/tr[2]/td[2]/span[4]";
 
     public FourteenerRouteScraper(WebClient webClient) {
         this.webClient = webClient;
     }
 
-    public ArrayList<ImmutableFetchedRoute> buildAllImmutableFetchedRoutes() throws Exception {
+    public static void main(String[] args) throws IOException {
+        FourteenerRouteScraper scraper = new FourteenerRouteScraper(new WebClient());
+        System.out.print(scraper.scrapeImmutableFetchedRoute("https://www.14ers.com/route.php?route=elbe1"));
+    }
+
+    public ArrayList<Optional<ImmutableFetchedRoute>> buildAllImmutableFetchedRoutes() throws Exception {
         HashSet<String> urlsSeen = new HashSet<>();
-        ArrayList<ImmutableFetchedRoute> fourteenerRouteArrayList = new ArrayList<>();
+        ArrayList<Optional<ImmutableFetchedRoute>> fourteenerRouteArrayList = new ArrayList<>();
         List<List<String>> allRouteIds = getListOfAllRouteIds();
         for (List<String> routeIdsByMountain : allRouteIds) {
             for (String routeId : routeIdsByMountain) {
@@ -51,31 +66,36 @@ public class FourteenerRouteScraper {
         return fourteenerRouteArrayList;
     }
 
-    public ImmutableFetchedRoute scrapeImmutableFetchedRoute(String url) throws IOException {
-        final String fullUrl = FOURTEENER_URL + url;
-        final HtmlPage page = webClient.getPage(fullUrl);
+    public Optional<ImmutableFetchedRoute> scrapeImmutableFetchedRoute(String url) throws IOException {
+        final HtmlPage page = webClient.getPage(url);
         final HtmlDivision div = (HtmlDivision) page.getByXPath(HEADER_DIV).get(0);
-        final HtmlTable table = (HtmlTable) page.getByXPath(ROUTE_STATS_TABLE).get(0);
+        Optional<ImmutableFetchedRoute> route = Optional.empty();
 
-        return ImmutableFetchedRoute.builder()
-                .mountainName(scrapeMountainName(div))
-                .routeName(scrapeRouteName(div))
-                .isSnowRoute(scrapeSnowRouteOnly(div))
-                .isStandardRoute(scrapeStandardRoute(div))
-                .grade(scrapeGrade(table))
-                .gradeQuality(scrapeGradeQuality(table))
-                .trailhead(scrapeTrailhead(table))
-                .startElevation(scrapeStartElevation(table))
-                .summitElevation(scrapeSummitElevation(table))
-                .totalGain(scrapeTotalGain(table))
-                .routeLength(scrapeRouteLength(table))
-                .exposure(scrapeExposure(table))
-                .rockfallPotential(scrapeRockfallPotential(table))
-                .routeFinding(scrapeRouteFinding(table))
-                .commitment(scrapeCommitment(table))
-                .hasMultipleRoutes(scrapeHasMultipleRoutes(table))
-                .url(fullUrl)
-                .build();
+        try {
+            route = Optional.of(ImmutableFetchedRoute.builder()
+                    .mountainName(scrapeMountainName(page))
+                    .routeName(scrapeRouteName(page))
+                    .isSnowRoute(scrapeSnowRouteOnly(div))
+                    .isStandardRoute(scrapeStandardRoute(div))
+                    .grade(scrapeGrade(page))
+                    .gradeQuality(scrapeGradeQuality(page))
+                    .trailhead(scrapeTrailhead(page))
+                    .startElevation(scrapeStartElevation(page))
+                    .summitElevation(scrapeSummitElevation(page))
+                    .totalGain(scrapeTotalGain(page))
+                    .routeLength(scrapeRouteLength(page))
+                    .exposure(scrapeExposure(page))
+                    .rockfallPotential(scrapeRockfallPotential(page))
+                    .routeFinding(scrapeRouteFinding(page))
+                    .commitment(scrapeCommitment(page))
+                    .hasMultipleRoutes(scrapeHasMultipleRoutes(page))
+                    .url(url)
+                    .build());
+            LOG.info("Able to scrape {}", url);
+        } catch (Exception e){
+            LOG.warn("Unable to scrape {}", url);
+        }
+        return route;
     }
 
     private List<List<String>> getListOfAllRouteIds() throws Exception {
@@ -134,49 +154,32 @@ public class FourteenerRouteScraper {
         }
     }
 
-    private static boolean scrapeHasMultipleRoutes(HtmlTable table) {
-        final HtmlTableDataCell cellTotalGain = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(5);
-        final HtmlTableDataCell cellRouteLength = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(6);
+    private static boolean scrapeHasMultipleRoutes(HtmlPage page) {
+        final HtmlTableDataCell cellTotalGain = (HtmlTableDataCell) page.getByXPath(TOTAL_GAIN_XPATH).get(0);
+        final HtmlTableDataCell cellRouteLength = (HtmlTableDataCell) page.getByXPath(ROUTE_LENGTH_XPATH).get(0);
         int totalGain = convertElevationIntoInteger(cellTotalGain.asNormalizedText());
         double routeLength = convertRouteLengthIntoDouble(cellRouteLength.asNormalizedText());
         return totalGain == 0 || routeLength == 0;
     }
 
-    private static int scrapeTotalGain(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(5);
+    private static int scrapeTotalGain(HtmlPage page) {
+        final HtmlTableDataCell cell = (HtmlTableDataCell) page.getByXPath(TOTAL_GAIN_XPATH).get(0);
         return convertElevationIntoInteger(cell.asNormalizedText());
     }
 
-    private static double scrapeRouteLength(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(6);
+    private static double scrapeRouteLength(HtmlPage page) {
+        final HtmlTableDataCell cell = (HtmlTableDataCell) page.getByXPath(ROUTE_LENGTH_XPATH).get(0);
         return convertRouteLengthIntoDouble(cell.asNormalizedText());
     }
 
-    private static String scrapeMountainName(HtmlDivision div) {
-        String mountainName;
-        String[] divArray0 = div.asNormalizedText().split("\n ");
-        String[] divArray1 = div.asNormalizedText().split("\n");
-        if (divArray1.length == 1 && divArray0.length == 1) {
-            mountainName = "Approach Route";
-        }
-        else if (divArray0.length == 1 && divArray1.length == 2) {
-            mountainName =  divArray1[0];
-        } else {
-            mountainName = divArray0[0];
-        }
-        return updateWithCorrectSqlSyntax(mountainName);
+    private static String scrapeMountainName(HtmlPage page) {
+        DomText text = (DomText) page.getByXPath(MOUNTAIN_NAME_XPATH).get(0);
+        return updateWithCorrectSqlSyntax(text.asNormalizedText());
     }
 
-    private static String scrapeRouteName(HtmlDivision div) {
-        String routeName;
-        String[] divArray0 = div.asNormalizedText().split("\n ");
-        String[] divArray1 = div.asNormalizedText().split("\n");
-        if (divArray1.length == 1 && divArray0.length == 1) {
-            routeName = divArray1[0];
-        } else {
-            routeName = divArray0[1];
-        }
-        return updateWithCorrectSqlSyntax(routeName);
+    private static String scrapeRouteName(HtmlPage page) {
+        DomText text = (DomText) page.getByXPath(ROUTE_NAME_XPATH).get(0);
+        return updateWithCorrectSqlSyntax(text.asNormalizedText());
     }
 
     private static boolean scrapeSnowRouteOnly(HtmlDivision div) {
@@ -187,20 +190,19 @@ public class FourteenerRouteScraper {
         return (boolean) div.getByXPath(STANDARD_ROUTE_ALT_IMAGE).get(0);
     }
 
-    private static int scrapeGrade(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(0);
-        String gradeString = cell.asNormalizedText().split("\n")[0];
+    private static int scrapeGrade(HtmlPage page) {
+        HtmlSpan var = (HtmlSpan) page.getByXPath(GRADE_XPATH).get(0);
+        String gradeString = var.asNormalizedText().split("\n")[0];
         if (gradeString.split(" ")[1].equals("Difficult") || gradeString.split(" ")[1].equals("Easy")) {
             return Integer.parseInt(gradeString.split(" ")[3]);
         } else {
             return Integer.parseInt(gradeString.split(" ")[2]);
         }
-
     }
 
-    private static String scrapeGradeQuality(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(0);
-        String gradeString = cell.asNormalizedText().split("\n")[0];
+    private static String scrapeGradeQuality(HtmlPage page) {
+        HtmlSpan var = (HtmlSpan) page.getByXPath(GRADE_XPATH).get(0);
+        String gradeString = var.asNormalizedText().split("\n")[0];
         if (gradeString.split(" ")[1].equals("Difficult")) {
             return "Difficult";
         }
@@ -211,42 +213,39 @@ public class FourteenerRouteScraper {
         }
     }
 
-    private static String scrapeTrailhead(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(2);
-        return updateWithCorrectSqlSyntax(cell.asNormalizedText() + " Trailhead");
+    private static String scrapeTrailhead(HtmlPage page) {
+        final HtmlAnchor anchor = (HtmlAnchor) page.getByXPath(TRAILHEAD_XPATH).get(0);
+        return updateWithCorrectSqlSyntax(anchor.asNormalizedText() + " Trailhead");
     }
 
-    private static int scrapeSummitElevation(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(4);
+    private static int scrapeSummitElevation(HtmlPage page) {
+        final HtmlTableDataCell cell = (HtmlTableDataCell) page.getByXPath(SUMMIT_ELEVATION_XPATH).get(0);
         return convertElevationIntoInteger(cell.asNormalizedText());
     }
 
-    private static int scrapeStartElevation(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(3);
+    private static int scrapeStartElevation(HtmlPage page) {
+        final HtmlTableDataCell cell = (HtmlTableDataCell) page.getByXPath(START_ELEVATION_XPATH).get(0);
         return convertElevationIntoInteger(cell.asNormalizedText());
     }
 
-    private static String scrapeExposure(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(1);
-        return cell.asNormalizedText().split(": ")[1].split("\n")[0];
+    private static String scrapeExposure(HtmlPage page) {
+        final HtmlSpan span = (HtmlSpan) page.getByXPath(EXPOSURE_XPATH).get(0);
+        return span.asNormalizedText();
     }
 
-    private static String scrapeRockfallPotential(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(1);
-        String rockfallPotential = cell.asNormalizedText().split(": ")[2].split("\n")[0];
-        return rockfallPotential.substring(0, rockfallPotential.length() - 2);
+    private static String scrapeRockfallPotential(HtmlPage page) {
+        final HtmlSpan span = (HtmlSpan) page.getByXPath(ROCKFALL_POTENTIAL_XPATH).get(0);
+        return span.asNormalizedText();
     }
 
-    private static String scrapeRouteFinding(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(1);
-        String routeFinding = cell.asNormalizedText().split(": ")[3].split("\n")[0];
-        return routeFinding.substring(0, routeFinding.length() - 2);
+    private static String scrapeRouteFinding(HtmlPage page) {
+        final HtmlSpan span = (HtmlSpan) page.getByXPath(ROUTE_FINDING_XPATH).get(0);
+        return span.asNormalizedText();
     }
 
-    private static String scrapeCommitment(HtmlTable table) {
-        final HtmlTableDataCell cell = (HtmlTableDataCell) table.getByXPath(ROUTE_STATS_CELL).get(1);
-        String commitment = cell.asNormalizedText().split(": ")[4].split("\n")[0];
-        return commitment.substring(0, commitment.length() - 2);
+    private static String scrapeCommitment(HtmlPage page) {
+        final HtmlSpan span = (HtmlSpan) page.getByXPath(COMMITMENT_XPATH).get(0);
+        return span.asNormalizedText();
     }
 
     @VisibleForTesting

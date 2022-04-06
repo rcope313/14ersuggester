@@ -7,8 +7,8 @@ import database.models.ImmutableStoredRoute;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import database.models.ImmutableStoredTrailhead;
 import database.models.SearchQuery;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -18,7 +18,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -31,10 +30,13 @@ public class DaoTest {
     ImmutableFetchedTrailhead elbNorthFetched, argentineFetched;
     ImmutableStoredTrailhead elbNorthStored, argentineStored;
     ImmutableStoredRouteAndTrailhead elbAndElbNorth, graysAndArgentine, elbAndElbSouth;
+    final static private String URL = "jdbc:h2:mem:myDb";
+    final static private String USER = "sa";
+    final static private String PASSWORD = "sa";
 
-    @BeforeClass
-    public static void getConnection() throws SQLException {
-        conn = DriverManager.getConnection("jdbc:h2:mem:myDb", "sa", "sa");
+    @Before
+    public void setUp() throws SQLException {
+        conn = DriverManager.getConnection(URL, USER, PASSWORD);
         Statement stmt = conn.createStatement();
         String createFourteenerRoutesTableSql =
                 "CREATE TABLE fourteener_routes "
@@ -333,6 +335,11 @@ public class DaoTest {
                 .trailhead("Mt. Elbert South Trailhead")
                 .routeUpdateDate(LocalDate.now().toString())
                 .build();
+    }
+
+    @After
+    public void tearDown() throws SQLException {
+        conn.close();
     }
 
     @Test
