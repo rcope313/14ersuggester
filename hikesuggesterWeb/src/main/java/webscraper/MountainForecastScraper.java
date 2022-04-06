@@ -5,6 +5,8 @@ import database.models.ImmutableStoredRouteAndTrailhead;
 import org.apache.commons.text.StringEscapeUtils;
 import org.apache.xerces.dom.DeferredElementImpl;
 import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import javax.xml.parsers.DocumentBuilder;
@@ -18,6 +20,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class MountainForecastScraper {
+    final private static Logger LOG = LoggerFactory.getLogger(MountainForecastScraper.class);
     private final static String NOAA_HYPERLINK = "a:contains(NOAA Forecast)";
     private final static String HOURLY_WEATHER_FORECAST_HYPERLINK =  "a[href]:contains(Hourly)";
     private final static String DWML_HYPERLINK = "a[href*=digitalDWML]";
@@ -49,18 +52,22 @@ public class MountainForecastScraper {
         ArrayList<String> windChillList = parseElements(WIND_CHILL_EXP, NULL_VALUE_ELEMENT, noaaXmlHourlyWeatherForecast);
 
         for (int idx = 0; idx < tempList.size(); idx ++) {
-            ImmutableMountainForecast forecast = ImmutableMountainForecast.builder()
-                    .date(dateList.get(idx).substring(0,19))
-                    .windSpeed(windSpeedList.get(idx))
-                    .cloudCover(cloudCoverList.get(idx))
-                    .precipProbability(probOfPrecipList.get(idx))
-                    .humidity(humidityList.get(idx))
-                    .windDirection(windDirectionList.get(idx))
-                    .temperature(tempList.get(idx))
-                    .precipAmount(precipAmountList.get(idx))
-                    .windChill(windChillList.get(idx))
-                    .build();
-            mountainForecasts.add(forecast);
+            try {
+                ImmutableMountainForecast forecast = ImmutableMountainForecast.builder()
+                        .date(dateList.get(idx).substring(0, 19))
+                        .windSpeed(windSpeedList.get(idx))
+                        .cloudCover(cloudCoverList.get(idx))
+                        .precipProbability(probOfPrecipList.get(idx))
+                        .humidity(humidityList.get(idx))
+                        .windDirection(windDirectionList.get(idx))
+                        .temperature(tempList.get(idx))
+                        .precipAmount(precipAmountList.get(idx))
+                        .windChill(windChillList.get(idx))
+                        .build();
+                mountainForecasts.add(forecast);
+            } catch (Exception e) {
+
+            }
         }
         return mountainForecasts;
     }

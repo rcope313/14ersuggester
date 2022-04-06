@@ -7,6 +7,8 @@ import database.models.SearchQuery;
 import models.RouteForecast;
 import models.TimeScore;
 import org.assertj.core.util.VisibleForTesting;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webscraper.MountainForecastScraper;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,6 +21,7 @@ import java.util.Map;
 public class CliSuggestOutput extends CliOutput {
     private final RoutesTrailheadsDao dao;
     private final MountainForecastScraper scraper;
+    final private static Logger LOG = LoggerFactory.getLogger(CliSuggestOutput.class);
     private final static int LOW_CONSEQUENCE = 6;
     private final static int HIGH_CONSEQUENCE = 12;
 
@@ -32,8 +35,9 @@ public class CliSuggestOutput extends CliOutput {
         routes.forEach((route) -> {
             try {
                 dao.update(route);
+                LOG.info("Updated {}", route.getRouteUrl());
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.warn("Unable to update {}", route.getRouteUrl());
             }
         });
         List<RouteForecast> forecasts = createListOfRouteForecasts(routes);
@@ -162,8 +166,9 @@ public class CliSuggestOutput extends CliOutput {
         routes.forEach((route) -> {
             try {
                 forecasts.add(new RouteForecast(route, scraper.buildMountainForecasts(route)));
+                LOG.info("Created 7-day route forecast for route {}", route.getRouteUrl());
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.warn("Unable to create 7-day route forecast for route {}", route.getRouteUrl());
             }
         });
         return forecasts;

@@ -54,13 +54,6 @@ public class SuggestSubCommandTest {
     }
 
     @Test
-    public void acceptanceTest() {
-
-        CommandLine cmd = new CommandLine(new SearchSubCommand());
-        int exitCode = cmd.execute();
-    }
-
-    @Test
     public void itInitializesClassFields() {
         assertThat(mockApp2.mountainNames).usingRecursiveComparison().isEqualTo(new String[]{"Mt. Elbert", "Longs Peak", "Mt. Antero"});
         assertThat(mockApp2.isStandardRoute).usingRecursiveComparison().isEqualTo(Optional.of(true));
