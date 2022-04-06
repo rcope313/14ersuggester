@@ -4,11 +4,15 @@ import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.html.DomAttr;
 import com.gargoylesoftware.htmlunit.html.HtmlDivision;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import database.models.ImmutableFetchedRoute;
 import database.models.ImmutableFetchedTrailhead;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class TrailheadScraper {
     final private WebClient webClient;
@@ -23,32 +27,40 @@ public class TrailheadScraper {
         this.webClient = webClient;
     }
 
-    public ArrayList<ImmutableFetchedTrailhead> buildAllImmutableFetchedTrailheads() throws Exception {
+    public ArrayList<Optional<ImmutableFetchedTrailhead>> buildAllImmutableFetchedTrailheads() throws Exception {
         ArrayList<String> trailHeadUrls = getTrailHeadUrlList();
-        ArrayList<ImmutableFetchedTrailhead> trailHeads = new ArrayList<>();
+        ArrayList<Optional<ImmutableFetchedTrailhead>> trailHeads = new ArrayList<>();
         for (String trailheadUrl : trailHeadUrls) {
             try {
                 trailHeads.add(scrapeImmutableFetchedTrailhead(FOURTNEERERS_URL + trailheadUrl));
+                LOG.info("Able to scrape {}", trailheadUrl);
             } catch (Exception e) {
-                LOG.warn("Unable to scrape " + trailheadUrl);
+                LOG.warn("Unable to scrape {}", trailheadUrl);
             }
         }
         return trailHeads;
     }
 
-    public ImmutableFetchedTrailhead scrapeImmutableFetchedTrailhead(String url) throws Exception {
+    public Optional<ImmutableFetchedTrailhead> scrapeImmutableFetchedTrailhead(String url) throws Exception {
         final HtmlPage page = webClient.getPage(url);
         final HtmlDivision pageTitle = (HtmlDivision) page.getByXPath(DIV_PAGE_TILE).get(0);
         final HtmlDivision statsBox = (HtmlDivision) page.getByXPath(DIV_STATS_BOX).get(0);
         final String[] statsBoxAsNormalizedText = statsBox.asNormalizedText().split("\n");
-        return ImmutableFetchedTrailhead.builder()
-                .name(scrapeName(pageTitle))
-                .coordinates(scrapeCoordinates(statsBoxAsNormalizedText))
-                .roadDifficulty(scrapeRoadDifficulty(statsBoxAsNormalizedText))
-                .roadDescription(scrapeRoadDescription(statsBoxAsNormalizedText))
-                .winterAccess(scrapeWinterAccess(statsBoxAsNormalizedText))
-                .url(url)
-                .build();
+        Optional<ImmutableFetchedTrailhead> trailhead = Optional.empty();
+        try {
+           trailhead = Optional.of(ImmutableFetchedTrailhead.builder()
+                    .name(scrapeName(pageTitle))
+                    .coordinates(scrapeCoordinates(statsBoxAsNormalizedText))
+                    .roadDifficulty(scrapeRoadDifficulty(statsBoxAsNormalizedText))
+                    .roadDescription(scrapeRoadDescription(statsBoxAsNormalizedText))
+                    .winterAccess(scrapeWinterAccess(statsBoxAsNormalizedText))
+                    .url(url)
+                    .build());
+            LOG.info("Able to scrape {}", url);
+        } catch (Exception e) {
+            LOG.warn("Unable to scrape {}", url);
+        }
+        return trailhead;
     }
 
     private static String scrapeName(HtmlDivision pageTitle) {

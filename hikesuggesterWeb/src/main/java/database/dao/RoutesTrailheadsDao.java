@@ -43,9 +43,13 @@ public class RoutesTrailheadsDao extends Dao {
                 conn.createStatement().execute(updateRouteQuery(updatedRoute.get()));
             }
         }
-        if (hasUpdateDateOverWeekAgo(routeAndTrailhead.getTrailheadUpdateDate().get())) {
-            ImmutableFetchedTrailhead updatedTrailhead = new TrailheadScraper(new WebClient()).scrapeImmutableFetchedTrailhead(routeAndTrailhead.getTrailheadUrl().get());
-            conn.createStatement().execute(updateTrailheadQuery(updatedTrailhead));
+        if (routeAndTrailhead.getTrailheadUpdateDate().isPresent()) {
+            if (hasUpdateDateOverWeekAgo(routeAndTrailhead.getTrailheadUpdateDate().get())) {
+                Optional<ImmutableFetchedTrailhead> updatedTrailhead = new TrailheadScraper(new WebClient()).scrapeImmutableFetchedTrailhead(routeAndTrailhead.getTrailheadUrl().get());
+                if (updatedTrailhead.isPresent()) {
+                    conn.createStatement().execute(updateTrailheadQuery(updatedTrailhead.get()));
+                }
+            }
         }
     }
 

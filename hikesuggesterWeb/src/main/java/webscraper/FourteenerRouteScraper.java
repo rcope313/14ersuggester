@@ -39,11 +39,6 @@ public class FourteenerRouteScraper {
         this.webClient = webClient;
     }
 
-    public static void main(String[] args) throws IOException {
-        FourteenerRouteScraper scraper = new FourteenerRouteScraper(new WebClient());
-        System.out.print(scraper.scrapeImmutableFetchedRoute("https://www.14ers.com/route.php?route=elbe1"));
-    }
-
     public ArrayList<Optional<ImmutableFetchedRoute>> buildAllImmutableFetchedRoutes() throws Exception {
         HashSet<String> urlsSeen = new HashSet<>();
         ArrayList<Optional<ImmutableFetchedRoute>> fourteenerRouteArrayList = new ArrayList<>();
