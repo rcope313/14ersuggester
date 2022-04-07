@@ -1,12 +1,12 @@
-console/CliSuggestOutput.class
 console/CliCompareOutput.class
+console/CliOutput.class
+subcommands/SearchSubCommand.class
+models/TimeScore.class
+console/CliSuggestOutput.class
 models/Column$1.class
 models/RouteForecast.class
 subcommands/CompareSubCommand.class
 models/Column.class
 HikeSuggesterCli.class
-console/CliOutput.class
 subcommands/SuggestSubCommand.class
 console/CliSearchOutput.class
-subcommands/SearchSubCommand.class
-models/TimeScore.class

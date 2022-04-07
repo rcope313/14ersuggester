@@ -4,7 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import picocli.CommandLine;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
@@ -50,12 +49,6 @@ public class SuggestSubCommandTest {
         mockApp9 = mock(SuggestSubCommand.class);
         cmd9 = new CommandLine(mockApp9);
         exitCode9 = cmd9.execute("-routeurls", "https://www.14ers.com/route.php?route=elbe1", "-routeurls", "https://www.14ers.com/route.php?route=elbe2", "-trailheadurls", "/trailheadsview.php?thparm=sw01", "-trailheadurls", "/trailheadsview.php?thparm=sw03");
-    }
-    
-    @Test
-    public void acceptanceTest() {
-        CommandLine cmd = new CommandLine(new SuggestSubCommand());
-        cmd.execute("--m", "Longs Peak");
     }
 
     @Test

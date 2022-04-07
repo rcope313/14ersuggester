@@ -25,19 +25,19 @@ public class CliCompareOutputTest {
     @Before
     public void initData() {
         differenceString =
-                "Standard Route: false, true\n" +
-                "Grade: 5, 1\n" +
-                "Start Elevation: 0, 13000\n" +
-                "Total Gain: 14000, 1000\n" +
-                "Route Length: 3.0, 2.0\n" +
-                "Exposure: Extreme, Low\n" +
-                "Rockfall Potential: Extreme, Low\n" +
-                "Route Finding: Extreme, Low\n" +
-                "Commitment: Extreme, Low\n" +
-                "Trailhead: Devil's Gates, \nHeaven's Tummy\n" +
-                "Road Difficulty: 6, 0\n" +
-                "Road Description: The fiery road to hell, \nRainbow to the pearly gates\n" +
-                "Winter Access: There is no winter in hell, \nOnly sunshine in heaven";
+                "Standard Route:\nfalse, true\n" +
+                "Grade:\n5, 1\n" +
+                "Start Elevation:\n0, 13000\n" +
+                "Total Gain:\n14000, 1000\n" +
+                "Route Length:\n3.0, 2.0\n" +
+                "Exposure:\nExtreme, Low\n" +
+                "Rockfall Potential:\nExtreme, Low\n" +
+                "Route Finding:\nExtreme, Low\n" +
+                "Commitment:\nExtreme, Low\n" +
+                "Trailhead:\nDevil's Gates, \nHeaven's Tummy\n" +
+                "Road Difficulty:\n6, 0\n" +
+                "Road Description:\nThe fiery road to hell, \nRainbow to the pearly gates\n" +
+                "Winter Access:\nThere is no winter in hell, \nOnly sunshine in heaven";
 
        mass = ImmutableStoredRouteAndTrailhead.builder()
                 .mountainName("Mt. Massive")
