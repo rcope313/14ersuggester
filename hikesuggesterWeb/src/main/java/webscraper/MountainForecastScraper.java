@@ -66,7 +66,7 @@ public class MountainForecastScraper {
                         .build();
                 mountainForecasts.add(forecast);
             } catch (Exception e) {
-
+                LOG.warn("Unable to scrape forecast by exception {}", e.getMessage());
             }
         }
         return mountainForecasts;

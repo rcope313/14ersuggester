@@ -7,6 +7,8 @@ import database.models.ImmutableFetchedRoute;
 import database.models.ImmutableFetchedTrailhead;
 import database.models.ImmutableStoredRouteAndTrailhead;
 import database.models.SearchQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import webscraper.FourteenerRouteScraper;
 import webscraper.TrailheadScraper;
 import java.sql.Connection;
@@ -18,9 +20,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.StringJoiner;
-import java.util.logging.Level;
 
 public class RoutesTrailheadsDao extends Dao {
+    final private static Logger LOG = LoggerFactory.getLogger(RoutesTrailheadsDao.class);
 
     public RoutesTrailheadsDao(Connection conn) {
         super(conn);
@@ -41,6 +43,7 @@ public class RoutesTrailheadsDao extends Dao {
             Optional<ImmutableFetchedRoute> updatedRoute = new FourteenerRouteScraper(new WebClient()).scrapeImmutableFetchedRoute(routeAndTrailhead.getRouteUrl());
             if (updatedRoute.isPresent()) {
                 conn.createStatement().execute(updateRouteQuery(updatedRoute.get()));
+                LOG.info("Updated route {}", routeAndTrailhead.getRouteUrl());
             }
         }
         if (routeAndTrailhead.getTrailheadUpdateDate().isPresent()) {
@@ -48,6 +51,7 @@ public class RoutesTrailheadsDao extends Dao {
                 Optional<ImmutableFetchedTrailhead> updatedTrailhead = new TrailheadScraper(new WebClient()).scrapeImmutableFetchedTrailhead(routeAndTrailhead.getTrailheadUrl().get());
                 if (updatedTrailhead.isPresent()) {
                     conn.createStatement().execute(updateTrailheadQuery(updatedTrailhead.get()));
+                    LOG.info("Updated trailhead {}", routeAndTrailhead.getTrailheadUrl());
                 }
             }
         }

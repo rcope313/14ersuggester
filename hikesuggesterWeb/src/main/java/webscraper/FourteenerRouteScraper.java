@@ -53,8 +53,7 @@ public class FourteenerRouteScraper {
                     urlsSeen.add(routeUrl);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    LOG.warn("Unable to scrape {}", routeId);
-                    System.out.print("unable to scrape" + routeId);
+                    LOG.warn("Unable to scrape {}" + routeId + " by exception {}", e.getMessage());
                 }
             }
         }
@@ -88,7 +87,7 @@ public class FourteenerRouteScraper {
                     .build());
             LOG.info("Able to scrape {}", url);
         } catch (Exception e){
-            LOG.warn("Unable to scrape {}", url);
+            LOG.warn("Unable to scrape" + url + "by exception {}", e.getMessage());
         }
         return route;
     }

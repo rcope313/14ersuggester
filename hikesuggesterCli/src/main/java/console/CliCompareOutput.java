@@ -23,9 +23,8 @@ public class CliCompareOutput extends CliOutput{
         routes.forEach((route) -> {
             try {
                 dao.update(route);
-                LOG.info("Updated {}", route.getRouteUrl());
             } catch (Exception e) {
-                LOG.warn("Unable to update {}", route.getRouteUrl());
+                LOG.warn("Unable to update {}" + route.getRouteUrl() + " by exception {}", e.getMessage());
             }
         });
         if (routes.size() != 2) {

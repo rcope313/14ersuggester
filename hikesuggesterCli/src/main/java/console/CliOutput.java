@@ -15,7 +15,6 @@ public abstract class CliOutput {
         columnFields.add(Column.TOTAL_GAIN);
         columnFields.add(Column.ROUTE_LENGTH);
         columnFields.add(Column.ROUTE_URL);
-        columnFields.add(Column.TRAILHEAD_URL);
         return columnFields;
     }
 
@@ -45,11 +44,6 @@ public abstract class CliOutput {
         routeData.add(route.getTotalGain());
         routeData.add(route.getRouteLength());
         routeData.add(route.getRouteUrl());
-        if (route.getTrailheadUrl().isPresent()) {
-            routeData.add(route.getTrailheadUrl().get());
-        } else {
-            routeData.add("");
-        }
         System.out.format(cliDataFormatter(columnList), routeData.toArray());
     }
 
@@ -59,5 +53,4 @@ public abstract class CliOutput {
         formatDataStringJoiner.add("\n");
         return formatDataStringJoiner.toString();
     }
-
 }
