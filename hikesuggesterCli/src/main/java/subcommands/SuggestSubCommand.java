@@ -17,10 +17,10 @@ import java.util.Optional;
 public class SuggestSubCommand implements Runnable {
 
     @CommandLine.Option(names = {"-m", "--mountainnames"}, arity = "1..*",
-            description = "Search by name of mountain. If searching by more than one mountain name, split list with space only.")
+            description = "Search by name of mountain. If searching by more than one mountain name, split list with spaces only.")
     public String[] mountainNames;
     @CommandLine.Option(names = {"-r", "--routenames"}, arity = "1..*",
-            description = "Search by name of route. If searching by more than one route name, split list with space only.")
+            description = "Search by name of route. If searching by more than one route name, split list with spaces only.")
     public String[] routeNames;
     @CommandLine.Option(names = {"-s", "--standardroute"},
             description = "Search if route is a standard route only.")
@@ -29,14 +29,14 @@ public class SuggestSubCommand implements Runnable {
             description = "Search if route is a snow route only.")
     public Optional<Boolean> isSnowRoute;
     @CommandLine.Option(names = {"--grades"}, arity = "1..*",
-            description = "Search by grade of route. If searching by more than one grade, split list with space only..")
+            description = "Search by grade of route. If searching by more than one grade, split list with spaces only..")
     public Integer[] grades;
     @CommandLine.Option(names = {"--gradequalities"}, arity = "1..*",
             description = "Search by grade qualities of route. Valid options include 'easy', 'difficult', and an empty string." +
                     "If searching by more than one quality, split list with space only.")
     public String[] gradeQualities;
     @CommandLine.Option(names = {"--trailheads"}, arity = "1..*",
-            description = "Search by trailhead name. If searching by more than one trailhead, split list with space only..")
+            description = "Search by trailhead name. If searching by more than one trailhead, split list with spaces only.")
     public String[] trailheads;
     @CommandLine.Option(names = {"--startelevation"},
             description = "Search by start elevation. Result will yield all results greater than or equal to input.")
@@ -72,13 +72,13 @@ public class SuggestSubCommand implements Runnable {
                     "This will be noted as a '0' in the route length and total gain columns.")
     public Optional<Boolean> hasMultipleRoutes;
     @CommandLine.Option(names = {"--routeurls"}, arity = "1..*",
-            description = "Search by route url. If searching by more than one url, split list with space only.")
+            description = "Search by route url. If searching by more than one url, split list with spaces only.")
     public String[] routeUrls;
     @CommandLine.Option(names = {"--roaddifficulty"},
-            description = "Search by road difficulty. Road difficulty ranges from 0 through 6.")
+            description = "Search by road difficulty. Result will yields results less than or equal to input. The highest road difficulty is 6.")
     public Optional<Integer> roadDifficulty;
     @CommandLine.Option(names = {"--trailheadurls"}, arity = "1..*",
-            description = "Search by trailhead url. If searching by more than one url, split list with space only.")
+            description = "Search by trailhead url. If searching by more than one url, split list with spaces only.")
     public String[] trailheadUrls;
 
     @Override
