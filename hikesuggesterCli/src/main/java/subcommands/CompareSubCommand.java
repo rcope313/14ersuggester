@@ -5,7 +5,6 @@ import database.dao.RoutesTrailheadsDao;
 import database.models.CompareQuery;
 import database.models.DatabaseConnection;
 import picocli.CommandLine;
-
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -14,15 +13,15 @@ import java.util.Optional;
 
 @CommandLine.Command(name = "compare", mixinStandardHelpOptions = true)
 public class CompareSubCommand implements Runnable {
-    @CommandLine.Option(names = {"-m1", "--mountain1"}, description = "First argument, mountain name")
+    @CommandLine.Option(names = {"--mountain1"}, description = "First argument, mountain name")
     Optional<String> mountainName1;
-    @CommandLine.Option(names = {"-r1", "--route1"}, description = "First argument, route name")
+    @CommandLine.Option(names = {"--route1"}, description = "First argument, route name")
     Optional<String> routeName1;
-    @CommandLine.Option(names = {"-m2", "--mountain2"}, description = "Second argument, mountain name")
+    @CommandLine.Option(names = {"--mountain2"}, description = "Second argument, mountain name")
     Optional<String> mountainName2;
-    @CommandLine.Option(names = {"-r2", "--route2"}, description = "Second argument, route name")
+    @CommandLine.Option(names = {"--route2"}, description = "Second argument, route name")
     Optional<String> routeName2;
-    @CommandLine.Option(names = {"-u", "--url"}, arity = "1..2",
+    @CommandLine.Option(names = {"--url"}, arity = "1..2",
             description = "Rather than entering in two separate Route and Mountain Names, enter two urls to compare.")
     public String[] routeUrls;
 
