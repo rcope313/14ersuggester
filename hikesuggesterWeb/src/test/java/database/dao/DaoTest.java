@@ -98,7 +98,7 @@ public class DaoTest {
             sq7.setRockfallPotential("low");
             sq7.setCommitment("low");
         sq8 = new SearchQuery();
-            sq8.setRoadDifficulties(new ArrayList<>(Arrays.asList(1,2,3)));
+            sq8.setRoadDifficulty(3);
 
         cq0 = new CompareQuery();
         cq1 = new CompareQuery();

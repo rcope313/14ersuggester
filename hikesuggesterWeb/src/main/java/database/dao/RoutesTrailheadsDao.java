@@ -200,7 +200,7 @@ public class RoutesTrailheadsDao extends Dao {
         stringJoiner.add(createCommitmentMySqlSyntax(query));
         stringJoiner.add(createHasMultipleRoutesMySqlSyntax(query));
         stringJoiner.add(createRouteUrlsMySqlSyntax(query));
-        stringJoiner.add(createRoadDifficultiesMySqlSyntax(query));
+        stringJoiner.add(createRoadDifficultyMySqlSyntax(query));
         stringJoiner.add(createTrailheadUrlsMySqlSyntax(query));
         return stringJoiner + ";";
     }
@@ -363,12 +363,10 @@ public class RoutesTrailheadsDao extends Dao {
         }
     }
 
-    private static CharSequence createRoadDifficultiesMySqlSyntax(SearchQuery query) {
-        String syntax = "AND " + HikeSuggesterDatabase.ROAD_DIFFICULTY + " IN (";
-        StringJoiner stringJoiner = new StringJoiner(", ");
-        if (query.getRoadDifficulties() != null) {
-            query.getRoadDifficulties().forEach((roadDifficulty) -> stringJoiner.add(String.valueOf(roadDifficulty)));
-            return syntax + stringJoiner.toString() + ") ";
+    private static CharSequence createRoadDifficultyMySqlSyntax(SearchQuery query) {
+        if (query.getRoadDifficulty() != 0) {
+            String routeLengthString = String.valueOf(query.getRoadDifficulty());
+            return "AND " + HikeSuggesterDatabase.ROAD_DIFFICULTY + " <= " + routeLengthString;
         } else {
             return "";
         }

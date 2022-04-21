@@ -21,7 +21,7 @@ public class SearchQuery {
     private boolean hasMultipleRoutes;
     private ArrayList<String> routeUrls;
     private ArrayList<String> trailheadCoordinates;
-    private ArrayList<Integer> roadDifficulties;
+    private int roadDifficulty;
     private ArrayList<String> trailheadUrls;
 
     public ArrayList<String> getMountainNames() {
@@ -168,12 +168,12 @@ public class SearchQuery {
         this.trailheadCoordinates = trailheadCoordinates;
     }
 
-    public ArrayList<Integer> getRoadDifficulties() {
-        return roadDifficulties;
+    public int getRoadDifficulty() {
+        return roadDifficulty;
     }
 
-    public void setRoadDifficulties(ArrayList<Integer> roadDifficulties) {
-        this.roadDifficulties = roadDifficulties;
+    public void setRoadDifficulty(int roadDifficulty) {
+        this.roadDifficulty = roadDifficulty;
     }
 
     public ArrayList<String> getTrailheadUrls() {
