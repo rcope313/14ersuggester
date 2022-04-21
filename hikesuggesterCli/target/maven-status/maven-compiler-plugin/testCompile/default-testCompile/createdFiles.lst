@@ -1,0 +1,6 @@
+console/CliCompareOutputTest.class
+subcommands/CompareSubCommandTest.class
+console/CliSuggestOutputTest.class
+subcommands/SuggestSubCommandTest.class
+subcommands/SearchSubCommandTest.class
+models/RouteForecastTest.class

@@ -7,46 +7,46 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class SearchSubCommandTest {
+public class SuggestSubCommandTest {
     int exitCode1, exitCode2, exitCode3, exitCode4, exitCode5, exitCode6, exitCode7, exitCode8, exitCode9;
     CommandLine cmd1, cmd2, cmd3, cmd4, cmd5, cmd6, cmd7, cmd8, cmd9;
-    SearchSubCommand mockApp1, mockApp2, mockApp3, mockApp4, mockApp5, mockApp6, mockApp7, mockApp8, mockApp9;
+    SuggestSubCommand mockApp1, mockApp2, mockApp3, mockApp4, mockApp5, mockApp6, mockApp7, mockApp8, mockApp9;
 
     @Before
     public void initData() {
-        mockApp1 = mock(SearchSubCommand.class);
+        mockApp1 = mock(SuggestSubCommand.class);
         cmd1 = new CommandLine(mockApp1);
         exitCode1 = cmd1.execute();
 
-        mockApp2 = mock(SearchSubCommand.class);
+        mockApp2 = mock(SuggestSubCommand.class);
         cmd2 = new CommandLine(mockApp2);
         exitCode2 = cmd2.execute("-sm", "Mt. Elbert", "Longs Peak", "Mt. Antero");
 
-        mockApp3 = mock(SearchSubCommand.class);
+        mockApp3 = mock(SuggestSubCommand.class);
         cmd3 = new CommandLine(mockApp3);
         exitCode3 = cmd3.execute( "--mountainnames", "Mt. Elbert", "Longs Peak", "Mt. Antero", "--totalgain", "5000", "--routelength", "4.5");
 
-        mockApp4 = mock(SearchSubCommand.class);
+        mockApp4 = mock(SuggestSubCommand.class);
         cmd4 = new CommandLine(mockApp4);
         exitCode4 = cmd4.execute("--snowroute", "--routenames", "Box Creek Couloirs", "South Face");
 
-        mockApp5 = mock(SearchSubCommand.class);
+        mockApp5 = mock(SuggestSubCommand.class);
         cmd5 = new CommandLine(mockApp5);
         exitCode5 = cmd5.execute("--startelevation", "8000", "--summitelevation", "14000");
 
-        mockApp6 = mock(SearchSubCommand.class);
+        mockApp6 = mock(SuggestSubCommand.class);
         cmd6 = new CommandLine(mockApp6);
         exitCode6 = cmd6.execute("--exposure", "low", "--routefinding", "low", "--rockfallpotential", "low", "--commitment", "low");
 
-        mockApp7 = mock(SearchSubCommand.class);
+        mockApp7 = mock(SuggestSubCommand.class);
         cmd7 = new CommandLine(mockApp7);
         exitCode7 = cmd7.execute("--grades", "1", "2", "3", "--gradequalities", "Easy", "Difficult");
 
-        mockApp8 = mock(SearchSubCommand.class);
+        mockApp8 = mock(SuggestSubCommand.class);
         cmd8 = new CommandLine(mockApp8);
         exitCode8 = cmd8.execute( "--roaddifficulty", "3" );
 
-        mockApp9 = mock(SearchSubCommand.class);
+        mockApp9 = mock(SuggestSubCommand.class);
         cmd9 = new CommandLine(mockApp9);
         exitCode9 = cmd9.execute("--routeurls", "https://www.14ers.com/route.php?route=elbe1", "https://www.14ers.com/route.php?route=elbe2", "--trailheadurls", "/trailheadsview.php?thparm=sw01", "/trailheadsview.php?thparm=sw03");
     }

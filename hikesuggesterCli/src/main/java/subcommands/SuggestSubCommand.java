@@ -1,20 +1,21 @@
 package subcommands;
 
-import console.CliSearchOutput;
+import console.CliSuggestOutput;
 import database.dao.RoutesTrailheadsDao;
 import database.models.DatabaseConnection;
 import database.models.SearchQuery;
-import org.assertj.core.util.VisibleForTesting;
 import picocli.CommandLine;
-
+import webscraper.MountainForecastScraper;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
-@CommandLine.Command(name = "search", mixinStandardHelpOptions = true)
-public class SearchSubCommand implements Runnable {
+
+@CommandLine.Command(name = "suggest", mixinStandardHelpOptions = true)
+public class SuggestSubCommand implements Runnable {
+
     @CommandLine.Option(names = {"-m", "--mountainnames"}, arity = "1..*",
             description = "Filter by name of mountain. If searching by more than one mountain name, split list with spaces only.")
     public String[] mountainNames;
@@ -82,9 +83,9 @@ public class SearchSubCommand implements Runnable {
 
     @Override
     public void run() {
-        CliSearchOutput output = null;
+        CliSuggestOutput output = null;
         try {
-            output = new CliSearchOutput(new RoutesTrailheadsDao(new DatabaseConnection().getConnection()));
+            output = new CliSuggestOutput(new RoutesTrailheadsDao(new DatabaseConnection().getConnection()), new MountainForecastScraper());
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -92,8 +93,7 @@ public class SearchSubCommand implements Runnable {
         output.buildCliTable(setSearchQuery());
     }
 
-    @VisibleForTesting
-    SearchQuery setSearchQuery() {
+    private SearchQuery setSearchQuery() {
         SearchQuery query = new SearchQuery();
         if (mountainNames != null) {
             query.setMountainNames(new ArrayList<>(Arrays.asList(mountainNames)));
@@ -128,6 +128,7 @@ public class SearchSubCommand implements Runnable {
         isSnowRoute.ifPresent(query::setSnowRoute);
         isStandardRoute.ifPresent(query::setStandardRoute);
         roadDifficulty.ifPresent(query::setRoadDifficulty);
+
         return query;
     }
 

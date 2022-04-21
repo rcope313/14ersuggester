@@ -1,4 +1,11 @@
+/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/models/RouteForecast.java
 /Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/subcommands/SearchSubCommand.java
-/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/subcommands/SubCommand.java
+/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/models/Column.java
 /Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/HikeSuggesterCli.java
 /Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/subcommands/CompareSubCommand.java
+/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/models/TimeScore.java
+/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/console/CliOutput.java
+/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/console/CliSuggestOutput.java
+/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/console/CliSearchOutput.java
+/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/subcommands/SuggestSubCommand.java
+/Users/rachelcope/Documents/hikesuggester/hikesuggesterCli/src/main/java/console/CliCompareOutput.java
