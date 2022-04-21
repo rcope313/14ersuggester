@@ -209,7 +209,7 @@ public class RoutesTrailheadsDao extends Dao {
         String syntax = "AND " + HikeSuggesterDatabase.MOUNTAIN_NAME + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getMountainNames() != null) {
-            query.getMountainNames().forEach((mountainName) -> stringJoiner.add("'" + mountainName + "'"));
+            query.getMountainNames().forEach((mountainName) -> stringJoiner.add("'" + FourteenerRouteScraper.updateWithCorrectSqlSyntax(mountainName) + "'"));
             return syntax + stringJoiner.toString() + ") ";
         } else {
             return "";
@@ -220,7 +220,7 @@ public class RoutesTrailheadsDao extends Dao {
         String syntax = "AND " + HikeSuggesterDatabase.ROUTE_NAME + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getRouteNames() != null) {
-            query.getRouteNames().forEach((routeName) -> stringJoiner.add("'" + routeName + "'"));
+            query.getRouteNames().forEach((routeName) -> stringJoiner.add("'" + FourteenerRouteScraper.updateWithCorrectSqlSyntax(routeName) + "'"));
             return syntax + stringJoiner.toString() + ") ";
         } else {
             return "";
@@ -269,7 +269,7 @@ public class RoutesTrailheadsDao extends Dao {
         String syntax = "AND " + HikeSuggesterDatabase.ROUTE_TRAILHEAD + " IN (";
         StringJoiner stringJoiner = new StringJoiner(", ");
         if (query.getTrailheads() != null) {
-            query.getTrailheads().forEach((trailhead) -> stringJoiner.add("'" + trailhead + "'"));
+            query.getTrailheads().forEach((trailhead) -> stringJoiner.add("'" + FourteenerRouteScraper.updateWithCorrectSqlSyntax(trailhead) + "'"));
             return syntax + stringJoiner.toString() + ") ";
         } else {
             return "";

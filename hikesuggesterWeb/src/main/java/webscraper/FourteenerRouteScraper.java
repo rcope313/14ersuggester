@@ -92,6 +92,14 @@ public class FourteenerRouteScraper {
         return route;
     }
 
+    public static String updateWithCorrectSqlSyntax(String str) {
+        if (str.contains("'")) {
+            return insertApostrophe(str);
+        } else {
+            return str;
+        }
+    }
+
     private List<List<String>> getListOfAllRouteIds() throws Exception {
         List<List<String>> listOfListOfRouteIds = new ArrayList<>();
         getListOfPeakIds().forEach((peakId) -> {
@@ -280,14 +288,6 @@ public class FourteenerRouteScraper {
             return Double.parseDouble(str.split(" mi")[0]);
         } else {
             return 0;
-        }
-    }
-
-    static String updateWithCorrectSqlSyntax(String str) {
-        if (str.contains("'")) {
-            return insertApostrophe(str);
-        } else {
-            return str;
         }
     }
 
