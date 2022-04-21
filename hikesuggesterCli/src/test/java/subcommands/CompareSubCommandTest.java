@@ -24,6 +24,12 @@ public class CompareSubCommandTest {
     }
 
     @Test
+    public void test() {
+        CommandLine cmd = new CommandLine(new CompareSubCommand());
+        cmd.execute("--url", "https://www.14ers.com/route.php?route=pikeeast", "https://www.14ers.com/route.php?route=pike1'");
+    }
+
+    @Test
     public void itInitializesClassFields() {
         assertThat(mockApp1.routeName1).usingRecursiveComparison().isEqualTo(Optional.of("Barr Trail"));
         assertThat(mockApp1.routeName2).usingRecursiveComparison().isEqualTo(Optional.of("KeyHole Route"));

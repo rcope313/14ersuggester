@@ -6,6 +6,8 @@ import database.models.DatabaseConnection;
 import database.models.SearchQuery;
 import org.assertj.core.util.VisibleForTesting;
 import picocli.CommandLine;
+
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -83,10 +85,11 @@ public class SearchSubCommand implements Runnable {
     public void run() {
         CliSearchOutput output = null;
         try {
-            output = new CliSearchOutput(new RoutesTrailheadsDao(DatabaseConnection.getConnection()));
-        } catch (SQLException e) {
+            output = new CliSearchOutput(new RoutesTrailheadsDao(new DatabaseConnection().getConnection()));
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+        assert output != null;
         output.buildCliTable(setSearchQuery());
     }
 

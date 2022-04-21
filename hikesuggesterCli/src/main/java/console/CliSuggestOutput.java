@@ -42,7 +42,7 @@ public class CliSuggestOutput extends CliOutput {
         List<RouteForecast> forecasts = createListOfRouteForecasts(routes);
         List<TimeScore> bestTimes = getBestTimesOfAllRoutes(forecasts);
         if (bestTimes.size() > 4) {
-            buildCliTableWeatherInputData(bestTimes.subList(0, 4));
+            buildCliTableWeatherInputData(bestTimes.subList(0, 5));
         } else {
             buildCliTableWeatherInputData(bestTimes);
         }
